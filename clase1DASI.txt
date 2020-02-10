@@ -1,0 +1,5 @@
+Compilar classes de agentes
+javac -classpath lib/jade.jar -d classes src/examples/bookTrading/Book*.java
+
+Lanzar plataforma de agente
+java -cp lib/jade.jar:classes jade.Boot -gui -agents comprador:examples.bookTrading.BookBuyerAgent
