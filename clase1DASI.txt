@@ -4,4 +4,4 @@ javac -classpath lib/jade.jar -d classes src/examples/pr1/*.java
 
 Lanzar plataforma de agente
 java -cp lib/jade.jar:classes jade.Boot -gui -agents comprador:examples.bookTrading.BookBuyerAgent
-java -cp lib/jade.jar:classes jade.Boot -gui -agents pepe:examples.pr1.pr1Agent
+java -cp lib/jade.jar:classes jade.Boot -gui -agents 'pepe:examples.pr1.pr1Agent(1)'
