@@ -1,4 +1,10 @@
-# DASI-JADE
-Environment for JAVA Agent DEvelopment Framework for DASI course (UCM, course 2019-2020)
+# DASI-SPADE
+Project for DASI subject (UCM, course 2019-2020) consisting on a multi-agent system.
 
-https://uomustansiriyah.edu.iq/media/lectures/6/6_2018_03_28!11_28_55_PM.pdf
+The system is developed with [SPADE platform](https://spade-mas.readthedocs.io/en/latest/readme.html), and makes use of a [XMPP server](https://xmpp.org/).
+
+The main purpose is to develop a multi-agent system able to recognize food and ingredients from pictures and sugguest receipes that could be cooked with such ingredients.
+
+## Authors and credits
+
+This project is managed by Raul Murillo (ramuri01@ucm.es) and Ignacio Regueiro.
