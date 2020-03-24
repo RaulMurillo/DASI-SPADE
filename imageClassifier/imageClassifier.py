@@ -11,23 +11,33 @@ from spade.template import Template
 # from aioxmpp import PresenceState, PresenceShow
 
 import numpy as np
-import tensorflow as tf 
+import tensorflow as tf
+
+import os
+dirname = os.path.dirname(__file__)
+CNN_DIR = os.path.join(dirname, 'dnn')
+
 
 class SenderAgent(Agent):
-    class InformBehav(PeriodicBehaviour):
+    """Agent for testing `ImageAgent`
+
+    Sends messages with image paths to `ImageAgent`. 
+    """
+    class SendBehav(PeriodicBehaviour):
         async def on_start(self):
             self.counter = 0
             self.imgs = ['IMG_20200321_181344.jpg', 'IMG_20200321_181528.jpg',
-                'IMG_20200322_193347.jpg', 'IMG_20200321_181521.jpg',
-                'IMG_20200321_181538.jpg', 'IMG_20200322_193356.jpg',
-                'IMG_20200321_181524.jpg', 'IMG_20200322_193316.jpg']
-        
+                         'IMG_20200322_193347.jpg', 'IMG_20200321_181521.jpg',
+                         'IMG_20200321_181538.jpg', 'IMG_20200322_193356.jpg',
+                         'IMG_20200321_181524.jpg', 'IMG_20200322_193316.jpg']
+
         async def run(self):
-            print("InformBehav running")
+            print("SendBehav running")
 
             msg = Message(to="image01@localhost")     # Instantiate the message
-            msg.set_metadata("performative", "request")  # Set the "request" FIPA performative
-            msg.body = "image_recognition/test_imgs/" + self.imgs[self.counter]  # Set the message content
+            # Set the "request" FIPA performative
+            msg.set_metadata("performative", "request")
+            msg.body = os.path.join(CNN_DIR, 'test_imgs', self.imgs[self.counter]) # Set the message content
             # msg.body = f"Message {self.counter}"
 
             await self.send(msg)
@@ -40,16 +50,22 @@ class SenderAgent(Agent):
 
     async def setup(self):
         print("SenderAgent started")
-        b = self.InformBehav(period=2)
+        b = self.SendBehav(period=2)
         self.add_behaviour(b)
 
+
 def decode_img(img):
-            # convert the compressed string to a 3D uint8 tensor
-            img = tf.image.decode_jpeg(img, channels=3)
-            # Use `convert_image_dtype` to convert to floats in the [0,1] range.
-            img = tf.image.convert_image_dtype(img, tf.float32)
-            # resize the image to the desired size.
-            return tf.image.resize(img, [224,224])
+    """Decodes an image according to the TF model specifications
+
+    Returns a TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
+    """
+    # convert the compressed string to a 3D uint8 tensor
+    img = tf.image.decode_jpeg(img, channels=3)
+    # Use `convert_image_dtype` to convert to floats in the [0,1] range.
+    img = tf.image.convert_image_dtype(img, tf.float32)
+    # resize the image to the desired size.
+    return tf.image.resize(img, [224, 224])
+
 
 class ImageAgent(Agent):
 
@@ -57,8 +73,9 @@ class ImageAgent(Agent):
         async def on_start(self):
             print("Starting behaviour . . .")
 
-            self.model = tf.keras.models.load_model('image_recognition/saved_model/my_model.h5')
-            self.CLASS_NAMES = np.genfromtxt('image_recognition/classes.csv', delimiter=',', dtype=str)
+            self.model = tf.keras.models.load_model(os.path.join(CNN_DIR, 'saved_model/my_model.h5'))
+            self.CLASS_NAMES = np.genfromtxt(
+                os.path.join(CNN_DIR, 'classes.csv'), delimiter=',', dtype=str)
 
             # self.presence.approve_all=True
             # self.presence.set_presence(
@@ -68,13 +85,14 @@ class ImageAgent(Agent):
             #                 )
 
         async def run(self):
-        
+
             # print("Counter: {}".format(self.counter))
             # self.counter += 1
             # await asyncio.sleep(1)
             print("ClassifyBehav running")
-            
-            msg = await self.receive(timeout=10) # wait for a message for 10 seconds
+
+            # wait for a message for 10 seconds
+            msg = await self.receive(timeout=10)
             # self.presence.set_available(show=PresenceShow.AWAY)
             if msg:
                 print("Message received with content: {}".format(msg.body))
@@ -88,13 +106,11 @@ class ImageAgent(Agent):
 
             # stop agent from behaviour
             # await self.agent.stop()
-            
+
             # self.presence.set_available(show=PresenceShow.CHAT)
 
         async def on_end(self):
             print("Behaviour finished")
-
-
 
     async def setup(self):
         print("Image Agent starting . . .")
@@ -110,8 +126,10 @@ class ImageAgent(Agent):
                 # Currently, memory growth needs to be the same across GPUs
                 for gpu in gpus:
                     tf.config.experimental.set_memory_growth(gpu, True)
-                logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-                print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+                logical_gpus = tf.config.experimental.list_logical_devices(
+                    'GPU')
+                print(len(gpus), "Physical GPUs,", len(
+                    logical_gpus), "Logical GPUs")
             except RuntimeError as e:
                 # Memory growth must be set before GPUs have been initialized
                 print(e)
@@ -130,13 +148,13 @@ if __name__ == "__main__":
 
     senderagent = SenderAgent("sender@localhost", "user01")
     senderagent.start()
-    
+
     while True:
         try:
             time.sleep(1)
         except KeyboardInterrupt:
             break
-    
+
     senderagent.stop()
     imageagent.stop()
 
