@@ -14,7 +14,7 @@ Se requiere tener instalada la última versión de TensorFlow (2.X). Puede ser f
 
 ## Ejecución del agente
 
-Tan sólo se debe crear el agente SPADE del tipo `ImageAgent`. Este agente espera recibir mensajes con performativa Request (`{"performative": "request"}`), en cuyo cuerpo se indique la ruta de la imagen a clasificar. Un ejemplo de mensaje sería el siguiente:
+Tan sólo se debe crear el agente SPADE del tipo `ImageAgent`. Este agente espera recibir mensajes con performativa *Request* (`{"performative": "request"}`), en cuyo cuerpo se indique la ruta de la imagen a clasificar. Un ejemplo de mensaje sería el siguiente:
 
 ```python
 msg = Message(to="agent_jid@domain")
