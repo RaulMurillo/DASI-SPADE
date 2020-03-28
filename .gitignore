@@ -1,5 +1,16 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
 # Compiled class file
 *.class
+
+# Visual Studio Code
+.vscode/*
 
 # Log file
 *.log
