@@ -1,81 +1,114 @@
 {
-    "Title": [  "Spanish tortilla", 
-                "Gratén de calabacines y berenjenas",
-                "Pasta con tomate",
-                "Gazpacho",
-                "Bizcocho de zanahoria"
+    "Title": [
+        "Spanish tortilla",
+        "Gratén de calabacines y berenjenas",
+        "Pasta con tomate",
+        "Gazpacho",
+        "Bizcocho de zanahoria",
+        "Mermelada de melocotón"
     ],
-    "Ingredients": [["6 huevos",
-                    "3 patatas (600 gr)",
-                    "1 cebolla",
-                    "2 vasos de aceite de oliva",
-                    "sal"],
-                    ["1 calabacín",
-                    "1 berenjena",
-                    "1/2 pimiento rojo picado",
-                    "1/2 pimiento verde picado ",
-                    "1 cebolla picada",
-                    "1 ramita apio picada",
-                    "Aceite de oliva Virgen Extra",
-                    "Caldo de verdura casero",
-                    "Queso rallado",
-                    "Sal y pimienta",
-                    "2 cdas pan rallado",
-                    "1 ramito albahaca"],
-                    ["500 gr. pasta ",
-                    "600 gr. Tomate Frito",
-                    "2 cucharaditas orégano",
-                    "Caldo de pollo",
-                    "2 dientes de ajo ",
-                    "Queso rallado ",
-                    "Sal",
-                    "Aceite de oliva"],
-                    ["1 kg Tomate pera",
-                    "1 Pimiento verde italiano",
-                    "1 Pepino",
-                    "2 Dientes de ajo",
-                    "50 ml Aceite de oliva virgen extra",
-                    "50 g Pan de hogaza duro",
-                    "250 ml Agua",
-                    "Sal",
-                    "30 ml Vinagre de Jerez"],
-                    ["250 g de zanahorias crudas (ya peladas y ralladas)",
-                    "200 g de harina",
-                    "7 g de levadura en polvo o polvo de hornear",
-                    "125 ml de aceite de girasol (podéis usar de oliva pero le dará un sabor más fuerte al pastel de zanahoria)",
-                    "4 huevos",
-                    "200 g de azúcar"]
+    "Ingredients": [
+        [
+            "6 huevos",
+            "3 patatas (600 gr)",
+            "1 cebolla",
+            "2 vasos de aceite de oliva",
+            "sal"
+        ],
+        [
+            "1 calabacín",
+            "1 berenjena",
+            "1/2 pimiento rojo picado",
+            "1/2 pimiento verde picado ",
+            "1 cebolla picada",
+            "1 ramita apio picada",
+            "Aceite de oliva Virgen Extra",
+            "Caldo de verdura casero",
+            "Queso rallado",
+            "Sal y pimienta",
+            "2 cdas pan rallado",
+            "1 ramito albahaca"
+        ],
+        [
+            "500 gr. pasta ",
+            "600 gr. Tomate Frito",
+            "2 cucharaditas orégano",
+            "Caldo de pollo",
+            "2 dientes de ajo ",
+            "Queso rallado ",
+            "Sal",
+            "Aceite de oliva"
+        ],
+        [
+            "1 kg Tomate pera",
+            "1 Pimiento verde",
+            "1 Pepino",
+            "2 Dientes de ajo",
+            "50 ml Aceite de oliva virgen extra",
+            "50 g Pan de hogaza duro",
+            "250 ml Agua",
+            "Sal",
+            "30 ml Vinagre de Jerez"
+        ],
+        [
+            "250 g de zanahorias crudas (ya peladas y ralladas)",
+            "200 g de harina",
+            "7 g de levadura en polvo o polvo de hornear",
+            "125 ml de aceite de girasol (podéis usar de oliva pero le dará un sabor más fuerte al pastel de zanahoria)",
+            "4 huevos",
+            "200 g de azúcar"
+        ],
+        [
+            "1 kg de melocotones",
+            "500 gr. de azúcar",
+            "1/2 limón entero o el zumo de medio limón"
+        ]
     ],
-    "Directions": [ ["Pela y pica la cebolla en dados medianos.",
-                    "Si las patatas estuvieran sucias, pásalas por agua. Pélalas, córtalas en láminas finas de medio centímetro.",
-                    "Introduce todo en la sartén, sazona a tu gusto y fríe a fuego suave durante 25-30 minutos.",
-                    "Retira la fritada y escúrrela. Pasa el aceite a un recipiente y resérvalo. Limpia el aceite de la sartén.",
-                    "Casca los huevos, colócalos en un recipiente grande y bátelos. Sálalos a tu gusto, agrega la fritada de patatas, cebolla y mezcla bien.",
-                    "Coloca la sartén nuevamente en el fuego, agrega un chorrito del aceite reservado y agrega la mezcla. Remueve un poco con una cuchara de madera y espera (20 segundos) a que empiece a cuajarse.",
-                    "Separa los bordes, cubre la sartén con un plato de mayor diámetro que la sartén y dale la vuelta.",
-                    "Échala de nuevo para que cuaje por el otro lado."
-                    ],
-                    ["En aceite de oliva pochar la cebolla y los pimientos.",
-                    "Una vez salteado añadir las berenjenas, el calabacín, el apio y cubrir con el caldo. Picar un poco de albahaca y agregar.",
-                    "Condimentar y dejar cocer unos minutos (5 serán suficientes).",
-                    "Esta preparación debe quedar no muy líquida porque el calabacín soltará su agua.",
-                    "Colocarlo en una fuente refractaria, cubrir con el queso y unas hojas de albahaca y gratinar a horno fuerte (200ºC)."
-                    ],
-                    ["Hierve la pasta como se indica en el envase, añadiendo en el agua el Caldo de Pollo. Después, escurre la pasta, añade un poco de aceite de oliva y remueve bien.",
-                    "Mientras se cuece la pasta, coloca al fuego una sartén con 6 cucharadas de aceite de oliva, el Tomate Frito, el ajo, el orégano y una pizca de azúcar.",
-                    "Tapamos y dejamos cocer a fuego medio, removiendo de vez en cuando, durante 5 min. Servir todo el conjunto."
-                    ],
-                    ["Troceamos todos los ingredientes y añadimos 50 ml de aceite de oliva, 250 ml de agua de la nevera y 50 ml de vinagre de Jerez",
-                    "Trituramos todo en la batidora de vaso o Turmix.",
-                    "Una vez triturado, pasamos el gazpacho resultante por el colador fino, apretando con un cucharón para que quede una crema sin pieles ni semillas.",
-                    "Lo metemos en la nevera un par de horas para que enfríe bien."
-                    ],
-                    ["Trituramos las zanahorias junto con el aceite.",
-                    "Echamos los huevos en un bol y los batimos con el azúcar, añadiendo luego la pasta de zanahoria que habíamos preparado ccon anterioridad.",
-                    "Incorporamos la harina y la levadura tamizadas y mezclamos con cuidado.",
-                    "Engrasamos con aceite o mantequilla un mole de 24 cm y echamos la masa.",
-                    "Hornear a 185ºC unos 30 minutos o hasta que veamos que al pinchar con un palillo o la punta de cuchillo el centro del bizcocho de zanahoria éste sale limpio.",
-                    "Este bizcocho de zanahoria podemos dejarlo tal como está si por ejemplo lo queréis para desayuno o merienda, o si lo queréis preparar para alguna celebración podéis espolvorear con azúcar glass o con un frosting hecho con Philadelphia y azúcar glass."
-                    ]
+    "Directions": [
+        [
+            "Pela y pica la cebolla en dados medianos.",
+            "Si las patatas estuvieran sucias, pásalas por agua. Pélalas, córtalas en láminas finas de medio centímetro.",
+            "Introduce todo en la sartén, sazona a tu gusto y fríe a fuego suave durante 25-30 minutos.",
+            "Retira la fritada y escúrrela. Pasa el aceite a un recipiente y resérvalo. Limpia el aceite de la sartén.",
+            "Casca los huevos, colócalos en un recipiente grande y bátelos. Sálalos a tu gusto, agrega la fritada de patatas, cebolla y mezcla bien.",
+            "Coloca la sartén nuevamente en el fuego, agrega un chorrito del aceite reservado y agrega la mezcla. Remueve un poco con una cuchara de madera y espera (20 segundos) a que empiece a cuajarse.",
+            "Separa los bordes, cubre la sartén con un plato de mayor diámetro que la sartén y dale la vuelta.",
+            "Échala de nuevo para que cuaje por el otro lado."
+        ],
+        [
+            "En aceite de oliva pochar la cebolla y los pimientos.",
+            "Una vez salteado añadir las berenjenas, el calabacín, el apio y cubrir con el caldo. Picar un poco de albahaca y agregar.",
+            "Condimentar y dejar cocer unos minutos (5 serán suficientes).",
+            "Esta preparación debe quedar no muy líquida porque el calabacín soltará su agua.",
+            "Colocarlo en una fuente refractaria, cubrir con el queso y unas hojas de albahaca y gratinar a horno fuerte (200ºC)."
+        ],
+        [
+            "Hierve la pasta como se indica en el envase, añadiendo en el agua el Caldo de Pollo. Después, escurre la pasta, añade un poco de aceite de oliva y remueve bien.",
+            "Mientras se cuece la pasta, coloca al fuego una sartén con 6 cucharadas de aceite de oliva, el Tomate Frito, el ajo, el orégano y una pizca de azúcar.",
+            "Tapamos y dejamos cocer a fuego medio, removiendo de vez en cuando, durante 5 min. Servir todo el conjunto."
+        ],
+        [
+            "Troceamos todos los ingredientes y añadimos 50 ml de aceite de oliva, 250 ml de agua de la nevera y 50 ml de vinagre de Jerez",
+            "Trituramos todo en la batidora de vaso o Turmix.",
+            "Una vez triturado, pasamos el gazpacho resultante por el colador fino, apretando con un cucharón para que quede una crema sin pieles ni semillas.",
+            "Lo metemos en la nevera un par de horas para que enfríe bien."
+        ],
+        [
+            "Trituramos las zanahorias junto con el aceite.",
+            "Echamos los huevos en un bol y los batimos con el azúcar, añadiendo luego la pasta de zanahoria que habíamos preparado ccon anterioridad.",
+            "Incorporamos la harina y la levadura tamizadas y mezclamos con cuidado.",
+            "Engrasamos con aceite o mantequilla un mole de 24 cm y echamos la masa.",
+            "Hornear a 185ºC unos 30 minutos o hasta que veamos que al pinchar con un palillo o la punta de cuchillo el centro del bizcocho de zanahoria éste sale limpio.",
+            "Este bizcocho de zanahoria podemos dejarlo tal como está si por ejemplo lo queréis para desayuno o merienda, o si lo queréis preparar para alguna celebración podéis espolvorear con azúcar glass o con un frosting hecho con Philadelphia y azúcar glass."
+        ],
+        [
+            "Lava los melocotones, pélalos y retira la semilla, pártelos en 4.",
+            "Incorpora los melocotones a una olla, el azúcar, añade el medio limón cortado en dos o el zumo de medio limón.",
+            "Lleva a ebullición y baja la temperatura a fuego medio-bajo durante 40-50 minutos. Revuelve con una cuchara de madera de vez en cuando.",
+            "Retira los dos trozos de limón.",
+            "Pon el brazo de la batidora dentro de la olla y a velocidad mínima, da dos o tres golpes de triturado para homogenizar un poco la mezcla. No es necesario que la tritures totalmente si como a mi te gusta encontrarte algún tropezón.",
+            "Comprueba el punto de la mermelada poniendo una cucharada en un plato frío, si pasados unos segundos mantiene la textura sin desparramarse, estará lista, si la notas muy líquida, déjala unos minutos más a fuego medio.",
+            "Deja enfriar y envasa"
+        ]
     ]
 }
