@@ -36,3 +36,7 @@ hs_err_pid*
 # Keras Neural network models
 *.h5
 
+# User data
+*.npy
+*.npz
+

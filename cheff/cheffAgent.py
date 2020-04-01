@@ -29,9 +29,10 @@ class SenderAgent(Agent):
     """Agent for testing `CheffAgent`
     Sends messages to `CheffAgent`.
     """
+
     class SendBehav(PeriodicBehaviour):
         async def on_start(self):
-            self.counter = 1
+            self.counter = 0
 
         async def run(self):
             logging.debug("SendBehav running")
@@ -39,18 +40,22 @@ class SenderAgent(Agent):
             msg = Message(to="cheff@localhost")     # Instantiate the message
             # Set the corresponding FIPA performative
             # http://www.fipa.org/specs/fipa00037/SC00037J.html
-            if self.counter % 5:
+            if self.counter < 15:
                 # A new ingredient is present
                 msg.set_metadata("performative", "inform")
                 # Set the message content
-                msg.body = str(self.counter-1)
+                msg.body = str(self.counter)
+            elif self.counter < 16:
+                # Add preferences
+                msg.set_metadata("performative", "inform_ref")
+                msg.body = str(13) + ',-100'
+
             else:
-                # # Start cooking
-                # msg.set_metadata("performative", "request")
-                # # Set the message content
-                # msg.body = 'Start cooking!'
-                msg.set_metadata("performative", "query_ref")
-                msg.body = str(3)
+                # Start cooking
+                msg.set_metadata("performative", "request")
+                msg.body = 'Start cooking!'
+                # msg.set_metadata("performative", "query_ref")
+                # msg.body = str(3)
 
             # msg.body = f"Message {self.counter}"
 
@@ -58,13 +63,13 @@ class SenderAgent(Agent):
             logging.info("[Sender] Message sent!")
 
             self.counter += 1
-            if self.counter >= 6:
+            if self.counter > 16:
                 # stop agent from behaviour
                 await self.agent.stop()
 
     async def setup(self):
         logging.info("SenderAgent started")
-        b = self.SendBehav(period=1)
+        b = self.SendBehav(period=0.1)
         self.add_behaviour(b)
 
 
@@ -91,6 +96,54 @@ class CheffAgent(Agent):
             else:
                 logging.info(
                     f"[AddIngred] Did not received any message after {t} seconds")
+
+    class PreferencesBehav(CyclicBehaviour):
+        async def on_start(self):
+            logging.debug("PreferencesBehav starting . . .")
+
+            prefs_file = os.path.join(CHEFF_DIR, 'prefs.npz')
+            if os.path.isfile('filename.txt'):
+                logging.debug("Preferences file exist")
+
+                self.agent.preferences = sp.sparse.load_npz(
+                    prefs_file)  # Expected np.int8 type
+                assert self.agent.preferences.dtype == np.int8
+                assert self.agent.preferences.shape == (
+                    1, len(self.agent.CLASS_NAMES))
+            else:
+                logging.debug("Preferences file does not exist")
+
+                self.agent.preferences = csc_matrix(
+                    np.zeros((1, len(self.agent.CLASS_NAMES)), dtype=np.int8)
+                )
+            pass
+
+        async def on_end(self):
+            logging.info("[Preferences] Vector:\n{}".format(
+                self.agent.preferences))
+            sp.sparse.save_npz(os.path.join(
+                CHEFF_DIR, 'prefs.npz'), self.agent.preferences)
+            pass
+
+        async def run(self):
+            pass
+            logging.debug("PreferencesBehav running . . .")
+            # wait for a message for t seconds
+            t = 10
+            msg = await self.receive(timeout=t)
+            if msg:
+                logging.info(
+                    "[Preferences] Message received with content: {}".format(msg.body))
+                ingred, pref = msg.body.split(',')
+                ingred = int(ingred)
+                pref = int(pref)
+                self.agent.preferences[0, ingred] = pref
+                logging.info(f"[Preferences]\n{self.agent.preferences}")
+            else:
+                logging.info(
+                    f"[Preferences] Did not received any message after {t} seconds")
+                self.kill()
+                return
 
     class MissingBehav(CyclicBehaviour):
         """Behaviour for dealing with use case 2
@@ -131,6 +184,7 @@ class CheffAgent(Agent):
                     f"[Missing] Did not received any message after {t} seconds")
 
     class CookBehav(CyclicBehaviour):
+
         async def on_start(self):
             logging.debug("Cooking Behaviour starting . . .")
             # self.ingreds_recipes = csc_matrix(
@@ -154,14 +208,22 @@ class CheffAgent(Agent):
                 logging.info("[Cooking] Gonna start cooking...")
                 # TODO: Change presence notification
 
-                logging.info(self.agent.list_ingred)
-
-                menu = csc_matrix(self.agent.list_ingred).dot(
+                logging.info(
+                    f"[Cooking] Ingredients list:\n{self.agent.list_ingred}")
+                # Menu according user available ingredients
+                menu_avail = csc_matrix(self.agent.list_ingred).dot(
                     self.agent.ingreds_recipes)
-                logging.debug(menu.get_shape())
-                logging.info(menu)
+                logging.debug(menu_avail.get_shape())
+                logging.info(f"[Cooking] Available menu:\n{menu_avail}")
+                # Menu according user preferences
+                menu_pref = self.agent.preferences.dot(
+                    self.agent.ingreds_recipes)
+                logging.debug(menu_pref.get_shape())
+                logging.info(f"[Cooking] Preferred menu:\n{menu_pref}")
 
-                logging.info('The recipe that best matches is {}'.format(
+                menu = menu_avail + menu_pref
+
+                logging.info('The recipe that best matches is: {}'.format(
                     self.recipe_book['Title'][menu.argmax()]))
                 logging.info(self.recipe_book['Ingredients'][menu.argmax()])
                 logging.info(self.recipe_book['Directions'][menu.argmax()])
@@ -180,22 +242,33 @@ class CheffAgent(Agent):
         logging.debug(self.CLASS_NAMES)
         # Matrix of ingreds_recipes
         self.ingreds_recipes = csc_matrix(np.genfromtxt(os.path.join(
-            CHEFF_DIR, 'ingreds_recipes.csv'), dtype=int, delimiter=','))
+            CHEFF_DIR, 'ingreds_recipes.csv'), dtype=np.int8, delimiter=','))
+        # # sp.sparse.save_npz(os.path.join(
+        # #     CHEFF_DIR, 'ingreds_recipes'), self.ingreds_recipes)
+        # self.ingreds_recipes = sp.sparse.load_npz(
+        #     os.path.join(CHEFF_DIR, 'ingreds_recipes.npz'))  # Expected np.int8 type
+        # assert self.ingreds_recipes.dtype == np.int8
+
         logging.debug(type(self.ingreds_recipes[0]))
-        # self.preferences = np.load(os.path.join(CHEFF_DIR, 'prefs.npy'))
+        # User preferences on ingredients
+        self.preferences = None
 
         i = self.AddIngredBehav()
         c = self.CookBehav()
         m = self.MissingBehav()
+        p = self.PreferencesBehav()
         t_i = Template()
         t_i.set_metadata("performative", "inform")
         t_c = Template()
         t_c.set_metadata("performative", "request")
         t_m = Template()
         t_m.set_metadata("performative", "query_ref")
+        t_p = Template()
+        t_p.set_metadata("performative", "inform_ref")
         self.add_behaviour(i, t_i)
         self.add_behaviour(m, t_m)
         self.add_behaviour(c, t_c)
+        self.add_behaviour(p, t_p)
 
 
 if __name__ == "__main__":
@@ -205,7 +278,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     a = CheffAgent("cheff@localhost", "user01")
-    a.start()
+    future = a.start()
+    future.result()  # Wait until the start method is finished
 
     sender = SenderAgent("sender@localhost", "user01")
     sender.start()
