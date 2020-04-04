@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+# This program is dedicated to the public domain under the CC0 license.
 
 """
 First, a few callback functions are defined. Then, those functions are passed to
@@ -14,8 +14,12 @@ bot.
 """
 
 import logging
+import os
+import dialogflow
+import json
 
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from google.api_core.exceptions import InvalidArgument
+from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
 
@@ -25,36 +29,119 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-PRE_REQUEST, REQUEST, PHOTO, LOCATION, PREFERENCIAS, ALERGIAS, FIN = range(7)
+# Telegram States
+CHOOSING, TYPING_REPLY, PHOTO, TYPING_CHOICE = range(4)
+
+reply_keyboard = [['Quiero cocinar'],
+                  ['Preferencias','Alergias'],
+                  ['Finalizar']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+# DialogFlow Credentials
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'private_key.json'
+
+DIALOGFLOW_PROJECT_ID = 'PROJECT_ID'
+DIALOGFLOW_LANGUAGE_CODE = 'es'
+SESSION_ID = 'me'
+
+# Valores respuesta DialogFlow
+fulfillment = ""
+intent = ""
+fields = ""
+
+# Llamada a DialogFlow sin fields
+def callToDialogFlow(text):
+    text_to_be_analyzed = text
+
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+    text_input = dialogflow.types.TextInput(text=text_to_be_analyzed, language_code=DIALOGFLOW_LANGUAGE_CODE)
+    query_input = dialogflow.types.QueryInput(text=text_input)
+    try:
+        response = session_client.detect_intent(session=session, query_input=query_input)
+    except InvalidArgument:
+        raise
+    
+    print("Query text:", response.query_result.query_text)
+    print("Detected intent:", response.query_result.intent.display_name)
+    print("Detected intent confidence:", response.query_result.intent_detection_confidence)
+    print("Fulfillment text:", response.query_result.fulfillment_text)
+    print("Response:", response)
+    global fulfillment
+    global intent
+    fulfillment = response.query_result.fulfillment_text
+    intent = response.query_result.intent.display_name
+
+#Llamada a DialogFlow que devuelve los fileds identificados
+def callToDialogFlowFields(text):
+    text_to_be_analyzed = text
+
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+    text_input = dialogflow.types.TextInput(text=text_to_be_analyzed, language_code=DIALOGFLOW_LANGUAGE_CODE)
+    query_input = dialogflow.types.QueryInput(text=text_input)
+    try:
+        response = session_client.detect_intent(session=session, query_input=query_input)
+    except InvalidArgument:
+        raise
+
+    valorFields = None
+    if(response.query_result.intent.display_name == "GuardarGusto"):
+        valorFields = "gustos"
+    elif(response.query_result.intent.display_name == "GuardarAlergia"):
+        valorFields = "Alergias"
+    print("Query text:", response.query_result.query_text)
+    print("Detected intent:", response.query_result.intent.display_name)
+    print("Detected intent confidence:", response.query_result.intent_detection_confidence)
+    print("Fulfillment text:", response.query_result.fulfillment_text)
+    print("fields:", response.query_result.parameters.fields[valorFields].list_value.values[0].string_value)  
+    print("Response:", response)
+    global fulfillment
+    global intent
+    fulfillment = response.query_result.fulfillment_text
+    intent = response.query_result.intent.display_name
+
+    return response.query_result.parameters.fields[valorFields].list_value.values[0].string_value
+
+def facts_to_str(user_data):
+    facts = list()
+
+    for key, value in user_data.items():
+        facts.append('{} - {}'.format(key, value))
+
+    return "\n".join(facts).join(['\n', '\n'])
 
 
 def start(update, context):
-    reply_keyboard = [['Indicar preferencias', 'Peticion al Chef']]
-
     update.message.reply_text(
-        'Hola! ME llamo DASIChef_bot pero puedes llamarme Chef_bot. '
-        'Puedo ayudarte a decirte una receta con los ingredientes que tienes. '
-        'Por cierto, escribe /cancel si quieres dejar de hablar conmigo.\n\n'
-        'Pulsa una tecla para continuar')
+        'Hola! Me llamo DASIChef_bot pero puedes llamarme Chef_bot. '
+        'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen. '
+ 	'Tambien puedes indicar tus preferencias y alergias. '
+	'Selecciona la opción de que desees y pulsa finalizar cuando hayas terminado\n\n',
+        reply_markup=markup)
 
-    return PRE_REQUEST
-
-def pre_request(update, context):
-    user = update.message.from_user
-    logger.info("Request for the user %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Ya veo el que quieres hacer, '
-                              'Que petición tienes para mi?, '
-                              'Puedo proponerte platos para cocinar o preguntarme que ingredientes necesitas para un plato en concreto',
-                              reply_markup=ReplyKeyboardRemove())
-
-    return REQUEST
+    return CHOOSING
 
 
-def request(update, context):
-    user = update.message.from_user
-    logger.info("Request for the user %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Fantastico!, '
-                              'Mandame una imagen para que pueda ver con que ingredientes cuentas.')
+def regular_choice(update, context):
+    text = update.message.text
+    context.user_data['choice'] = text
+    print("Valor seleccionado:", text)
+    #Llamada a DialogFlow
+    callToDialogFlow(text)
+    global fulfillment
+    update.message.reply_text(
+        fulfillment.format(text.lower()))
+
+    return TYPING_REPLY
+
+
+def custom_choice(update, context):
+    text = update.message.text
+    callToDialogFlow(text)
+    global fulfillment
+    update.message.reply_text(
+        fulfillment.format(text.lower()))
 
     return PHOTO
 
@@ -63,72 +150,39 @@ def photo(update, context):
     photo_file = update.message.photo[-1].get_file()
     photo_file.download('user_photo.jpg')
     logger.info("Image of %s: %s", user.first_name, 'user_photo.jpg')
-    update.message.reply_text('Una imagen explendida, Ya estoy identificando que se encuentra en ella. '
-                              'Si quieres introducir alguna preferencia o alergeno, Introduce una tecla para continuar')
+    text = "SendImage"
+    callToDialogFlow(text)
+    update.message.reply_text(fulfillment.format(text.lower()),reply_markup=markup)
 
-    return PREFERENCIAS
+    return CHOOSING
 
+def received_information(update, context):
+    user_data = context.user_data
+    text = update.message.text
+    print("Valor introducido:", text)
+    #Llamada a DialogFlow
+    filds = callToDialogFlowFields(text)
 
-def skip_photo(update, context):
-    user = update.message.from_user
-    logger.info("User %s did not send a photo.", user.first_name)
-    update.message.reply_text('No puedo ayudarte si no me mandas ninguna imagen! Ve a buscarla que aquí espero, '
-                              'intenta no escribir /skip.')
+    category = user_data['choice']
+    user_data[category] = filds
+    del user_data['choice']
 
-    return PHOTO
+    update.message.reply_text(fulfillment.format(facts_to_str(user_data)),
+                              reply_markup=markup)
 
-
-def preferencias(update, context):
-    user = update.message.from_user
-    user_location = update.message.location
-    logger.info("El usuario %s ha seleccionado: %s", user.first_name, update.message.text)
-    update.message.reply_text('¿Que tipo de platos te gustan más? '
-                              '¿Dulce o salados? Escribe /skip si no te decantas por ninguna')
-
-    return ALERGIAS
+    return CHOOSING
 
 
-def skip_preferencias(update, context):
-    user = update.message.from_user
-    logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text('You seem a bit paranoid! '
-                              'At last, tell me something about yourself.')
+def done(update, context):
+    user_data = context.user_data
+    if 'choice' in user_data:
+        del user_data['choice']
 
-    return ALERGIAS
+    update.message.reply_text("I learned these facts about you:"
+                              "{}"
+                              "Until next time!".format(facts_to_str(user_data)))
 
-def alergias(update, context):
-    user = update.message.from_user
-    user_location = update.message.location
-    logger.info("El usuario %s ha introducido la preferencia: %s", user.first_name, update.message.text)
-    update.message.reply_text('¡Oido cocina! Importante, ¿Eres alergico a algún alimento? '
-                              'Escribe todos ellos o escribe /skip si puedes comer de todo')
-
-    return FIN
-
-
-def skip_alergias(update, context):
-    user = update.message.from_user
-    logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text('Perfecto, no tienes alergia a nada, Me alegro.')
-
-    return FIN
-
-def fin(update, context):
-    user = update.message.from_user
-    user_location = update.message.location
-    logger.info("El usuario %s ha tiene alergia a: %s", user.first_name, update.message.text)
-    update.message.reply_text('¡Listo! Información guardada. '
-                              'Podemos volver a hablar cuando lo desees')
-
-    return ConversationHandler.END
-
-
-def cancel(update, context):
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text('Bye! I hope we can talk again some day.',
-                              reply_markup=ReplyKeyboardRemove())
-
+    user_data.clear()
     return ConversationHandler.END
 
 
@@ -142,30 +196,28 @@ def main():
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater("TOKEN", use_context=True)
-
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # Add conversation handler with the states
+    # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
 
         states={
-            PRE_REQUEST: [MessageHandler(Filters.text, pre_request)],
-
-            REQUEST: [MessageHandler(Filters.text, request)],
-
-            PHOTO: [MessageHandler(Filters.photo, photo)],
-
-            PREFERENCIAS: [MessageHandler(Filters.text, preferencias),
-                       CommandHandler('skip', skip_preferencias)],
-
-            ALERGIAS: [MessageHandler(Filters.text, alergias),
-                       CommandHandler('skip', skip_alergias)],
-            FIN: [MessageHandler(Filters.text, fin)]
+            CHOOSING: [MessageHandler(Filters.regex('^(Preferencias|Alergias)$'),
+                                      regular_choice),
+                        MessageHandler(Filters.regex('^Quiero cocinar$'),
+                                      custom_choice)
+                       ],
+            PHOTO: [MessageHandler(Filters.photo,
+                                           photo)
+                            ],
+            TYPING_REPLY: [MessageHandler(Filters.text,
+                                          received_information),
+                           ],
         },
 
-        fallbacks=[CommandHandler('cancel', cancel)]
+        fallbacks=[MessageHandler(Filters.regex('^Finalizar$'), done)]
     )
 
     dp.add_handler(conv_handler)
