@@ -9,6 +9,7 @@ from spade.behaviour import OneShotBehaviour
 from spade.message import Message
 from spade.template import Template
 # from aioxmpp import PresenceState, PresenceShow
+import csv
 
 import numpy as np
 import tensorflow as tf
@@ -69,11 +70,11 @@ def decode_img(img):
 
 class ImageAgent(Agent):
 
-    class ClassifyBehav(CyclicBehaviour):
+    class ClassifyBehaviour(CyclicBehaviour):
         async def on_start(self):
             print("Starting behaviour . . .")
 
-            self.model = tf.keras.models.load_model(os.path.join(CNN_DIR, 'saved_model/my_model.h5'))
+            self.cnn_model = tf.keras.models.load_model(os.path.join(CNN_DIR, 'saved_model/my_model.h5'))
 
             # self.presence.approve_all=True
             # self.presence.set_presence(
@@ -87,7 +88,7 @@ class ImageAgent(Agent):
             # print("Counter: {}".format(self.counter))
             # self.counter += 1
             # await asyncio.sleep(1)
-            print("ClassifyBehav running")
+            print("ClassifyBehaviour running")
 
             # wait for a message for 10 seconds
             msg = await self.receive(timeout=10)
@@ -97,7 +98,7 @@ class ImageAgent(Agent):
                 img = tf.io.read_file(msg.body)
                 img = decode_img(img)
                 img = tf.expand_dims(img, axis=0)
-                pred = self.model.predict_classes(img)[0]
+                pred = self.cnn_model.predict_classes(img)[0]
                 print(f"Image is of class {self.agent.CLASS_NAMES[pred]}")
             else:
                 print("Did not received any message after 10 seconds")
@@ -136,7 +137,7 @@ class ImageAgent(Agent):
                 # Memory growth must be set before GPUs have been initialized
                 print(e)
 
-        b = self.ClassifyBehav()
+        b = self.ClassifyBehaviour()
         t = Template()
         t.set_metadata("performative", "request")
         self.add_behaviour(b, t)
