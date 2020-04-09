@@ -74,8 +74,6 @@ class ImageAgent(Agent):
             print("Starting behaviour . . .")
 
             self.model = tf.keras.models.load_model(os.path.join(CNN_DIR, 'saved_model/my_model.h5'))
-            self.CLASS_NAMES = np.genfromtxt(
-                os.path.join(CNN_DIR, 'classes.csv'), delimiter=',', dtype=str)
 
             # self.presence.approve_all=True
             # self.presence.set_presence(
@@ -100,7 +98,7 @@ class ImageAgent(Agent):
                 img = decode_img(img)
                 img = tf.expand_dims(img, axis=0)
                 pred = self.model.predict_classes(img)[0]
-                print(f"Image is of class {self.CLASS_NAMES[pred]}")
+                print(f"Image is of class {self.agent.CLASS_NAMES[pred]}")
             else:
                 print("Did not received any message after 10 seconds")
 
@@ -114,6 +112,10 @@ class ImageAgent(Agent):
 
     async def setup(self):
         print("Image Agent starting . . .")
+        # Ingredients names
+        with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:
+            self.CLASS_NAMES = list(csv.reader(f))[0]
+
         # self. presence.set_presence(
         #                      state=PresenceState(True, PresenceShow.CHAT),  # available and interested in chatting
         #                      status="Lunch",
