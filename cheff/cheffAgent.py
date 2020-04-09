@@ -18,6 +18,7 @@ from scipy.sparse import csc_matrix
 from scipy.sparse import csr_matrix
 from scipy.sparse import lil_matrix
 import json
+import csv
 
 import os
 dirname = os.path.dirname(__file__)
@@ -235,8 +236,8 @@ class CheffAgent(Agent):
     async def setup(self):
         logging.info("Cheff Agent starting . . .")
         # Ingredients names
-        self.CLASS_NAMES = np.genfromtxt(
-            os.path.join(CNN_DIR, 'classes.csv'), delimiter=',', dtype=str)
+        with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:
+            self.CLASS_NAMES = list(csv.reader(f))[0]
         # User list of ingredients
         self.list_ingred = lil_matrix((1, len(self.CLASS_NAMES)), dtype=bool)
         logging.debug(self.CLASS_NAMES)
