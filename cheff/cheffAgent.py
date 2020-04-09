@@ -76,16 +76,16 @@ class SenderAgent(Agent):
 
 class CheffAgent(Agent):
 
-    class AddIngredBehav(CyclicBehaviour):
+    class AddIngredBehaviour(CyclicBehaviour):
         async def on_start(self):
-            logging.debug("AddIngredBehav starting . . .")
+            logging.debug("AddIngredBehaviour starting . . .")
             pass
 
         async def on_end(self):
             pass
 
         async def run(self):
-            logging.debug("AddIngredBehav running . . .")
+            logging.debug("AddIngredBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
             msg = await self.receive(timeout=t)
@@ -98,9 +98,9 @@ class CheffAgent(Agent):
                 logging.info(
                     f"[AddIngred] Did not received any message after {t} seconds")
 
-    class PreferencesBehav(CyclicBehaviour):
+    class PreferencesBehaviour(CyclicBehaviour):
         async def on_start(self):
-            logging.debug("PreferencesBehav starting . . .")
+            logging.debug("PreferencesBehaviour starting . . .")
 
             prefs_file = os.path.join(CHEFF_DIR, 'prefs.npz')
             if os.path.isfile('filename.txt'):
@@ -128,7 +128,7 @@ class CheffAgent(Agent):
 
         async def run(self):
             pass
-            logging.debug("PreferencesBehav running . . .")
+            logging.debug("PreferencesBehaviour running . . .")
             # wait for a message for t seconds
             t = 10
             msg = await self.receive(timeout=t)
@@ -146,21 +146,21 @@ class CheffAgent(Agent):
                 self.kill()
                 return
 
-    class MissingBehav(CyclicBehaviour):
+    class MissingBehaviour(CyclicBehaviour):
         """Behaviour for dealing with use case 2
 
         Receives a receipe identifier and checks which ingredients are missing 
         from the user ingredients list.
         """
         async def on_start(self):
-            logging.debug("Missing Behaviour starting . . .")
+            logging.debug("MissingBehaviour starting . . .")
             pass
 
         async def on_end(self):
             pass
 
         async def run(self):
-            logging.debug("Missing Behaviour running . . .")
+            logging.debug("MissingBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
             msg = await self.receive(timeout=t)
@@ -184,10 +184,10 @@ class CheffAgent(Agent):
                 logging.info(
                     f"[Missing] Did not received any message after {t} seconds")
 
-    class CookBehav(CyclicBehaviour):
+    class CookBehaviour(CyclicBehaviour):
 
         async def on_start(self):
-            logging.debug("Cooking Behaviour starting . . .")
+            logging.debug("CookBehaviour starting . . .")
             # self.ingreds_recipes = csc_matrix(
             #     np.load(os.path.join(CHEFF_DIR, 'recipes.npy')))
             with open(os.path.join(CHEFF_DIR, 'recipes.json'), 'r') as json_file:
@@ -199,28 +199,28 @@ class CheffAgent(Agent):
             pass
 
         async def run(self):
-            logging.debug("Cooking Behaviour running . . .")
+            logging.debug("CookBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
             msg = await self.receive(timeout=t)
             if msg:
                 logging.info(
-                    "[Cooking] Message received with content: {}".format(msg.body))
-                logging.info("[Cooking] Gonna start cooking...")
+                    "[Cook] Message received with content: {}".format(msg.body))
+                logging.info("[Cook] Gonna start cooking...")
                 # TODO: Change presence notification
 
                 logging.info(
-                    f"[Cooking] Ingredients list:\n{self.agent.list_ingred}")
+                    f"[Cook] Ingredients list:\n{self.agent.list_ingred}")
                 # Menu according user available ingredients
                 menu_avail = csc_matrix(self.agent.list_ingred).dot(
                     self.agent.ingreds_recipes)
                 logging.debug(menu_avail.get_shape())
-                logging.info(f"[Cooking] Available menu:\n{menu_avail}")
+                logging.info(f"[Cook] Available menu:\n{menu_avail}")
                 # Menu according user preferences
                 menu_pref = self.agent.preferences.dot(
                     self.agent.ingreds_recipes)
                 logging.debug(menu_pref.get_shape())
-                logging.info(f"[Cooking] Preferred menu:\n{menu_pref}")
+                logging.info(f"[Cook] Preferred menu:\n{menu_pref}")
 
                 menu = menu_avail + menu_pref
 
@@ -231,7 +231,7 @@ class CheffAgent(Agent):
 
             else:
                 logging.info(
-                    f"[Cooking] Did not received any message after {t} seconds")
+                    f"[Cook] Did not received any message after {t} seconds")
 
     async def setup(self):
         logging.info("Cheff Agent starting . . .")
@@ -254,10 +254,10 @@ class CheffAgent(Agent):
         # User preferences on ingredients
         self.preferences = None
 
-        i = self.AddIngredBehav()
-        c = self.CookBehav()
-        m = self.MissingBehav()
-        p = self.PreferencesBehav()
+        i = self.AddIngredBehaviour()
+        c = self.CookBehaviour()
+        m = self.MissingBehaviour()
+        p = self.PreferencesBehaviour()
         t_i = Template()
         t_i.set_metadata("performative", "inform")
         t_c = Template()
