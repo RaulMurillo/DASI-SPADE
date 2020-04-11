@@ -2,6 +2,12 @@ import time
 import asyncio
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
+from spade.behaviour import PeriodicBehaviour
+from spade.behaviour import OneShotBehaviour
+from spade.message import Message
+from spade.template import Template
+from spade import quit_spade
+
 
 import logging
 import os
@@ -13,47 +19,135 @@ from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler)
 
+messageAlergia = None
+messagePreferencia = None
+messageImage = None
+messageReceta = None
 
 class SenderAgent(Agent):
+    
     class SendBehav(PeriodicBehaviour):
         async def on_start(self):
             print("Starting behaviour . . .")
-            self.counter = 0
 
         async def run(self):
-            print("Counter: {}".format(self.counter))
-            self.counter += 1
             logging.debug("SendBehav running")
+            print("SenderAgent running . . .")
+
+            global messageAlergia
+            global messagePreferencia
+            global messageImage
+            global messageReceta
+            print("Estado de messagePreferencia" + str(messagePreferencia))
             if(messageAlergia != None):
 
-                msg = Message(to="cheff@localhost")     # Instantiate the message
+                msg = Message(to="akjncakj1@616.pub")     # Instantiate the message
                 #Alergia o Preferencia
                 msg.set_metadata("performative", "inform")
                 # Set the message content
                 msg.body = str(messageAlergia)
-                global messageAlergia
+                await self.send(msg)
                 messageAlergia = None
             elif(messagePreferencia != None):
-                msg = Message(to="cheff@localhost")     # Instantiate the message
+
+                msg = Message(to="akjncakj1@616.pub")     # Instantiate the message
                 #Alergia o Preferencia
-                msg.set_metadata("performative", "inform_ref")
-                global messagePreferencia
+                msg.set_metadata("performative", "request")
+                msg.body = str(messagePreferencia)
+                await self.send(msg)
                 messagePreferencia = None
             elif(messageImage != None):
 
-                msg = Message(to="image01@localhost")
+                msg = Message(to="akjncakj1@616.pub")
                 # Start cooking
-                msg.set_metadata("performative", "request")
-                global messageImage
+                msg.set_metadata("performative", "inform_ref")
+                msg.body = str(messageImage)
+                await self.send(msg)
                 messageImage = None
+            elif(messageReceta != None):
+
+                msg = Message(to="akjncakj1@616.pub")
+                # Start cooking
+                msg.set_metadata("performative", "inform_ref")
+                msg.body = str(messageReceta)
+                await self.send(msg)
+                messageReceta = None            
             else:
+                print("Nothing to send")
                 pass
-            await asyncio.sleep(1)
+            pass
+            #await asyncio.sleep(1)
 
     async def setup(self):
-        print("Agent starting . . .")
-        b = self.SendBehav(period=0.1)
+        print("SenderAgent starting . . .")
+        b = self.SendBehav(period=1.0)
         self.add_behaviour(b)
+
+class ReceiveAgent(Agent):
+    """Agent for testing
+    Receive message to this agent
+    """
+    class ReceiveAlergia(PeriodicBehaviour):
+        async def on_start(self):
+            print("Starting behaviour . . .")
+
+        async def run(self):
+            logging.debug("ReceivePref running")
+            t = 10
+            msg = await self.receive(timeout=t)
+            if msg:
+                logging.info("[Alergia] Message received with content: {}".format(msg.body))
+            else:
+                logging.info("[Alergia] Did not receive any message after {t} seconds")
+                #self.kill()
+                return
+
+    class ReceiveFoto(PeriodicBehaviour):
+        async def on_start(self):
+            print("Starting behaviour . . .")
+
+        async def run(self):
+            logging.debug("ReceivePref running")
+            t = 10
+            msg = await self.receive(timeout=t)
+            if msg:
+                logging.info("[Foto] Message received with content: {}".format(msg.body))
+            else:
+                logging.info("[Foto] Did not receive any message after {t} seconds")
+                #self.kill()
+                return
+            pass
+
+    class ReceivePref(PeriodicBehaviour):
+        async def on_start(self):
+            print("Starting behaviour . . .")
+
+        async def run(self):
+            logging.debug("ReceivePref running")
+            t = 10
+            msg = await self.receive(timeout=t)
+            if msg:
+                print("[Preferences] Message received with content: {}".format(msg.body))
+                logging.info("[Preferences] Message received with content: {}".format(msg.body))
+            else:
+                print("[Preferences] Did not receive any message after {t} seconds")
+                logging.info("[Preferences] Did not receive any message after {t} seconds")
+                return
+            pass
+    async def setup(self):
+        print("ReceiveAgent starting . . .")
+        b = self.ReceiveAlergia(period=0.1)
+        c = self.ReceiveFoto(period=0.1)
+        d = self.ReceivePref(period=0.1)
+        t_b = Template()
+        t_b.set_metadata("performative", "inform")
+        t_c = Template()
+        t_c.set_metadata("performative", "inform_ref")
+        t_d = Template()
+        t_d.set_metadata("performative", "request")
+        self.add_behaviour(b, t_b)
+        self.add_behaviour(c, t_c)
+        self.add_behaviour(d, t_d)
 
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
 # Enable logging
@@ -81,9 +175,7 @@ SESSION_ID = 'me'
 fulfillment = ""
 intent = ""
 fields = ""
-messageAlergia = None
-messagePreferencia = None
-messageImage = None
+
 # Llamada a DialogFlow sin fields
 def callToDialogFlow(text):
     text_to_be_analyzed = text
@@ -135,8 +227,15 @@ def callToDialogFlowFields(text):
     global intent
     fulfillment = response.query_result.fulfillment_text
     intent = response.query_result.intent.display_name
+    print("TAMAÑO FILEDS:", len(response.query_result.parameters.fields[valorFields].list_value.values))
+    all_fields_response = ""
+    for x in range(0,len(response.query_result.parameters.fields[valorFields].list_value.values)):
 
-    return response.query_result.parameters.fields[valorFields].list_value.values[0].string_value
+        all_fields_response = all_fields_response + response.query_result.parameters.fields[valorFields].list_value.values[x].string_value
+        if(x+1 != len(response.query_result.parameters.fields[valorFields].list_value.values)):
+            all_fields_response = all_fields_response + ", "
+    print("callToDialogFlowFields return: " + all_fields_response)
+    return all_fields_response
 
 def facts_to_str(user_data):
     facts = list()
@@ -201,7 +300,21 @@ def received_information(update, context):
     category = user_data['choice']
     user_data[category] = fields
     del user_data['choice']
-
+    global intent
+    if(intent == "GuardarGusto"):
+        global messagePreferencia
+        messagePreferencia = fields
+    elif(intent == "GuardarAlergia"):
+        global messageAlergia
+        messageAlergia = fields
+    elif(intent == "RecepcionImagen"):
+        pass
+        ##TODO Mensaje con el PATH de la imagen
+    elif(intent == "GuardarReceta"):
+        global messageReceta
+        ##TODO Terminar la parte de la receta
+        messageReceta = fields
+    print("Mensaje: " + messagePreferencia)
     update.message.reply_text(fulfillment.format(facts_to_str(user_data)),
                               reply_markup=markup)
 
@@ -230,7 +343,7 @@ def telegramBot_main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("1109746327:AAEfk6ivUvhR23M6z1BBOHvKKb5pHHwSGlQ", use_context=True)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
@@ -270,12 +383,17 @@ def telegramBot_main():
 ## ---------------------------------- END TELEGRAM -----------------------------------------------##
 
 if __name__ == "__main__":
-    senderAgent = SenderAgent("telegram@localhost", "your_password")
-    senderAgent.start()
+
     logging.basicConfig()
     logging.root.setLevel(logging.INFO)
     logging.basicConfig(level=logging.INFO)
 
+    senderAgent = SenderAgent("akjncakj@616.pub", "123456")
+    future = senderAgent.start()
+    future.result()
+
+    receiver = ReceiveAgent("akjncakj1@616.pub", "123456")
+    receiver.start()
 
     telegramBot_main()
     print("Wait until user interrupts with ctrl+C")
@@ -284,4 +402,7 @@ if __name__ == "__main__":
             time.sleep(1)
         except KeyboardInterrupt:
             break
-    dummy.stop()
+    senderAgent.stop()
+    receiver.stop()
+    logging.debug("[INFO] Agents finished")
+    quit_spade()
