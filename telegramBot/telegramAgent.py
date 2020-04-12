@@ -13,6 +13,7 @@ import logging
 import os
 import dialogflow
 import json
+import datetime
 
 from google.api_core.exceptions import InvalidArgument
 from telegram import ReplyKeyboardMarkup
@@ -159,7 +160,7 @@ logger = logging.getLogger(__name__)
 # Telegram States
 CHOOSING, TYPING_REPLY, PHOTO, TYPING_CHOICE = range(4)
 
-reply_keyboard = [['Quiero cocinar'],
+reply_keyboard = [['Subir imagen', 'Tu receta'],
                   ['Preferencias','Alergias'],
                   ['Finalizar']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
@@ -217,12 +218,15 @@ def callToDialogFlowFields(text):
         valorFields = "gustos"
     elif(response.query_result.intent.display_name == "GuardarAlergia"):
         valorFields = "Alergias"
+    elif(response.query_result.intent.display_name == "GuardarReceta"):
+        valorFields = "Receta"     
+
+    print("Response:", response)
     print("Query text:", response.query_result.query_text)
     print("Detected intent:", response.query_result.intent.display_name)
     print("Detected intent confidence:", response.query_result.intent_detection_confidence)
     print("Fulfillment text:", response.query_result.fulfillment_text)
     print("fields:", response.query_result.parameters.fields[valorFields].list_value.values[0].string_value)  
-    print("Response:", response)
     global fulfillment
     global intent
     fulfillment = response.query_result.fulfillment_text
@@ -235,7 +239,7 @@ def callToDialogFlowFields(text):
         if(x+1 != len(response.query_result.parameters.fields[valorFields].list_value.values)):
             all_fields_response = all_fields_response + ", "
     print("callToDialogFlowFields return: " + all_fields_response)
-    return all_fields_response
+    return str(all_fields_response)
 
 def facts_to_str(user_data):
     facts = list()
@@ -282,8 +286,14 @@ def custom_choice(update, context):
 def photo(update, context):
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
-    photo_file.download('user_photo.jpg')
-    logger.info("Image of %s: %s", user.first_name, 'user_photo.jpg')
+    currentDT = datetime.datetime.now()
+    photo_name = 'user_photo' + currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
+    photo_file.download(photo_name)
+    logger.info("Image of %s: %s", user.first_name, photo_name)
+    cwd = os.getcwd()
+    global messageImage
+    messageImage = cwd + "/" + photo_name
+    logger.info("messageInfo updated to: %s", messageImage)
     text = "SendImage"
     callToDialogFlow(text)
     update.message.reply_text(fulfillment.format(text.lower()),reply_markup=markup)
@@ -296,7 +306,7 @@ def received_information(update, context):
     print("Valor introducido:", text)
     #Llamada a DialogFlow
     fields = callToDialogFlowFields(text)
-
+    print("FIELDS: " + fields)
     category = user_data['choice']
     user_data[category] = fields
     del user_data['choice']
@@ -308,13 +318,13 @@ def received_information(update, context):
         global messageAlergia
         messageAlergia = fields
     elif(intent == "RecepcionImagen"):
+        ## No se hace nada, ya que el mensaje de Imagen se actualiza cuando se sube la imagen en funcion photo
         pass
-        ##TODO Mensaje con el PATH de la imagen
     elif(intent == "GuardarReceta"):
         global messageReceta
         ##TODO Terminar la parte de la receta
         messageReceta = fields
-    print("Mensaje: " + messagePreferencia)
+    #print("Mensaje: " + fulfillment)
     update.message.reply_text(fulfillment.format(facts_to_str(user_data)),
                               reply_markup=markup)
 
@@ -343,7 +353,7 @@ def telegramBot_main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1109746327:AAEfk6ivUvhR23M6z1BBOHvKKb5pHHwSGlQ", use_context=True)
+    updater = Updater("TOKEN", use_context=True)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
@@ -352,9 +362,9 @@ def telegramBot_main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            CHOOSING: [MessageHandler(Filters.regex('^(Preferencias|Alergias)$'),
+            CHOOSING: [MessageHandler(Filters.regex('^(Preferencias|Alergias|Tu receta)$'),
                                       regular_choice),
-                        MessageHandler(Filters.regex('^Quiero cocinar$'),
+                        MessageHandler(Filters.regex('^Subir imagen$'),
                                       custom_choice)
                        ],
             PHOTO: [MessageHandler(Filters.photo,
