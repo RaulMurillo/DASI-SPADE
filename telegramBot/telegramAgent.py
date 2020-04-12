@@ -215,7 +215,7 @@ def callToDialogFlowFields(text):
 
     valorFields = None
     if(response.query_result.intent.display_name == "GuardarGusto"):
-        valorFields = "gustos"
+        valorFields = "Gustos"
     elif(response.query_result.intent.display_name == "GuardarAlergia"):
         valorFields = "Alergias"
     elif(response.query_result.intent.display_name == "GuardarReceta"):
