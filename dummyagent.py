@@ -20,7 +20,7 @@ class DummyAgent(Agent):
         self.add_behaviour(b)
 
 if __name__ == "__main__":
-    dummy = DummyAgent("akjncakj@616.pub", "123456")
+    dummy = DummyAgent("dummy01@localhost", "user01")
 
     future = dummy.start()
     future.result()  # Wait until the start method is finished
