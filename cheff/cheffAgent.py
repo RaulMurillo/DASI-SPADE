@@ -130,7 +130,7 @@ class CheffAgent(Agent):
             pass
             logging.debug("PreferencesBehaviour running . . .")
             # wait for a message for t seconds
-            t = 10
+            t = 10000
             msg = await self.receive(timeout=t)
             if msg:
                 logging.info(
@@ -285,7 +285,7 @@ if __name__ == "__main__":
     future.result()  # Wait until the start method is finished
 
     # sender = SenderAgent("sender@localhost", "user01")
-    sender.start()
+    # sender.start()
 
     while True:
         try:
