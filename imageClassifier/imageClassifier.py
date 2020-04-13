@@ -144,13 +144,14 @@ class ImageAgent(Agent):
 
 
 if __name__ == "__main__":
-    imageagent = ImageAgent("image01@localhost", "user01")
+    # imageagent = ImageAgent("image01@localhost", "user01")
+    imageagent = ImageAgent("dasi2020image@616.pub", "123456")
 
     future = imageagent.start()
     future.result()  # Wait until the start method is finished
 
-    senderagent = SenderAgent("sender@localhost", "user01")
-    senderagent.start()
+    # senderagent = SenderAgent("sender@localhost", "user01")
+    # senderagent.start()
 
     while True:
         try:
@@ -158,7 +159,7 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
 
-    senderagent.stop()
+    # senderagent.stop()
     imageagent.stop()
 
     print("Agents finished")

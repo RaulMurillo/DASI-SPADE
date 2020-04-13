@@ -278,11 +278,13 @@ if __name__ == "__main__":
     logging.root.setLevel(logging.INFO)
     logging.basicConfig(level=logging.INFO)
 
-    a = CheffAgent("cheff@localhost", "user01")
+    # a = CheffAgent("cheff@localhost", "user01")
+    a = CheffAgent("dasi2020cheff@616.pub", "123456")
+    
     future = a.start()
     future.result()  # Wait until the start method is finished
 
-    sender = SenderAgent("sender@localhost", "user01")
+    # sender = SenderAgent("sender@localhost", "user01")
     sender.start()
 
     while True:
@@ -292,7 +294,7 @@ if __name__ == "__main__":
             break
 
     a.stop()
-    sender.stop()
+    # sender.stop()
 
     print("Agents finished")
     quit_spade()

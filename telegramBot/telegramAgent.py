@@ -59,9 +59,9 @@ class SenderAgent(Agent):
                 messagePreferencia = None
             elif(messageImage != None):
 
-                msg = Message(to="akjncakj1@616.pub")
+                msg = Message(to="dasi2020image@616.pub")#"akjncakj1@616.pub")
                 # Start cooking
-                msg.set_metadata("performative", "inform_ref")
+                msg.set_metadata("performative", "request")#"inform_ref")
                 msg.body = str(messageImage)
                 await self.send(msg)
                 messageImage = None
@@ -94,12 +94,12 @@ class ReceiveAgent(Agent):
 
         async def run(self):
             logging.debug("ReceivePref running")
-            t = 10
+            t = 10000
             msg = await self.receive(timeout=t)
             if msg:
                 logging.info("[Alergia] Message received with content: {}".format(msg.body))
             else:
-                logging.info("[Alergia] Did not receive any message after {t} seconds")
+                logging.info(f"[Alergia] Did not receive any message after {t} seconds")
                 #self.kill()
                 return
 
@@ -353,7 +353,7 @@ def telegramBot_main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("1109746327:AAEfk6ivUvhR23M6z1BBOHvKKb5pHHwSGlQ", use_context=True)
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
