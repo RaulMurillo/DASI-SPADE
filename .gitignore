@@ -1,5 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+
+# C extensions
+*.so
+
 # Compiled class file
 *.class
+
+# Visual Studio Code
+.vscode/*
 
 # Log file
 *.log
@@ -24,4 +38,8 @@ hs_err_pid*
 
 # Keras Neural network models
 *.h5
+
+# User data
+*.npy
+*.npz
 
