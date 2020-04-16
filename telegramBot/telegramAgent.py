@@ -286,6 +286,9 @@ def facts_to_str(user_data):
 
     return "\n".join(facts).join(['\n', '\n'])
 
+## ---------------------------------- END DIALOGFLOW -------------------------------------------##
+## ---------------------------------- START TELEGRAM -------------------------------------------##
+
 
 def start(update, context):
     update.message.reply_text(
