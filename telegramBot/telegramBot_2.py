@@ -480,7 +480,7 @@ def save_image(update, context):
     try:
         os.mkdir(photo_dir)
         print("Directory ", photo_dir, " created")
-    except FileExistsError:y
+    except FileExistsError:
         print("Directory ", photo_dir, " already exists")
     photo_name = 'user_photo' + \
         currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
