@@ -443,19 +443,29 @@ def error(update, context):
 
 def detect_intention(update, context):
     """Detect user's intention from input text."""
+    
+    # Use Dialogflow to detect user's intenction (use case)
+    text = update.message.text
+    callToDialogFlow(text)
+    global intent
+    if intent == 'GuardarGusto':
+        return adding_prefs(update, context)
+    elif intent == 'GuardarAlergia':
+        return adding_allergies (update, context)
+    elif intent == 'SubirImagen':
+        return adding_images(update, context)
+    elif intent == 'GuardarReceta':
+        return adding_recipe(update, context)
+    else:
+        update.message.reply_text('No te he entendido')
 
-    # TODO: Use Dialogflow to detect user's intenction (use case)
-
-    return SELECTING_ACTION
+    return detect_intention(update, context) #Esto no se si esta bien que el return sea llamar a la misma funcion @rmurillo
 
 
 def adding_images(update, context):
     """Add the images of ingredients."""
-    text = 'Ahora introduce fotos de los ingredientes que tengas.\n' + \
-        'Procura que aparezca un alimento por imagen.\n' + \
-        'Escribe texto cuando hayas terminado de introducir fotos.\n\n'
+    update.message.reply_text(fulfillment)
 
-    update.message.reply_text(text)
 
     return ADD_PHOTO
 
@@ -467,6 +477,11 @@ def save_image(update, context):
     currentDT = datetime.datetime.now()
 
     photo_dir = os.path.join(os.getcwd(), 'uploads')
+    try:
+        os.mkdir(photo_dir)
+        print("Directory ", photo_dir, " created")
+    except FileExistsError:y
+        print("Directory ", photo_dir, " already exists")
     photo_name = 'user_photo' + \
         currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
     photo_path = os.path.join(photo_dir, photo_name)
@@ -507,19 +522,24 @@ def stop_images(update, context):
 
 def adding_recipe(update, context):
     """Add the recipe you would like to cook."""
-    text = 'Ok, por favor, indícame qué receta quieres preparar.'
-    update.message.reply_text(text)
+    update.message.reply_text(fulfillment)
+
 
     return ADD_RECIPE
 
 
 def save_recipe(update, context):
     """Save input for recipe and return to next state."""
-    # Fake recipes
-    valid_recipes = ['PASTA', 'SOPA']
+    text = update.message.text
 
-    # TODO: Validate with Dialogflow
-    if update.message.text not in valid_recipes:
+    # Fake recipes
+    # valid_recipes = ['PASTA', 'SOPA']
+
+    # Validate with Dialogflow
+    valid_recipes = callToDialogFlowFields(text)
+    update.message.reply_text(fulfillment)
+
+    if valid_recipes is None: # @rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
         update.message.reply_text(
             'Lo siento, no conozco esa receta.\nPrueba con otra.')
         return ADD_RECIPE
@@ -533,20 +553,24 @@ def save_recipe(update, context):
 
 def adding_prefs(update, context):
     """Add likes to the system."""
-    text = 'Dime qué alimentos prefieres.'
-    update.message.reply_text(text)
+    update.message.reply_text(fulfillment)
+
 
     return ADD_PREFS
 
 
 def save_prefs(update, context):
     """Save detected preferences into system."""
+    text = update.message.text
     # Fake preferences
-    ingreds = ['APPLE', 'BANANA']
+    #ingreds = ['APPLE', 'BANANA'] @rmurillo esto no hace falta ya que dialogflow los saca de la lista que me pasaste
 
-    # TODO: Validate with Dialogflow
+    # Validate with Dialogflow
+    ingreds = callToDialogFlowFields(text)
+    update.message.reply_text(fulfillment)
+
     # TODO: Detect all possible ingreds in user message
-    if update.message.text not in ingreds:
+    if update.message.text not in ingreds: #@rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
         update.message.reply_text(
             'Lo siento, no conozco ese ingrediente.\nPrueba con otro.')
     # TODO: for every ingred in user message: send to Chat Agent
@@ -559,20 +583,22 @@ def save_prefs(update, context):
 
 def adding_allergies(update, context):
     """Add allergies to the system."""
-    text = 'Dime qué alimentos no puedes tomar.'
-    update.message.reply_text(text)
+    update.message.reply_text(fulfillment)
 
     return ADD_ALLERGY
 
 
 def save_allergies(update, context):
     """Save detected allergies into system."""
+    text = update.message.text
     # Fake allergies
-    ingreds = ['GARLIC', 'ONION']
+    #ingreds = ['GARLIC', 'ONION'] @rmurillo esto no hace falta ya que dialogflow los saca de la lista que me pasaste
 
-    # TODO: Validate with Dialogflow
+    # Validate with Dialogflow
+    ingreds = callToDialogFlowFields(text)
+    update.message.reply_text(fulfillment)
     # TODO: Detect all possible ingreds in user message
-    if update.message.text not in ingreds:
+    if update.message.text not in ingreds: #@rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
         update.message.reply_text(
             'Lo siento, no conozco ese ingrediente.\nPrueba con otro.')
     # TODO: for every ingred in user message: send to Chat Agent
