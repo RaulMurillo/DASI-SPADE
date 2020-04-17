@@ -195,6 +195,8 @@ intent = ""
 fields = ""
 
 # Llamada a DialogFlow sin fields
+
+
 def callToDialogFlow(text):
     text_to_be_analyzed = text
 
@@ -209,6 +211,11 @@ def callToDialogFlow(text):
     except InvalidArgument:
         raise
 
+    if response.query_result.all_required_params_present:
+        print('Great 2!')
+    else:
+        print('no req.params present')
+
     print("Query text:", response.query_result.query_text)
     print("Detected intent:", response.query_result.intent.display_name)
     print("Detected intent confidence:",
@@ -221,6 +228,8 @@ def callToDialogFlow(text):
     intent = response.query_result.intent.display_name
 
 # Llamada a DialogFlow que devuelve los fileds identificados
+
+
 def callToDialogFlowFields(text):
     text_to_be_analyzed = text
 
@@ -239,7 +248,7 @@ def callToDialogFlowFields(text):
     if(response.query_result.intent.display_name == "GuardarGusto"):
         valorFields = "Gustos"
     elif(response.query_result.intent.display_name == "GuardarAlergia"):
-        valorFields = "Alergias"
+        valorFields = "Ingredientes"
     elif(response.query_result.intent.display_name == "GuardarReceta"):
         valorFields = "Receta"
 
@@ -266,6 +275,70 @@ def callToDialogFlowFields(text):
             all_fields_response = all_fields_response + ", "
     print("callToDialogFlowFields return: " + all_fields_response)
     return str(all_fields_response)
+
+
+def call2dialogflow(input_text):
+    # Init API
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+    text_input = dialogflow.types.TextInput(
+        text=input_text, language_code=DIALOGFLOW_LANGUAGE_CODE)
+    query_input = dialogflow.types.QueryInput(text=text_input)
+    try:
+        response = session_client.detect_intent(
+            session=session, query_input=query_input)
+    except InvalidArgument:
+        raise
+
+    global fulfillment
+    global intent
+    fulfillment = response.query_result.fulfillment_text
+    intent = response.query_result.intent.display_name
+
+    r = {
+        'fulfillment': response.query_result.fulfillment_text,
+        'intent': response.query_result.intent.display_name,
+    }
+
+    if response.query_result.all_required_params_present:
+        # There is no need to ask again
+        print(
+            f'Great 2! - {response.query_result.all_required_params_present}')
+        valorFields = None
+        if(r['intent'] == "GuardarGusto") or (r['intent'] == "GuardarAlergia"):
+            valorFields = "Ingredientes"
+        elif(r['intent'] == "GuardarReceta"):
+            valorFields = "Receta"
+        else:
+            raise ValueError
+
+        r['fields'] = response.query_result.parameters.fields[valorFields]
+    else:
+        print(
+            f'no req.params present - {response.query_result.all_required_params_present}')
+    
+    return r
+
+    # valorFields = None
+    # if(response.query_result.intent.display_name == "GuardarGusto"):
+    #     valorFields = "Gustos"
+    # elif(response.query_result.intent.display_name == "GuardarAlergia"):
+    #     valorFields = "Ingredientes"
+    # elif(response.query_result.intent.display_name == "GuardarReceta"):
+    #     valorFields = "Receta"
+    # else:
+    #     raise ValueError
+
+    # print("Response:", response)
+    # print("Query text:", response.query_result.query_text)
+    # print("Detected intent:", response.query_result.intent.display_name)
+    # print("Detected intent confidence:",
+    #       response.query_result.intent_detection_confidence)
+    # print("Fulfillment text:", response.query_result.fulfillment_text)
+    # print("fields:",
+    #       response.query_result.parameters.fields[valorFields].list_value.values[0].string_value)
+
+    # return response.query_result.parameters.fields[valorFields]
 
 
 def facts_to_str(user_data):
@@ -296,7 +369,6 @@ reply_keyboard = [['Subir imagen', 'Tu receta'],
                   ['Preferencias', 'Alergias'],
                   ['Finalizar']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-
 
 
 def start(update, context):
@@ -442,29 +514,29 @@ def error(update, context):
 
 def detect_intention(update, context):
     """Detect user's intention from input text."""
-    
+
     # Use Dialogflow to detect user's intenction (use case)
     text = update.message.text
-    callToDialogFlow(text)
+    call2dialogflow(text)
     global intent
     if intent == 'GuardarGusto':
         return adding_prefs(update, context)
     elif intent == 'GuardarAlergia':
-        return adding_allergies (update, context)
+        return adding_allergies(update, context)
     elif intent == 'SubirImagen':
         return adding_images(update, context)
     elif intent == 'GuardarReceta':
         return adding_recipe(update, context)
     else:
-        update.message.reply_text('No te he entendido')
+        update.message.reply_text('Lo siento, no te he entendido')
 
-    return detect_intention(update, context) #Esto no se si esta bien que el return sea llamar a la misma funcion @rmurillo
+    # detect_intention(update, context) #Esto no se si esta bien que el return sea llamar a la misma funcion @rmurillo
+    return SELECTING_ACTION
 
 
 def adding_images(update, context):
     """Add the images of ingredients."""
     update.message.reply_text(fulfillment)
-
 
     return ADD_PHOTO
 
@@ -525,7 +597,6 @@ def adding_recipe(update, context):
     """Add the recipe you would like to cook."""
     update.message.reply_text(fulfillment)
 
-
     return ADD_RECIPE
 
 
@@ -540,7 +611,7 @@ def save_recipe(update, context):
     valid_recipes = callToDialogFlowFields(text)
     update.message.reply_text(fulfillment)
 
-    if valid_recipes is None: # @rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
+    if valid_recipes is None:  # @rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
         update.message.reply_text(
             'Lo siento, no conozco esa receta.\nPrueba con otra.')
         return ADD_RECIPE
@@ -556,7 +627,6 @@ def adding_prefs(update, context):
     """Add likes to the system."""
     update.message.reply_text(fulfillment)
 
-
     return ADD_PREFS
 
 
@@ -564,14 +634,14 @@ def save_prefs(update, context):
     """Save detected preferences into system."""
     text = update.message.text
     # Fake preferences
-    #ingreds = ['APPLE', 'BANANA'] @rmurillo esto no hace falta ya que dialogflow los saca de la lista que me pasaste
+    # ingreds = ['APPLE', 'BANANA'] @rmurillo esto no hace falta ya que dialogflow los saca de la lista que me pasaste
 
     # Validate with Dialogflow
     ingreds = callToDialogFlowFields(text)
     update.message.reply_text(fulfillment)
 
     # TODO: Detect all possible ingreds in user message
-    if update.message.text not in ingreds: #@rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
+    if update.message.text not in ingreds:  # @rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
         update.message.reply_text(
             'Lo siento, no conozco ese ingrediente.\nPrueba con otro.')
     # TODO: for every ingred in user message: send to Chat Agent
@@ -592,20 +662,39 @@ def adding_allergies(update, context):
 def save_allergies(update, context):
     """Save detected allergies into system."""
     text = update.message.text
-    # Fake allergies
-    #ingreds = ['GARLIC', 'ONION'] @rmurillo esto no hace falta ya que dialogflow los saca de la lista que me pasaste
+    # Fake ingreds list
+    INGREDIENTS = ['AJO', 'JUDIAS', 'PERA', 'LIMON', 'TOMATE']
 
     # Validate with Dialogflow
-    ingreds = callToDialogFlowFields(text)
-    update.message.reply_text(fulfillment)
-    # TODO: Detect all possible ingreds in user message
-    if update.message.text not in ingreds: #@rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
+    # ingreds = callToDialogFlowFields(text)
+    response = call2dialogflow(text)
+    # print('[SAVE ALLERGIES]')
+    # print(type(ingreds))
+    # print((ingreds))
+    update.message.reply_text(response['fulfillment'])
+
+    assert 'fields' in response
+    
+    # Detect all possible ingreds in user message
+    unknowns = []
+    for i in response['fields'].list_value.values:
+        ingredient = i.string_value
+        if ingredient not in INGREDIENTS:
+            unknowns.append(ingredient)
+        else:
+            # TODO: send to Chat Agent
+            e = INGREDIENTS.index(ingredient)
+
+    if len(unknowns) > 0:
+        my_string = ', '.join(unknowns)
         update.message.reply_text(
-            'Lo siento, no conozco ese ingrediente.\nPrueba con otro.')
-    # TODO: for every ingred in user message: send to Chat Agent
+            f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
+
+    buttons = [['si', 'no']]
+    keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
 
     update.message.reply_text(
-        '¿Hay algún otro alimento que no puedas tomar? (si/no)')
+        '¿Hay algún otro alimento que no puedas tomar? (si/no)', reply_keyboard=keyboard)
     context.user_data[START_OVER] = True
     return ADD_ALLERGY
 
