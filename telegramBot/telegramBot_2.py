@@ -174,20 +174,13 @@ messageReceta = None
 #         self.add_behaviour(d, t_d)
 
 
-## ---------------------------------- START TELEGRAM -------------------------------------------##
+## ---------------------------------- START DIALOGFLOW -----------------------------------------##
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-# Telegram States
-CHOOSING, TYPING_REPLY, PHOTO, TYPING_CHOICE = range(4)
-
-reply_keyboard = [['Subir imagen', 'Tu receta'],
-                  ['Preferencias', 'Alergias'],
-                  ['Finalizar']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 # DialogFlow Credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'private_key.json'
@@ -202,8 +195,6 @@ intent = ""
 fields = ""
 
 # Llamada a DialogFlow sin fields
-
-
 def callToDialogFlow(text):
     text_to_be_analyzed = text
 
@@ -230,8 +221,6 @@ def callToDialogFlow(text):
     intent = response.query_result.intent.display_name
 
 # Llamada a DialogFlow que devuelve los fileds identificados
-
-
 def callToDialogFlowFields(text):
     text_to_be_analyzed = text
 
@@ -290,6 +279,7 @@ def facts_to_str(user_data):
 
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
+
 # State definitions for top level conversation
 (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO, ASK_CHEFF,
  ADD_PREFS, ADD_ALLERGY) = map(chr, range(6))
@@ -298,6 +288,15 @@ END = ConversationHandler.END
 
 # Different constants for this example
 (RECIPE, START_OVER) = map(chr, range(10, 12))
+
+# Telegram States
+CHOOSING, TYPING_REPLY, PHOTO, TYPING_CHOICE = range(4)
+
+reply_keyboard = [['Subir imagen', 'Tu receta'],
+                  ['Preferencias', 'Alergias'],
+                  ['Finalizar']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
 
 
 def start(update, context):
@@ -421,9 +420,9 @@ def received_information(update, context):
 
 
 def done(update, context):
-    user_data = context.user_data
-    if 'choice' in user_data:
-        del user_data['choice']
+    # user_data = context.user_data
+    # if 'choice' in user_data:
+    #     del user_data['choice']
 
     # update.message.reply_text("I learned these facts about you:"
     #                           "{}"
@@ -477,11 +476,13 @@ def save_image(update, context):
     currentDT = datetime.datetime.now()
 
     photo_dir = os.path.join(os.getcwd(), 'uploads')
-    try:
-        os.mkdir(photo_dir)
-        print("Directory ", photo_dir, " created")
-    except FileExistsError:
-        print("Directory ", photo_dir, " already exists")
+    if not os.path.exists(photo_dir):
+        os.makedirs(photo_dir)
+    # try:
+    #     os.mkdir(photo_dir, )
+    #     print("Directory ", photo_dir, " created")
+    # except FileExistsError:
+    #     print("Directory ", photo_dir, " already exists")
     photo_name = 'user_photo' + \
         currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
     photo_path = os.path.join(photo_dir, photo_name)
