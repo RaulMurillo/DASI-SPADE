@@ -1,3 +1,4 @@
+# SPADE libs
 import time
 import asyncio
 from spade.agent import Agent
@@ -17,7 +18,6 @@ import datetime
 
 from google.api_core.exceptions import InvalidArgument
 from telegram import ReplyKeyboardMarkup
-from telegram import (InlineKeyboardMarkup, InlineKeyboardButton)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler, CallbackQueryHandler)
 
@@ -181,13 +181,14 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-
 # DialogFlow Credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'private_key.json'
 
 DIALOGFLOW_PROJECT_ID = 'dasibot-pfrrfb'
 DIALOGFLOW_LANGUAGE_CODE = 'es'
 SESSION_ID = 'me'
+
+photo_dir = os.path.join(os.getcwd(), 'uploads')
 
 
 def call2dialogflow(input_text):
@@ -221,9 +222,8 @@ def call2dialogflow(input_text):
             return r
 
         r['fields'] = response.query_result.parameters.fields[valorFields]
-    # else:
-    #     print(
-    #         f'no req.params present - {response.query_result.all_required_params_present}')
+    else:
+        logging.debug('[Dialogflow] - Missing required params')
     return r
 
 
@@ -255,11 +255,12 @@ def start(update, context):
     if not context.user_data.get(START_OVER):
         update.message.reply_text(
             'Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot.')
-    update.message.reply_text(text=text, resize_keyboard=True, reply_markup=keyboard)
+    update.message.reply_text(
+        text=text, resize_keyboard=True, reply_markup=keyboard)
 
     # Clear Dialogflow context
     call2dialogflow('Hola DASI-Chef Bot')
-
+    # Clear user context
     context.user_data.clear()
     context.user_data[START_OVER] = True
     return SELECTING_ACTION
@@ -288,8 +289,7 @@ def error(update, context):
 def detect_intention(update, context):
     """Detect user's intention from input text."""
     # Use Dialogflow to detect user's intention (use case)
-    text = update.message.text
-    response = call2dialogflow(text)
+    response = call2dialogflow(update.message.text)
     # Store values
     try:
         context.user_data[FULFILLMENT] = response['fulfillment']
@@ -341,10 +341,6 @@ def save_image(update, context):
     photo_file = update.message.photo[-1].get_file()
     currentDT = datetime.datetime.now()
 
-    # TODO: Set un main
-    photo_dir = os.path.join(os.getcwd(), 'uploads')
-    if not os.path.exists(photo_dir):
-        os.makedirs(photo_dir)
     # try:
     #     os.mkdir(photo_dir, )
     #     print("Directory ", photo_dir, " created")
@@ -367,7 +363,7 @@ def save_image(update, context):
 
     return ADD_PHOTO
 
-
+# TODO: ChatAgent
 def stop_images(update, context):
     update.message.reply_text(
         'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
@@ -384,9 +380,11 @@ def stop_images(update, context):
     # TODO: Receive answer from Chat Agent (another state?)
 
     buttons = [['Sí', 'No']]
-    keyboard = ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup(
+        buttons, resize_keyboard=True, one_time_keyboard=True)
 
-    update.message.reply_text(text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
+    update.message.reply_text(
+        text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
     context.user_data[START_OVER] = True
 
     return ASK_CHEFF
@@ -424,7 +422,7 @@ def save_recipe(update, context):
             context.user_data[FIELDS] = response['fields']
             if len(context.user_data[FIELDS].list_value.values) > 1:
                 update.message.reply_text(
-                'Por favor, introduce una sola receta, o escribe \'salir\' para volver')
+                    'Por favor, introduce una sola receta, o escribe \'salir\' para volver')
                 return ADD_RECIPE
         except KeyError:
             update.message.reply_text(
@@ -449,10 +447,10 @@ def adding_prefs(update, context):
         return ADD_PREFS
     return END  # Unreachable
 
-
+# TODO: ChatAgent
 def save_prefs(update, context):
     """Save detected likes or allergies into system."""
-    
+
     # Fake ingreds list
     INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
     # Get ingredients, if not introduced previously
@@ -493,11 +491,12 @@ def save_prefs(update, context):
                 f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
     # Ask for more ingredients or leave
     buttons = [['Sí', 'No']]
-    keyboard = ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
+    keyboard = ReplyKeyboardMarkup(
+        buttons, resize_keyboard=True, one_time_keyboard=True)
 
     prefs_text = 'que no puedas tomar' if context.user_data[
         INTENT] == 'GuardarAlergia' else 'que te guste especialmente'
-    
+
     update.message.reply_text(
         f'¿Hay algún otro alimento {prefs_text}?', reply_markup=keyboard)
     # Next state's FULFILLMENT
@@ -525,6 +524,7 @@ def telegramBot_main():
         states={
             SELECTING_ACTION: [
                 CommandHandler('info', display_info),
+                CommandHandler('exit', done),
                 # MessageHandler(Filters.regex('^CU01$'), adding_images),
                 # MessageHandler(Filters.regex('^CU02$'), adding_recipe),
                 # MessageHandler(Filters.regex('^CU03A$'), adding_prefs),
@@ -536,8 +536,8 @@ def telegramBot_main():
                 MessageHandler(Filters.text, save_recipe),
             ],
             ADD_PHOTO: [
-                MessageHandler(Filters.text, stop_images),
                 MessageHandler(Filters.photo, save_image),
+                MessageHandler(Filters.text, stop_images),
             ],
             ASK_CHEFF: [
                 MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
@@ -560,6 +560,10 @@ def telegramBot_main():
 
     # log all errors
     dp.add_error_handler(error)
+
+    # Pictures folder
+    if not os.path.exists(photo_dir):
+        os.makedirs(photo_dir)
 
     # Start the Bot
     updater.start_polling()
