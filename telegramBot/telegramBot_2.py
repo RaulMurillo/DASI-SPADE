@@ -284,12 +284,13 @@ def call2dialogflow(input_text):
     text_input = dialogflow.types.TextInput(
         text=input_text, language_code=DIALOGFLOW_LANGUAGE_CODE)
     query_input = dialogflow.types.QueryInput(text=text_input)
+    print('[CALL2] - detect_intent')
     try:
         response = session_client.detect_intent(
             session=session, query_input=query_input)
     except InvalidArgument:
         raise Exception('Dialogflow request failed')
-
+    print('[CALL2] - got response')
     global fulfillment
     global intent
     fulfillment = response.query_result.fulfillment_text
@@ -299,8 +300,7 @@ def call2dialogflow(input_text):
         'fulfillment': response.query_result.fulfillment_text,
         'intent': response.query_result.intent.display_name,
     }
-
-    if response.query_result.all_required_params_present:
+    if (response.query_result.all_required_params_present): # and (r['intent']!= 'Default Fallback Intent')
         # There is no need to ask again
         valorFields = None
         if(r['intent'] == "GuardarGusto") or (r['intent'] == "GuardarAlergia"):
@@ -308,13 +308,13 @@ def call2dialogflow(input_text):
         elif(r['intent'] == "GuardarReceta"):
             valorFields = "Receta"
         else:
-            raise ValueError
+            # raise ValueError
+            return r
 
         r['fields'] = response.query_result.parameters.fields[valorFields]
-    else:
-        print(
-            f'no req.params present - {response.query_result.all_required_params_present}')
-
+    # else:
+    #     print(
+    #         f'no req.params present - {response.query_result.all_required_params_present}')
     return r
 
     # valorFields = None
@@ -358,7 +358,7 @@ def facts_to_str(user_data):
 END = ConversationHandler.END
 
 # Different constants for this example
-(RECIPE, START_OVER) = map(chr, range(10, 12))
+(START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
 
 # Telegram States
 CHOOSING, TYPING_REPLY, PHOTO, TYPING_CHOICE = range(4)
@@ -513,38 +513,39 @@ def error(update, context):
 
 def detect_intention(update, context):
     """Detect user's intention from input text."""
-
-    # Use Dialogflow to detect user's intenction (use case)
+    print('[DETECT]')
+    # Use Dialogflow to detect user's intention (use case)
     text = update.message.text
     response = call2dialogflow(text)
+    print('[RESPONSE]')
     # Store values
     try:
-        context.user_data['fulfillment'] = response['fulfillment']
-        context.user_data['intent'] = response['intent']
+        context.user_data[FULFILLMENT] = response['fulfillment']
+        context.user_data[INTENT] = response['intent']
     except KeyError:
         update.message.reply_text('Error with Dialogflow server')
         exit(1)
-
+    print()
     try:
-        context.user_data['fields'] = response['fields']
+        context.user_data[FIELDS] = response['fields']
     except KeyError:
         logging.info('No fields in Dialogflow response')
-
+    print('[CHECK]')
     # global intent
-    if context.user_data['intent'] == 'GuardarGusto':
+    if context.user_data[INTENT] == 'GuardarGusto':
         return adding_prefs(update, context)
-    elif context.user_data['intent'] == 'GuardarAlergia':
+    elif context.user_data[INTENT] == 'GuardarAlergia':
         return adding_allergies(update, context)
-    elif context.user_data['intent'] == 'SubirImagen':
+    elif context.user_data[INTENT] == 'SubirImagen':
         return adding_images(update, context)
-    elif context.user_data['intent'] == 'GuardarReceta':
+    elif context.user_data[INTENT] == 'GuardarReceta':
         return adding_recipe(update, context)
     else:
-        update.message.reply_text('Lo siento, no te he entendido')
+        # context.user_data[INTENT] == 'Default Fallback Intent'
+        update.message.reply_text(context.user_data[FULFILLMENT])
         # context.user_data.clear()
-        context.user_data['intent'] = None
+        context.user_data[INTENT] = None
 
-    # detect_intention(update, context) #Esto no se si esta bien que el return sea llamar a la misma funcion @rmurillo
     return SELECTING_ACTION
 
 
@@ -668,12 +669,12 @@ def save_prefs(update, context):
 
 def adding_allergies(update, context):
     """Add allergies to the system."""
-    if 'fields' in context.user_data:
+    if FIELDS in context.user_data:
         # Allergies already introduced by the user
         return save_allergies(update, context)
 
     else:
-        update.message.reply_text(context.user_data['fulfillment'])
+        update.message.reply_text(context.user_data[FULFILLMENT])
         # response = call2dialogflow(text)
         return ADD_ALLERGY
 
@@ -685,28 +686,28 @@ def save_allergies(update, context):
     # print('[SAVE ALLERGIES]')
     # Fake ingreds list
     INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
-    if 'fields' not in context.user_data:
+    if FIELDS not in context.user_data:
         # Validate with Dialogflow
         response = call2dialogflow(update.message.text)
 
         try:
-            context.user_data['fulfillment'] = response['fulfillment']
-            # context.user_data['intent'] = response['intent'] # Should be already set
+            context.user_data[FULFILLMENT] = response['fulfillment']
+            # context.user_data[INTENT] = response['intent'] # Should be already set
         except KeyError:
             update.message.reply_text('Error with Dialogflow server')
             exit(1)
 
         try:
-            context.user_data['fields'] = response['fields']
+            context.user_data[FIELDS] = response['fields']
         except KeyError:
             update.message.reply_text('Lo siento, no conozco ninguno de esos alimentos')
 
-    if 'fields' in context.user_data:
-        update.message.reply_text(context.user_data['fulfillment'])
+    if FIELDS in context.user_data:
+        update.message.reply_text(context.user_data[FULFILLMENT])
 
         # Detect all possible ingreds in user message
         unknowns = []
-        for i in context.user_data['fields'].list_value.values:
+        for i in context.user_data[FIELDS].list_value.values:
             ingredient = i.string_value
             if ingredient not in INGREDIENTS:
                 unknowns.append(ingredient)
@@ -725,9 +726,9 @@ def save_allergies(update, context):
     update.message.reply_text(
         '¿Hay algún otro alimento que no puedas tomar? (si/no)', reply_keyboard=my_keyboard)
     context.user_data[START_OVER] = True
-    context.user_data.pop('fields', None)
-    prefs_list = 'alergias' if context.user_data['intent'] == 'GuardarAlergia' else 'preferencias'
-    context.user_data['fulfillment'] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
+    context.user_data.pop(FIELDS, None)
+    prefs_list = 'alergias' if context.user_data[INTENT] == 'GuardarAlergia' else 'preferencias'
+    context.user_data[FULFILLMENT] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
     return SAVE_ALLERGY
 
 
