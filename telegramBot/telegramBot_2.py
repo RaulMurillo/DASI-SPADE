@@ -288,7 +288,7 @@ def call2dialogflow(input_text):
         response = session_client.detect_intent(
             session=session, query_input=query_input)
     except InvalidArgument:
-        raise
+        raise Exception('Dialogflow request failed')
 
     global fulfillment
     global intent
@@ -302,8 +302,6 @@ def call2dialogflow(input_text):
 
     if response.query_result.all_required_params_present:
         # There is no need to ask again
-        print(
-            f'Great 2! - {response.query_result.all_required_params_present}')
         valorFields = None
         if(r['intent'] == "GuardarGusto") or (r['intent'] == "GuardarAlergia"):
             valorFields = "Ingredientes"
@@ -316,7 +314,7 @@ def call2dialogflow(input_text):
     else:
         print(
             f'no req.params present - {response.query_result.all_required_params_present}')
-    
+
     return r
 
     # valorFields = None
@@ -355,7 +353,7 @@ def facts_to_str(user_data):
 
 # State definitions for top level conversation
 (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO, ASK_CHEFF,
- ADD_PREFS, ADD_ALLERGY) = map(chr, range(6))
+ ADD_PREFS, ADD_ALLERGY, SAVE_ALLERGY) = map(chr, range(7))
 # Shortcut for ConversationHandler.END
 END = ConversationHandler.END
 
@@ -387,11 +385,11 @@ def start(update, context):
     # ],[
     #     InlineKeyboardButton(text='Finalizar', callback_data=str(END))
     # ]]
-    buttons = [['CU01', 'CU02'],
-               ['CU03A', 'CU03B'],
-               ['Finalizar']]
-    # keyboard = InlineKeyboardMarkup(buttons)
-    keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=False)
+    # buttons = [['CU01', 'CU02'],
+    #            ['CU03A', 'CU03B'],
+    #            ['Finalizar']]
+    # # keyboard = InlineKeyboardMarkup(buttons)
+    # keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=False)
     # update.message.reply_text(
     #     text,
     #     reply_markup=markkeyboardup2)
@@ -403,7 +401,7 @@ def start(update, context):
     if not context.user_data.get(START_OVER):
         update.message.reply_text(
             'Hola! Me llamo DASIChef_bot pero puedes llamarme Chef_bot.')
-    update.message.reply_text(text=text, reply_markup=keyboard)
+    update.message.reply_text(text=text)
 
     # if context.user_data.get(START_OVER):
     #     update.callback_query.answer()
@@ -412,7 +410,8 @@ def start(update, context):
     #     update.message.reply_text('Hola! Me llamo DASIChef_bot pero puedes llamarme Chef_bot.')
     #     update.message.reply_text(text=text, reply_markup=keyboard)
 
-    context.user_data[START_OVER] = False
+    context.user_data.clear()
+    context.user_data[START_OVER] = True
     return SELECTING_ACTION
 
 
@@ -517,18 +516,33 @@ def detect_intention(update, context):
 
     # Use Dialogflow to detect user's intenction (use case)
     text = update.message.text
-    call2dialogflow(text)
-    global intent
-    if intent == 'GuardarGusto':
+    response = call2dialogflow(text)
+    # Store values
+    try:
+        context.user_data['fulfillment'] = response['fulfillment']
+        context.user_data['intent'] = response['intent']
+    except KeyError:
+        update.message.reply_text('Error with Dialogflow server')
+        exit(1)
+
+    try:
+        context.user_data['fields'] = response['fields']
+    except KeyError:
+        logging.info('No fields in Dialogflow response')
+
+    # global intent
+    if context.user_data['intent'] == 'GuardarGusto':
         return adding_prefs(update, context)
-    elif intent == 'GuardarAlergia':
+    elif context.user_data['intent'] == 'GuardarAlergia':
         return adding_allergies(update, context)
-    elif intent == 'SubirImagen':
+    elif context.user_data['intent'] == 'SubirImagen':
         return adding_images(update, context)
-    elif intent == 'GuardarReceta':
+    elif context.user_data['intent'] == 'GuardarReceta':
         return adding_recipe(update, context)
     else:
         update.message.reply_text('Lo siento, no te he entendido')
+        # context.user_data.clear()
+        context.user_data['intent'] = None
 
     # detect_intention(update, context) #Esto no se si esta bien que el return sea llamar a la misma funcion @rmurillo
     return SELECTING_ACTION
@@ -654,49 +668,67 @@ def save_prefs(update, context):
 
 def adding_allergies(update, context):
     """Add allergies to the system."""
-    update.message.reply_text(fulfillment)
+    if 'fields' in context.user_data:
+        # Allergies already introduced by the user
+        return save_allergies(update, context)
 
-    return ADD_ALLERGY
+    else:
+        update.message.reply_text(context.user_data['fulfillment'])
+        # response = call2dialogflow(text)
+        return ADD_ALLERGY
+
+    return END
 
 
 def save_allergies(update, context):
     """Save detected allergies into system."""
-    text = update.message.text
-    # Fake ingreds list
-    INGREDIENTS = ['AJO', 'JUDIAS', 'PERA', 'LIMON', 'TOMATE']
-
-    # Validate with Dialogflow
-    # ingreds = callToDialogFlowFields(text)
-    response = call2dialogflow(text)
     # print('[SAVE ALLERGIES]')
-    # print(type(ingreds))
-    # print((ingreds))
-    update.message.reply_text(response['fulfillment'])
+    # Fake ingreds list
+    INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
+    if 'fields' not in context.user_data:
+        # Validate with Dialogflow
+        response = call2dialogflow(update.message.text)
 
-    assert 'fields' in response
-    
-    # Detect all possible ingreds in user message
-    unknowns = []
-    for i in response['fields'].list_value.values:
-        ingredient = i.string_value
-        if ingredient not in INGREDIENTS:
-            unknowns.append(ingredient)
-        else:
-            # TODO: send to Chat Agent
-            e = INGREDIENTS.index(ingredient)
+        try:
+            context.user_data['fulfillment'] = response['fulfillment']
+            # context.user_data['intent'] = response['intent'] # Should be already set
+        except KeyError:
+            update.message.reply_text('Error with Dialogflow server')
+            exit(1)
 
-    if len(unknowns) > 0:
-        my_string = ', '.join(unknowns)
-        update.message.reply_text(
-            f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
+        try:
+            context.user_data['fields'] = response['fields']
+        except KeyError:
+            update.message.reply_text('Lo siento, no conozco ninguno de esos alimentos')
+
+    if 'fields' in context.user_data:
+        update.message.reply_text(context.user_data['fulfillment'])
+
+        # Detect all possible ingreds in user message
+        unknowns = []
+        for i in context.user_data['fields'].list_value.values:
+            ingredient = i.string_value
+            if ingredient not in INGREDIENTS:
+                unknowns.append(ingredient)
+            else:
+                # TODO: send to Chat Agent
+                e = INGREDIENTS.index(ingredient)
+
+        if len(unknowns) > 0:
+            my_string = ', '.join(unknowns)
+            update.message.reply_text(
+                f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
 
     buttons = [['si', 'no']]
-    keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
+    my_keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
 
     update.message.reply_text(
-        '¿Hay algún otro alimento que no puedas tomar? (si/no)', reply_keyboard=keyboard)
+        '¿Hay algún otro alimento que no puedas tomar? (si/no)', reply_keyboard=my_keyboard)
     context.user_data[START_OVER] = True
-    return ADD_ALLERGY
+    context.user_data.pop('fields', None)
+    prefs_list = 'alergias' if context.user_data['intent'] == 'GuardarAlergia' else 'preferencias'
+    context.user_data['fulfillment'] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
+    return SAVE_ALLERGY
 
 
 def telegramBot_main():
@@ -740,9 +772,14 @@ def telegramBot_main():
                 MessageHandler(Filters.text, save_prefs),
             ],
             ADD_ALLERGY: [
-                MessageHandler(Filters.regex('^si$'), adding_allergies),
-                MessageHandler(Filters.regex('^no$'), start),
+                # MessageHandler(Filters.regex('^si$'), adding_allergies),
+                # MessageHandler(Filters.regex('^no$'), start),
                 MessageHandler(Filters.text, save_allergies),
+            ],
+            SAVE_ALLERGY: [
+                MessageHandler(Filters.regex(r'^[Ss][iIíÍ]$'), adding_allergies),
+                MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
+                # MessageHandler(Filters.text, save_allergies),
             ],
             # CHOOSING: [MessageHandler(Filters.regex('^(Preferencias|Alergias|Tu receta)$'),
             #                           regular_choice),
