@@ -318,8 +318,8 @@ def call2dialogflow(input_text):
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
 
 # State definitions for top level conversation
-(SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO, ASK_CHEFF,
- ADD_PREFS, ADD_ALLERGY, SAVE_ALLERGY) = map(chr, range(7))
+(SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
+ ASK_CHEFF, ADD_PREFS) = map(chr, range(5))
 # Shortcut for ConversationHandler.END
 END = ConversationHandler.END
 
@@ -452,29 +452,30 @@ def error(update, context):
 
 def detect_intention(update, context):
     """Detect user's intention from input text."""
-    print('[DETECT]')
     # Use Dialogflow to detect user's intention (use case)
     text = update.message.text
     response = call2dialogflow(text)
-    print('[RESPONSE]')
     # Store values
     try:
         context.user_data[FULFILLMENT] = response['fulfillment']
         context.user_data[INTENT] = response['intent']
+
+        logging.info(f'INTENT: {context.user_data[INTENT]}')
     except KeyError:
         update.message.reply_text('Error with Dialogflow server')
         exit(1)
 
     try:
         context.user_data[FIELDS] = response['fields']
+
+        logging.info(f'FIELDS: {context.user_data[FIELDS]}')
     except KeyError:
         logging.info('No fields in Dialogflow response')
-    print('[CHECK]')
-    # global intent
-    if context.user_data[INTENT] == 'GuardarGusto':
+        
+    if (context.user_data[INTENT] == 'GuardarGusto') or (context.user_data[INTENT] == 'GuardarAlergia'):
         return adding_prefs(update, context)
-    elif context.user_data[INTENT] == 'GuardarAlergia':
-        return adding_allergies(update, context)
+    # elif context.user_data[INTENT] == 'GuardarAlergia':
+    #     return adding_allergies(update, context)
     elif context.user_data[INTENT] == 'ConsultarPlatoAElaborar':  # CU01
         return adding_images(update, context)
     elif context.user_data[INTENT] == 'GuardarReceta':  # CU02
@@ -492,8 +493,8 @@ def adding_images(update, context):
     """Add the images of ingredients."""
     update.message.reply_text(context.user_data[FULFILLMENT])
     info_text = 'Introduce todas las fotos de los ingredientes que tengas.\n' + \
-      'Avísame cuando hayas terminado de introducir fotos.\n'
-      # 'Procura que aparezca un alimento por imagen.\n' + \
+        'Avísame cuando hayas terminado de introducir fotos.\n'
+    # 'Procura que aparezca un alimento por imagen.\n' + \
     update.message.reply_text(info_text)
 
     return ADD_PHOTO
@@ -590,94 +591,21 @@ def save_recipe(update, context):
     print(context.user_data[RECIPE])
     return adding_images(update, context)
 
-    # # Validate with Dialogflow
-    # valid_recipes = callToDialogFlowFields(text)
-    # update.message.reply_text(fulfillment)
-
-    # if valid_recipes is None:  # @rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
-    #     update.message.reply_text(
-    #         'Lo siento, no conozco esa receta.\nPrueba con otra.')
-    #     return ADD_RECIPE
-    # else:
-    #     context.user_data[RECIPE] = update.message.text
-    #     update.message.reply_text(f'{context.user_data[RECIPE]}, muy bien!\n')
-    #     return adding_images(update, context)
-    # return END  # Unreachable
-
-    # update.message.reply_text(context.user_data[FULFILLMENT])
-
-    #   # Detect all possible ingreds in user message
-    #   unknowns = []
-    #    for i in context.user_data[FIELDS].list_value.values:
-    #         ingredient = i.string_value
-    #         if ingredient not in INGREDIENTS:
-    #             unknowns.append(ingredient)
-    #         else:
-    #             # TODO: send to Chat Agent
-    #             e = INGREDIENTS.index(ingredient)
-
-    #     if len(unknowns) > 0:
-    #         my_string = ', '.join(unknowns)
-    #         update.message.reply_text(
-    #             f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
-
-    # buttons = [['si', 'no']]
-    # my_keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
-
-    # update.message.reply_text(
-    #     '¿Hay algún otro alimento que no puedas tomar? (si/no)', reply_keyboard=my_keyboard)
-    # context.user_data[START_OVER] = True
-    # context.user_data.pop(FIELDS, None)
-    # prefs_list = 'alergias' if context.user_data[INTENT] == 'GuardarAlergia' else 'preferencias'
-    # context.user_data[
-    #     FULFILLMENT] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
-    # return ADD_ALLERGY
-
 
 def adding_prefs(update, context):
-    """Add likes to the system."""
-    update.message.reply_text(fulfillment)
-
-    return ADD_PREFS
-
-
-def save_prefs(update, context):
-    """Save detected preferences into system."""
-    text = update.message.text
-    # Fake preferences
-    # ingreds = ['APPLE', 'BANANA'] @rmurillo esto no hace falta ya que dialogflow los saca de la lista que me pasaste
-
-    # Validate with Dialogflow
-    ingreds = callToDialogFlowFields(text)
-    update.message.reply_text(fulfillment)
-
-    # TODO: Detect all possible ingreds in user message
-    if update.message.text not in ingreds:  # @rmurillo lo ideal sería analizar en la funcion callToDialogFlowFields si existe o no fields, pero por como devuelve google el json, no hubo manera
-        update.message.reply_text(
-            'Lo siento, no conozco ese ingrediente.\nPrueba con otro.')
-    # TODO: for every ingred in user message: send to Chat Agent
-
-    update.message.reply_text(
-        '¿Quieres añadir algún alimento más a tus prefencias? (si/no)')
-    context.user_data[START_OVER] = True
-    return ADD_PREFS
-
-
-def adding_allergies(update, context):
-    """Add allergies to the system."""
+    """Add likes or allergies to the system."""
     if FIELDS in context.user_data:
         # Allergies already introduced by the user
-        return save_allergies(update, context)
+        return save_prefs(update, context)
 
     else:
         update.message.reply_text(context.user_data[FULFILLMENT])
-        # response = call2dialogflow(text)
-        return ADD_ALLERGY
+        return ADD_PREFS
     return END  # Unreachable
 
 
-def save_allergies(update, context):
-    """Save detected allergies into system."""
+def save_prefs(update, context):
+    """Save detected likes or allergies into system."""
     # print('[SAVE ALLERGIES]')
     # Fake ingreds list
     INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
@@ -715,18 +643,20 @@ def save_allergies(update, context):
             my_string = ', '.join(unknowns)
             update.message.reply_text(
                 f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
-
+    # Ask for more ingredients or leave
     buttons = [['si', 'no']]
     my_keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
 
+    prefs_text = 'que te guste especialmente' if context.user_data[INTENT] == 'GuardarAlergia' else 'que no puedas tomar'
     update.message.reply_text(
-        '¿Hay algún otro alimento que no puedas tomar? (si/no)', reply_keyboard=my_keyboard)
-    context.user_data[START_OVER] = True
-    context.user_data.pop(FIELDS, None)
+        f'¿Hay algún otro alimento {prefs_text}?', reply_keyboard=my_keyboard)
     prefs_list = 'alergias' if context.user_data[INTENT] == 'GuardarAlergia' else 'preferencias'
+    # Next state's FULFILLMENT
     context.user_data[
         FULFILLMENT] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
-    return ADD_ALLERGY
+    context.user_data[START_OVER] = True
+    context.user_data.pop(FIELDS, None) # Delete fields
+    return ADD_PREFS
 
 
 def telegramBot_main():
@@ -747,7 +677,7 @@ def telegramBot_main():
                 MessageHandler(Filters.regex('^CU01$'), adding_images),
                 MessageHandler(Filters.regex('^CU02$'), adding_recipe),
                 MessageHandler(Filters.regex('^CU03A$'), adding_prefs),
-                MessageHandler(Filters.regex('^CU03B$'), adding_allergies),
+                MessageHandler(Filters.regex('^CU03B$'), adding_prefs),
                 MessageHandler(Filters.text, detect_intention),
                 # CallbackQueryHandler(done, pattern='^' + str(CU1) + '$'),
                 # CallbackQueryHandler(adding_recipe, pattern='^' + str(CU2) + '$'),
@@ -771,12 +701,12 @@ def telegramBot_main():
                 MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
                 MessageHandler(Filters.text, save_prefs),
             ],
-            ADD_ALLERGY: [
-                MessageHandler(Filters.regex(
-                    r'^[Ss][IiÍí]$'), adding_allergies),
-                MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
-                MessageHandler(Filters.text, save_allergies),
-            ],
+            # ADD_PREFS: [
+            #     MessageHandler(Filters.regex(
+            #         r'^[Ss][IiÍí]$'), adding_allergies),
+            #     MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
+            #     MessageHandler(Filters.text, save_allergies),
+            # ],
             # CHOOSING: [MessageHandler(Filters.regex('^(Preferencias|Alergias|Tu receta)$'),
             #                           regular_choice),
             #            MessageHandler(Filters.regex('^Subir imagen$'),
