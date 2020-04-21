@@ -1,4 +1,5 @@
 # SPADE libs
+from multiprocessing import Process, Pipe
 import time
 import asyncio
 from spade.agent import Agent
@@ -173,6 +174,33 @@ messageReceta = None
 #         self.add_behaviour(c, t_c)
 #         self.add_behaviour(d, t_d)
 
+class Agent2(Agent):
+    def __init__(self, jid, password, verify_security=False, pipe=None):
+        super().__init__(jid, password, verify_security)
+        self.pipe = pipe
+
+    class MyBehav(CyclicBehaviour):
+        async def on_start(self):
+            print("[A2] Starting behaviour . . .")
+            # self.counter = 0
+
+        async def on_end(self):
+            self.agent.pipe.close()
+
+        async def run(self):
+            msg = self.agent.pipe.recv()
+            print("[A2] Received msg from DASI Bot: {}".format(msg))
+            # self.counter += 1
+            # await asyncio.sleep(1)
+            if msg == '5':
+                self.kill()
+
+    async def setup(self):
+        print("Agent2 starting . . .")
+        print("My pipe is", self.pipe)
+        b = self.MyBehav()
+        self.add_behaviour(b)
+
 
 ## ---------------------------------- START DIALOGFLOW -----------------------------------------##
 # Enable logging
@@ -229,349 +257,355 @@ def call2dialogflow(input_text):
 
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
+def start_bot(conn=None):
+    # State definitions for Telegram Bot
+    (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
+     ASK_CHEFF, ADD_PREFS) = map(chr, range(5))
+    # Shortcut for ConversationHandler.END
+    END = ConversationHandler.END
 
-# State definitions for Telegram Bot
-(SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
- ASK_CHEFF, ADD_PREFS) = map(chr, range(5))
-# Shortcut for ConversationHandler.END
-END = ConversationHandler.END
+    # Different constants for this example
+    (START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
 
-# Different constants for this example
-(START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
+    def start(update, context):
+        """Select an action: query by recipes/ingredients or add preferences."""
+        text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
+            'Tambien puedes indicar tus preferencias y alergias.\n' + \
+            'Selecciona la opción de que desees y pulsa finalizar cuando hayas terminado\n\n'
 
+        buttons = [['Quiero cocinar algo, pero no se me ocurre nada', 'Quiero preparar una receta concreta'],
+                   ['Añadir preferencia', 'Añadir alergia'],
+                   ['Finalizar']]
+        keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
 
-def start(update, context):
-    """Select an action: query by recipes/ingredients or add preferences."""
-    text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
-        'Tambien puedes indicar tus preferencias y alergias.\n' + \
-        'Selecciona la opción de que desees y pulsa finalizar cuando hayas terminado\n\n'
-
-    buttons = [['Quiero cocinar algo, pero no se me ocurre nada', 'Quiero preparar una receta concreta'],
-               ['Añadir preferencia', 'Añadir alergia'],
-               ['Finalizar']]
-    keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
-
-    # If we're starting over we don't need do send a new message
-    if not context.user_data.get(START_OVER):
+        # If we're starting over we don't need do send a new message
+        if not context.user_data.get(START_OVER):
+            update.message.reply_text(
+                'Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot.')
         update.message.reply_text(
-            'Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot.')
-    update.message.reply_text(
-        text=text, resize_keyboard=True, reply_markup=keyboard)
+            text=text, resize_keyboard=True, reply_markup=keyboard)
 
-    # Clear Dialogflow context
-    call2dialogflow('Hola DASI-Chef Bot')
-    # Clear user context
-    context.user_data.clear()
-    context.user_data[START_OVER] = True
-    return SELECTING_ACTION
+        # Clear Dialogflow context
+        call2dialogflow('Hola DASI-Chef Bot')
+        # Clear user context
+        context.user_data.clear()
+        context.user_data[START_OVER] = True
+        return SELECTING_ACTION
 
+    def display_info(update, context):
+        """Show software user manual in GUI"""
+        # TODO
+        text = 'Información actualmente no disponible :('
+        update.message.reply_text(text=text)
+        return SELECTING_ACTION
 
-def display_info(update, context):
-    """Show software user manual in GUI"""
-    # TODO
-    text = 'Información actualmente no disponible :('
-    update.message.reply_text(text=text)
-    return SELECTING_ACTION
+    # TODO: ChatAgent
+    def done(update, context):
+        update.message.reply_text('Hasta la próxima!')
 
+        context.user_data.clear()
+        return ConversationHandler.END
 
-def done(update, context):
-    update.message.reply_text('Hasta la próxima!')
+    def error(update, context):
+        """Log Errors caused by Updates."""
+        logger.warning('Update "%s" caused error "%s"', update, context.error)
 
-    context.user_data.clear()
-    return ConversationHandler.END
-
-
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
-
-def detect_intention(update, context):
-    """Detect user's intention from input text."""
-    # Use Dialogflow to detect user's intention (use case)
-    response = call2dialogflow(update.message.text)
-    # Store values
-    try:
-        context.user_data[FULFILLMENT] = response['fulfillment']
-        context.user_data[INTENT] = response['intent']
-
-        logging.info(f'INTENT: {context.user_data[INTENT]}')
-    except KeyError:
-        update.message.reply_text('Error with Dialogflow server')
-        exit(1)
-
-    try:
-        context.user_data[FIELDS] = response['fields']
-
-        logging.info(f'FIELDS: {context.user_data[FIELDS]}')
-    except KeyError:
-        logging.debug('No fields in Dialogflow response')
-
-    if context.user_data[INTENT] == 'ConsultarPlatoAElaborar':  # CU01
-        return adding_images(update, context)
-    elif context.user_data[INTENT] == 'GuardarReceta':  # CU02
-        return adding_recipe(update, context)
-    elif (context.user_data[INTENT] == 'GuardarGusto') or (context.user_data[INTENT] == 'GuardarAlergia'):  # CU03
-        return adding_prefs(update, context)
-    # elif context.user_data[INTENT] == 'GuardarAlergia':
-    #     return adding_allergies(update, context)
-    else:
-        # context.user_data[INTENT] == 'Default Fallback Intent'
-        update.message.reply_text(context.user_data[FULFILLMENT])
-        # context.user_data.clear()
-        context.user_data[INTENT] = None
-
-    return SELECTING_ACTION
-
-
-def adding_images(update, context):
-    """Add the images of ingredients."""
-    update.message.reply_text(context.user_data[FULFILLMENT])
-    info_text = 'Introduce todas las fotos de los ingredientes que tengas.\n' + \
-        'Avísame cuando hayas terminado de introducir fotos.\n'
-    # 'Procura que aparezca un alimento por imagen.\n' + \
-    update.message.reply_text(info_text)
-
-    return ADD_PHOTO
-
-
-def save_image(update, context):
-    """Save the input images."""
-    user = update.message.from_user
-    photo_file = update.message.photo[-1].get_file()
-    currentDT = datetime.datetime.now()
-
-    # try:
-    #     os.mkdir(photo_dir, )
-    #     print("Directory ", photo_dir, " created")
-    # except FileExistsError:
-    #     print("Directory ", photo_dir, " already exists")
-    photo_name = 'user_photo' + \
-        currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
-    photo_path = os.path.join(photo_dir, photo_name)
-    photo_file.download(photo_path)
-    logger.info("Image of %s: %s", user.first_name, photo_name)
-
-    # TODO: Send message to Chat Agent
-    # global messageImage
-    messageImage = photo_path
-    logger.info("messageInfo updated to: %s", messageImage)
-    text = "SendImage"
-
-    # TODO: Change by Image agent's response
-    update.message.reply_text(f'Uploaded image as {photo_name}!')
-
-    return ADD_PHOTO
-
-# TODO: ChatAgent
-def stop_images(update, context):
-    update.message.reply_text(
-        'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
-
-    # TODO: Send message to Chat Agent
-    if not context.user_data.get(RECIPE):
-        # CU-001
-        update.message.reply_text('[CU-001] Obtener recetas')
-
-    else:
-        # CU-002
-        update.message.reply_text('[CU-002] Obtener ingredientes restantes')
-
-    # TODO: Receive answer from Chat Agent (another state?)
-
-    buttons = [['Sí', 'No']]
-    keyboard = ReplyKeyboardMarkup(
-        buttons, resize_keyboard=True, one_time_keyboard=True)
-
-    update.message.reply_text(
-        text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
-    context.user_data[START_OVER] = True
-
-    return ASK_CHEFF
-
-
-def adding_recipe(update, context):
-    """Add the recipe you would like to cook."""
-    if FIELDS in context.user_data:
-        # Recipe already introduced by the user
-        return save_recipe(update, context)
-    else:
-        update.message.reply_text(context.user_data[FULFILLMENT])
-        return ADD_RECIPE
-    # Unreachable
-    return END
-
-
-def save_recipe(update, context):
-    """Save input for recipe and return to next state."""
-    # Get recipe, if not introduced previously
-    if FIELDS not in context.user_data:
-        # Validate with Dialogflow
+    def detect_intention(update, context):
+        """Detect user's intention from input text."""
+        # Use Dialogflow to detect user's intention (use case)
         response = call2dialogflow(update.message.text)
-
+        # Store values
         try:
             context.user_data[FULFILLMENT] = response['fulfillment']
-            # context.user_data[INTENT] = response['intent'] # Should be already set
+            context.user_data[INTENT] = response['intent']
 
-            # logging.info(context.user_data[INTENT])
+            logging.info(f'INTENT: {context.user_data[INTENT]}')
         except KeyError:
             update.message.reply_text('Error with Dialogflow server')
             exit(1)
 
         try:
             context.user_data[FIELDS] = response['fields']
-            if len(context.user_data[FIELDS].list_value.values) > 1:
-                update.message.reply_text(
-                    'Por favor, introduce una sola receta, o escribe \'salir\' para volver')
-                return ADD_RECIPE
+
+            logging.info(f'FIELDS: {context.user_data[FIELDS]}')
         except KeyError:
-            update.message.reply_text(
-                'Lo siento, no conozco esa receta.\nPrueba con otra, o escribe \'salir\' para volver')
+            logging.debug('No fields in Dialogflow response')
+
+        if context.user_data[INTENT] == 'ConsultarPlatoAElaborar':  # CU01
+            return adding_images(update, context)
+        elif context.user_data[INTENT] == 'GuardarReceta':  # CU02
+            return adding_recipe(update, context)
+        elif (context.user_data[INTENT] == 'GuardarGusto') or (context.user_data[INTENT] == 'GuardarAlergia'):  # CU03
+            return adding_prefs(update, context)
+        # elif context.user_data[INTENT] == 'GuardarAlergia':
+        #     return adding_allergies(update, context)
+        else:
+            # context.user_data[INTENT] == 'Default Fallback Intent'
+            update.message.reply_text(context.user_data[FULFILLMENT])
+            # context.user_data.clear()
+            context.user_data[INTENT] = None
+
+        return SELECTING_ACTION
+
+    def adding_images(update, context):
+        """Add the images of ingredients."""
+        update.message.reply_text(context.user_data[FULFILLMENT])
+        info_text = 'Introduce todas las fotos de los ingredientes que tengas.\n' + \
+            'Avísame cuando hayas terminado de introducir fotos.\n'
+        # 'Procura que aparezca un alimento por imagen.\n' + \
+        keyboard = ReplyKeyboardMarkup(
+            [['Ya!']], resize_keyboard=True, one_time_keyboard=True)
+        update.message.reply_text(info_text, reply_markup=keyboard)
+
+        return ADD_PHOTO
+
+    def save_image(update, context):
+        """Save the input images."""
+        user = update.message.from_user
+        photo_file = update.message.photo[-1].get_file()
+        currentDT = datetime.datetime.now()
+
+        # try:
+        #     os.mkdir(photo_dir, )
+        #     print("Directory ", photo_dir, " created")
+        # except FileExistsError:
+        #     print("Directory ", photo_dir, " already exists")
+        photo_name = 'user_photo' + \
+            currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
+        photo_path = os.path.join(photo_dir, photo_name)
+        photo_file.download(photo_path)
+        logger.info("Image of %s: %s", user.first_name, photo_name)
+
+        logger.info("Image updated at %s", photo_path)
+
+        conn.send({'Image': photo_path})
+
+        # # TODO: Change by Image agent's response
+        # update.message.reply_text(f'Uploaded image as {photo_name}!')
+        # Receive answer from Chat Agent
+        response = f'Uploaded image as {photo_name}!'
+        if conn.poll(timeout=1):
+            response = conn.recv()
+        update.message.reply_text(response)
+
+        return ADD_PHOTO
+
+    def stop_images(update, context):
+        update.message.reply_text(
+            'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+
+        # Send message to Chat Agent
+        if not context.user_data.get(RECIPE):
+            # CU-001
+            conn.send({'CU-001': None})
+        else:
+            # CU-002
+            conn.send({'CU-002': context.user_data.get(RECIPE)})
+            # update.message.reply_text()
+
+        # Receive answer from Chat Agent
+        response = 'Lo siento, el servidor está teniendo problemas. Vuelve a probar más tarde'
+        if conn.poll(timeout=2):
+            response = conn.recv()
+        update.message.reply_text(response)
+
+        buttons = [['Sí', 'No']]
+        keyboard = ReplyKeyboardMarkup(
+            buttons, resize_keyboard=True, one_time_keyboard=True)
+
+        update.message.reply_text(
+            text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
+        context.user_data[START_OVER] = True
+
+        return ASK_CHEFF
+
+    def adding_recipe(update, context):
+        """Add the recipe you would like to cook."""
+        if FIELDS in context.user_data:
+            # Recipe already introduced by the user
+            return save_recipe(update, context)
+        else:
+            update.message.reply_text(context.user_data[FULFILLMENT])
             return ADD_RECIPE
+        # Unreachable
+        return END
 
-    # Save recipe to cook
-    context.user_data[RECIPE] = context.user_data[FIELDS].list_value.values[0].string_value
-    context.user_data[FIELDS] = None
-    logging.info(context.user_data[RECIPE])
-    return adding_images(update, context)
+    def save_recipe(update, context):
+        """Save input for recipe and return to next state."""
+        # Get recipe, if not introduced previously
+        if FIELDS not in context.user_data:
+            # Validate with Dialogflow
+            response = call2dialogflow(update.message.text)
 
+            try:
+                context.user_data[FULFILLMENT] = response['fulfillment']
+                # context.user_data[INTENT] = response['intent'] # Should be already set
 
-def adding_prefs(update, context):
-    """Add likes or allergies to the system."""
-    if FIELDS in context.user_data:
-        # Allergies already introduced by the user
-        return save_prefs(update, context)
+                # logging.info(context.user_data[INTENT])
+            except KeyError:
+                update.message.reply_text('Error with Dialogflow server')
+                exit(1)
 
-    else:
-        update.message.reply_text(context.user_data[FULFILLMENT])
+            keyboard = ReplyKeyboardMarkup(
+                [['salir']], resize_keyboard=True, one_time_keyboard=True)
+            try:
+                context.user_data[FIELDS] = response['fields']
+                if len(context.user_data[FIELDS].list_value.values) > 1:
+                    update.message.reply_text(
+                        'Por favor, introduce una sola receta, o escribe \'salir\' para volver', reply_markup=keyboard)
+                    return ADD_RECIPE
+            except KeyError:
+                update.message.reply_text(
+                    'Lo siento, no conozco esa receta.\nPrueba con otra, o escribe \'salir\' para volver', reply_markup=keyboard)
+                return ADD_RECIPE
+
+        # Save recipe to cook
+        context.user_data[RECIPE] = context.user_data[FIELDS].list_value.values[0].string_value
+        context.user_data[FIELDS] = None
+        logging.info(context.user_data[RECIPE])
+        return adding_images(update, context)
+
+    def adding_prefs(update, context):
+        """Add likes or allergies to the system."""
+        if FIELDS in context.user_data:
+            # Allergies already introduced by the user
+            return save_prefs(update, context)
+
+        else:
+            update.message.reply_text(context.user_data[FULFILLMENT])
+            return ADD_PREFS
+        return END  # Unreachable
+
+    def save_prefs(update, context):
+        """Save detected likes or allergies into system."""
+
+        # Fake ingreds list
+        INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
+        # Get ingredients, if not introduced previously
+        if FIELDS not in context.user_data:
+            # Validate with Dialogflow
+            response = call2dialogflow(update.message.text)
+
+            try:
+                context.user_data[FULFILLMENT] = response['fulfillment']
+                # context.user_data[INTENT] = response['intent'] # Should be already set
+            except KeyError:
+                update.message.reply_text('Error with Dialogflow server')
+                exit(1)
+
+            try:
+                context.user_data[FIELDS] = response['fields']
+            except KeyError:
+                update.message.reply_text(
+                    'Lo siento, no conozco ninguno de esos alimentos')
+        # Save ingredients preferences
+        if FIELDS in context.user_data:
+            update.message.reply_text(context.user_data[FULFILLMENT])
+
+            # Detect all possible ingreds in user message
+            unknowns = []
+            knowns = []
+            for i in context.user_data[FIELDS].list_value.values:
+                ingredient = i.string_value
+                if ingredient not in INGREDIENTS:
+                    unknowns.append(ingredient)
+                else:
+                    knowns.append(ingredient)
+            # Pass ingredients to chat agent
+            if len(knowns) > 0:
+                f = -10 if context.user_data[INTENT] == 'GuardarAlergia' else 5
+                conn.send({'CU-003': knowns, 'factor': f})
+
+            if len(unknowns) > 0:
+                my_string = ', '.join(unknowns)
+                update.message.reply_text(
+                    f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
+        # Ask for more ingredients or leave
+        buttons = [['Sí', 'No']]
+        keyboard = ReplyKeyboardMarkup(
+            buttons, resize_keyboard=True, one_time_keyboard=True)
+
+        prefs_text = 'que no puedas tomar' if context.user_data[
+            INTENT] == 'GuardarAlergia' else 'que te guste especialmente'
+
+        update.message.reply_text(
+            f'¿Hay algún otro alimento {prefs_text}?', reply_markup=keyboard)
+        # Next state's FULFILLMENT
+        prefs_list = 'alergias' if context.user_data[INTENT] == 'GuardarAlergia' else 'preferencias'
+        context.user_data[
+            FULFILLMENT] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
+        context.user_data[START_OVER] = True
+        context.user_data.pop(FIELDS, None)  # Delete fields
         return ADD_PREFS
-    return END  # Unreachable
 
-# TODO: ChatAgent
-def save_prefs(update, context):
-    """Save detected likes or allergies into system."""
+    def telegramBot_main():
+        # Create the Updater and pass it your bot's token.
+        # Make sure to set use_context=True to use the new context based callbacks
+        # Post version 12 this will no longer be necessary
+        updater = Updater(
+            "1109746327:AAEfk6ivUvhR23M6z1BBOHvKKb5pHHwSGlQ", use_context=True)
+        # Get the dispatcher to register handlers
+        dp = updater.dispatcher
 
-    # Fake ingreds list
-    INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
-    # Get ingredients, if not introduced previously
-    if FIELDS not in context.user_data:
-        # Validate with Dialogflow
-        response = call2dialogflow(update.message.text)
+        # Add conversation handler
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', start)],
 
-        try:
-            context.user_data[FULFILLMENT] = response['fulfillment']
-            # context.user_data[INTENT] = response['intent'] # Should be already set
-        except KeyError:
-            update.message.reply_text('Error with Dialogflow server')
-            exit(1)
+            states={
+                SELECTING_ACTION: [
+                    CommandHandler('info', display_info),
+                    CommandHandler('exit', done),
+                    # MessageHandler(Filters.regex('^CU01$'), adding_images),
+                    # MessageHandler(Filters.regex('^CU02$'), adding_recipe),
+                    # MessageHandler(Filters.regex('^CU03A$'), adding_prefs),
+                    # MessageHandler(Filters.regex('^CU03B$'), adding_prefs),
+                    MessageHandler(Filters.text, detect_intention),
+                ],
+                ADD_RECIPE: [
+                    MessageHandler(Filters.regex('^salir$'), start),
+                    MessageHandler(Filters.text, save_recipe),
+                ],
+                ADD_PHOTO: [
+                    MessageHandler(Filters.photo, save_image),
+                    MessageHandler(Filters.text, stop_images),
+                ],
+                ASK_CHEFF: [
+                    MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
+                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), done),
+                ],
+                ADD_PREFS: [
+                    MessageHandler(Filters.regex(
+                        r'^[Ss][IiÍí]$'), adding_prefs),
+                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
+                    MessageHandler(Filters.text, save_prefs),
+                ],
+            },
 
-        try:
-            context.user_data[FIELDS] = response['fields']
-        except KeyError:
-            update.message.reply_text(
-                'Lo siento, no conozco ninguno de esos alimentos')
-    # Save ingredients preferences
-    if FIELDS in context.user_data:
-        update.message.reply_text(context.user_data[FULFILLMENT])
-
-        # Detect all possible ingreds in user message
-        unknowns = []
-        for i in context.user_data[FIELDS].list_value.values:
-            ingredient = i.string_value
-            if ingredient not in INGREDIENTS:
-                unknowns.append(ingredient)
-            else:
-                # TODO: send to Chat Agent
-                e = INGREDIENTS.index(ingredient)
-                # if context.user_data[INTENT] == 'GuardarAlergia'
-
-        if len(unknowns) > 0:
-            my_string = ', '.join(unknowns)
-            update.message.reply_text(
-                f'Lo siento, no conozco estos alimentos: {my_string}.\nPrueba con otros.')
-    # Ask for more ingredients or leave
-    buttons = [['Sí', 'No']]
-    keyboard = ReplyKeyboardMarkup(
-        buttons, resize_keyboard=True, one_time_keyboard=True)
-
-    prefs_text = 'que no puedas tomar' if context.user_data[
-        INTENT] == 'GuardarAlergia' else 'que te guste especialmente'
-
-    update.message.reply_text(
-        f'¿Hay algún otro alimento {prefs_text}?', reply_markup=keyboard)
-    # Next state's FULFILLMENT
-    prefs_list = 'alergias' if context.user_data[INTENT] == 'GuardarAlergia' else 'preferencias'
-    context.user_data[
-        FULFILLMENT] = f'¿Qué más alimentos quieres introducir en tu lista de {prefs_list}?'
-    context.user_data[START_OVER] = True
-    context.user_data.pop(FIELDS, None)  # Delete fields
-    return ADD_PREFS
-
-
-def telegramBot_main():
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    updater = Updater(
-        "1109746327:AAEfk6ivUvhR23M6z1BBOHvKKb5pHHwSGlQ", use_context=True)
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
-
-    # Add conversation handler
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-
-        states={
-            SELECTING_ACTION: [
-                CommandHandler('info', display_info),
+            fallbacks=[
                 CommandHandler('exit', done),
-                # MessageHandler(Filters.regex('^CU01$'), adding_images),
-                # MessageHandler(Filters.regex('^CU02$'), adding_recipe),
-                # MessageHandler(Filters.regex('^CU03A$'), adding_prefs),
-                # MessageHandler(Filters.regex('^CU03B$'), adding_prefs),
-                MessageHandler(Filters.text, detect_intention),
-            ],
-            ADD_RECIPE: [
-                MessageHandler(Filters.regex('^salir$'), start),
-                MessageHandler(Filters.text, save_recipe),
-            ],
-            ADD_PHOTO: [
-                MessageHandler(Filters.photo, save_image),
-                MessageHandler(Filters.text, stop_images),
-            ],
-            ASK_CHEFF: [
-                MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
-                MessageHandler(Filters.regex(r'^[Nn][Oo]$'), done),
-            ],
-            ADD_PREFS: [
-                MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), adding_prefs),
-                MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
-                MessageHandler(Filters.text, save_prefs),
-            ],
-        },
+                MessageHandler(Filters.regex('^Finalizar$'), done),
+            ]
+        )
 
-        fallbacks=[
-            CommandHandler('exit', done),
-            MessageHandler(Filters.regex('^Finalizar$'), done),
-        ]
-    )
+        dp.add_handler(conv_handler)
 
-    dp.add_handler(conv_handler)
+        # log all errors
+        dp.add_error_handler(error)
 
-    # log all errors
-    dp.add_error_handler(error)
+        # Pictures folder
+        if not os.path.exists(photo_dir):
+            os.makedirs(photo_dir)
 
-    # Pictures folder
-    if not os.path.exists(photo_dir):
-        os.makedirs(photo_dir)
+        # Start the Bot
+        updater.start_polling()
 
-    # Start the Bot
-    updater.start_polling()
+        # Run the bot until you press Ctrl-C or the process receives SIGINT,
+        # SIGTERM or SIGABRT. This should be used most of the time, since
+        # start_polling() is non-blocking and will stop the bot gracefully.
+        updater.idle()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    logging.debug(f'My connection is {conn}')
+    telegramBot_main()
 ## ---------------------------------- END TELEGRAM -----------------------------------------------##
 
 
@@ -588,14 +622,24 @@ if __name__ == "__main__":
     # receiver = ReceiveAgent("akjncakj1@616.pub", "123456")
     # receiver.start()
 
-    telegramBot_main()
+    # telegramBot_main()
+
+    # creating a pipe
+    parent_conn, child_conn = Pipe()
+    p = Process(target=start_bot, args=(child_conn,))
+    p.start()
+
+    a2 = Agent2("a2@localhost", "user01", pipe=parent_conn)
+    a2.start()
+
     print("Wait until user interrupts with ctrl+C")
-    # while True:
-    #     try:
-    #         time.sleep(1)
-    #     except KeyboardInterrupt:
-    #         break
+    while True:
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            break
     # senderAgent.stop()
     # receiver.stop()
-    # logging.debug("[INFO] Agents finished")
-    # quit_spade()
+    a2.stop()
+    logging.info("Agents finished")
+    quit_spade()
