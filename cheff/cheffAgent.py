@@ -127,7 +127,6 @@ class CheffAgent(Agent):
             pass
 
         async def run(self):
-            pass
             logging.debug("PreferencesBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
@@ -143,7 +142,7 @@ class CheffAgent(Agent):
             else:
                 logging.info(
                     f"[Preferences] Did not received any message after {t} seconds")
-                self.kill()
+                # self.kill()
                 return
 
     class MissingBehaviour(CyclicBehaviour):
@@ -234,6 +233,7 @@ class CheffAgent(Agent):
                     f"[Cook] Did not received any message after {t} seconds")
 
     async def setup(self):
+        print('CHEFF')
         logging.info("Cheff Agent starting . . .")
         # Ingredients names
         with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:

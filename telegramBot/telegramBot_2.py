@@ -22,10 +22,14 @@ from telegram import ReplyKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler, CallbackQueryHandler)
 
-messageAlergia = None
-messagePreferencia = None
-messageImage = None
-messageReceta = None
+
+import csv
+CNN_DIR = os.path.join('imageClassifier', 'dnn')
+
+# messageAlergia = None
+# messagePreferencia = None
+# messageImage = None
+# messageReceta = None
 
 
 # class SenderAgent(Agent):
@@ -257,7 +261,7 @@ def call2dialogflow(input_text):
 
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
-def start_bot(conn=None):
+def start_bot(conn):
     # State definitions for Telegram Bot
     (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
      ASK_CHEFF, ADD_PREFS) = map(chr, range(5))
@@ -267,6 +271,9 @@ def start_bot(conn=None):
     # Different constants for this example
     (START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
 
+    with open(os.path.join(CNN_DIR, 'ingredients_es.csv'), 'r') as f:
+            INGREDIENTS = list(csv.reader(f))[0]
+
     def start(update, context):
         """Select an action: query by recipes/ingredients or add preferences."""
         text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
@@ -275,7 +282,7 @@ def start_bot(conn=None):
 
         buttons = [['Quiero cocinar algo, pero no se me ocurre nada', 'Quiero preparar una receta concreta'],
                    ['Añadir preferencia', 'Añadir alergia'],
-                   ['Finalizar']]
+                   ['/exit']]
         keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
 
         # If we're starting over we don't need do send a new message
@@ -302,6 +309,7 @@ def start_bot(conn=None):
     # TODO: ChatAgent
     def done(update, context):
         update.message.reply_text('Hasta la próxima!')
+        conn.send({'Finish': None})
 
         context.user_data.clear()
         return ConversationHandler.END
@@ -405,7 +413,7 @@ def start_bot(conn=None):
 
         # Receive answer from Chat Agent
         response = 'Lo siento, el servidor está teniendo problemas. Vuelve a probar más tarde'
-        if conn.poll(timeout=2):
+        if conn.poll(timeout=10):
             response = conn.recv()
         update.message.reply_text(response)
 
@@ -480,7 +488,7 @@ def start_bot(conn=None):
         """Save detected likes or allergies into system."""
 
         # Fake ingreds list
-        INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
+        # INGREDIENTS = ['AJO', 'JUDÍAS', 'PERA', 'LIMÓN', 'TOMATE']
         # Get ingredients, if not introduced previously
         if FIELDS not in context.user_data:
             # Validate with Dialogflow
@@ -500,7 +508,7 @@ def start_bot(conn=None):
                     'Lo siento, no conozco ninguno de esos alimentos')
         # Save ingredients preferences
         if FIELDS in context.user_data:
-            update.message.reply_text(context.user_data[FULFILLMENT])
+            update.message.reply_text(context.user_data.get(FULFILLMENT))
 
             # Detect all possible ingreds in user message
             unknowns = []
@@ -513,8 +521,8 @@ def start_bot(conn=None):
                     knowns.append(ingredient)
             # Pass ingredients to chat agent
             if len(knowns) > 0:
-                f = -10 if context.user_data[INTENT] == 'GuardarAlergia' else 5
-                conn.send({'CU-003': knowns, 'factor': f})
+                # f = -10 if context.user_data[INTENT] == 'GuardarAlergia' else 5
+                conn.send({'CU-003': knowns, 'factor': context.user_data.get(INTENT)})
 
             if len(unknowns) > 0:
                 my_string = ', '.join(unknowns)

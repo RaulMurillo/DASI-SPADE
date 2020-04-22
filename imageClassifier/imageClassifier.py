@@ -89,10 +89,11 @@ class ImageAgent(Agent):
             # print("Counter: {}".format(self.counter))
             # self.counter += 1
             # await asyncio.sleep(1)
-            print("ClassifyBehaviour running")
+            logging.info("ClassifyBehaviour running")
+            t=10000
 
             # wait for a message for 10 seconds
-            msg = await self.receive(timeout=10)
+            msg = await self.receive(timeout=t)
             # self.presence.set_available(show=PresenceShow.AWAY)
             if msg:
                 print("Message received with content: {}".format(msg.body))
