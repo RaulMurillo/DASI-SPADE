@@ -414,7 +414,15 @@ def start_bot(conn):
         # Receive answer from Chat Agent
         response = 'Lo siento, el servidor está teniendo problemas. Vuelve a probar más tarde'
         if conn.poll(timeout=10):
-            response = conn.recv()
+            r = conn.recv()
+            if not context.user_data.get(RECIPE):
+                # CU-001
+                response = str(r)
+            else:
+                # CU-002
+                my_string = ', '.join(r)
+                response = 'Te faltan los siguientes ingredientes clave: ' + my_string.to_lower()
+
         update.message.reply_text(response)
 
         buttons = [['Sí', 'No']]

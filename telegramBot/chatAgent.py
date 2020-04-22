@@ -11,11 +11,13 @@ from spade import quit_spade
 from multiprocessing import Pipe
 import logging
 
+import numpy as np
 import os
 import csv
+import json
 dirname = os.path.dirname(__file__)
 CNN_DIR = os.path.join('imageClassifier', 'dnn')
-CHEFF_DIR = os.path.join(dirname, '')
+CHEFF_DIR = os.path.join('cheff', '')
 
 
 class ChatAgent(Agent):
@@ -26,6 +28,8 @@ class ChatAgent(Agent):
     class DispatcherBehav(PeriodicBehaviour):
         async def on_start(self):
             logging.info("[ChatAgent] Starting behaviour . . .")
+            with open(os.path.join(CHEFF_DIR, 'recipes.json'), 'r') as json_file:
+                self.recipe_book = json.load(json_file)
             # self.counter = 0
 
         async def on_end(self):
@@ -55,24 +59,33 @@ class ChatAgent(Agent):
                     response = await self.receive(timeout=t)
                     # Pass response to bot - notify to user
                     if response:
-                        self.agent.pipe.send(response.body)
+                        all_menus = np.array(json.loads(response.body))
+                        # TODO: JSON with best recipe
+                        menu = {
+                            'Title': self.recipe_book['Title'][all_menus.argmax()],
+                            'Ingredients': self.recipe_book['Ingredients'][all_menus.argmax()],
+                            'Directions': self.recipe_book['Directions'][all_menus.argmax()],
+                        }
+                        self.agent.pipe.send(menu)
                     else:
                         self.agent.pipe.send('Lo siento, el servidor tiene problemas. Prueba más tarde')
                 elif 'CU-002' in bot_msg:
                     # Notify cheff
                     msg = Message(to="dasi2020cheff@616.pub")
                     msg.set_metadata("performative", "query_ref")
-                    msg.body = bot_msg['CU-002']
-                    # TODO
-                    # await self.send(msg)
+                    msg.body = str(self.recipe_book['Title'].index(bot_msg['CU-002']))
+                    i = bot_msg['CU-002']
+                    logging.info(f'{i} - {msg.body}')
+                    await self.send(msg)
                     
-                    # # Recive cheff's response
-                    # response = await self.receive(timeout=t)
-                    # # Pass response to bot - notify to user
-                    # if response:
-                    #     self.agent.pipe.send(response.body)
-                    # else:
-                    #     self.agent.pipe.send('Lo siento, el servidor tiene problemas. Prueba más tarde')
+                    # Recive cheff's response
+                    response = await self.receive(timeout=t)
+                    # Pass response to bot - notify to user
+                    if response:
+                        lst = json.loads(response.body)
+                        self.agent.pipe.send(lst)
+                    else:
+                        self.agent.pipe.send('Lo siento, el servidor tiene problemas. Prueba más tarde')
                 elif 'CU-003' in bot_msg:
                     prefs = bot_msg['CU-003']
                     f = bot_msg['factor']

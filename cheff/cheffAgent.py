@@ -25,6 +25,8 @@ dirname = os.path.dirname(__file__)
 CNN_DIR = os.path.join('imageClassifier', 'dnn')
 CHEFF_DIR = os.path.join(dirname, '')
 
+CHAT_JID = 'akjncakj@616.pub'
+
 
 class SenderAgent(Agent):
     """Agent for testing `CheffAgent`
@@ -99,6 +101,7 @@ class CheffAgent(Agent):
                     f"[AddIngred] Did not received any message after {t} seconds")
 
     class PreferencesBehaviour(CyclicBehaviour):
+        # TODO: messages as JSON
         async def on_start(self):
             logging.debug("PreferencesBehaviour starting . . .")
 
@@ -176,8 +179,17 @@ class CheffAgent(Agent):
                     np.logical_not(self.agent.list_ingred.toarray()))),
                     dtype=bool)
 
-                logging.debug(missing.toarray()[0, :])
-                logging.info(self.agent.CLASS_NAMES[missing.toarray()[0, :]])
+                b_list = missing.toarray()[0, :]
+                logging.debug(b_list)
+
+                m_list = [i for (i, v) in zip(self.agent.CLASS_NAMES, b_list) if v]
+                logging.info(m_list)
+
+                # Notify chat/user
+                msg = Message(to=CHAT_JID)
+                msg.set_metadata("performative", "confirm")
+                msg.body = json.dumps(m_list)
+                await self.send(msg)
 
             else:
                 logging.info(
@@ -206,7 +218,6 @@ class CheffAgent(Agent):
                 logging.info(
                     "[Cook] Message received with content: {}".format(msg.body))
                 logging.info("[Cook] Gonna start cooking...")
-                # TODO: Change presence notification
 
                 logging.info(
                     f"[Cook] Ingredients list:\n{self.agent.list_ingred}")
@@ -223,10 +234,17 @@ class CheffAgent(Agent):
 
                 menu = menu_avail + menu_pref
 
-                logging.info('The recipe that best matches is: {}'.format(
+                logging.info('[Cook] The recipe that best matches is: {}'.format(
                     self.recipe_book['Title'][menu.argmax()]))
-                logging.info(self.recipe_book['Ingredients'][menu.argmax()])
-                logging.info(self.recipe_book['Directions'][menu.argmax()])
+                logging.debug(self.recipe_book['Ingredients'][menu.argmax()])
+                logging.debug(self.recipe_book['Directions'][menu.argmax()])
+
+                # Notify chat/user
+                msg = Message(to=CHAT_JID)
+                msg.set_metadata("performative", "confirm")
+                msg.body = json.dumps(menu.toarray()[0, :].tolist())
+                await self.send(msg)
+
 
             else:
                 logging.info(
