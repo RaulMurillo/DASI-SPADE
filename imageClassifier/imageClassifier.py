@@ -13,6 +13,7 @@ import csv
 
 import numpy as np
 import tensorflow as tf
+import logging
 
 import os
 dirname = os.path.dirname(__file__)
@@ -99,7 +100,13 @@ class ImageAgent(Agent):
                 img = decode_img(img)
                 img = tf.expand_dims(img, axis=0)
                 pred = self.cnn_model.predict_classes(img)[0]
-                print(f"Image is of class {self.agent.CLASS_NAMES[pred]}")
+                logging.info(f"Image is of class {self.agent.CLASS_NAMES[pred]}")
+
+                msg = Message(to="dasi2020cheff@616.pub")#"akjncakj1@616.pub")
+                # Send ingredient
+                msg.set_metadata("performative", "inform")
+                msg.body = str(pred)
+                await self.send(msg)
             else:
                 print("Did not received any message after 10 seconds")
 
