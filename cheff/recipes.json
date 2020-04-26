@@ -5,7 +5,16 @@
         "Pasta con tomate",
         "Gazpacho",
         "Bizcocho de zanahoria",
-        "Mermelada de melocotón"
+        "Mermelada de melocotón",
+        "Melón con jamón",
+        "Helado de manzana",
+        "Helado de pera",
+        "Helado de melón",
+        "Helado de kiwi",
+        "Helado de naranja",
+        "Helado de melocotón",
+        "Macedonia",
+        "Pasta con zanahoria"
     ],
     "Ingredients": [
         [
@@ -62,6 +71,65 @@
             "1 kg de melocotones",
             "500 gr. de azúcar",
             "1/2 limón entero o el zumo de medio limón"
+        ],
+        [
+            "1/2 melón piel de sapo (unos 750 g sin piel)",
+            "200 g de jamón serrano en lonchas muy finas",
+            "Aceite de oliva virgen extra"
+        ],
+        [
+            "400 gramos de manzanas",
+            "150 gramos de azúcar",
+            "Zumo de 1 limón",
+            "500 ml de agua"
+        ],
+        [
+            "400 gramos de peras",
+            "150 gramos de azúcar",
+            "Zumo de 1 limón",
+            "500 ml de agua"
+        ],
+        [
+            "400 gramos de melón",
+            "150 gramos de azúcar",
+            "Zumo de 1 limón",
+            "500 ml de agua"
+        ],
+        [
+            "400 gramos de kiwis",
+            "150 gramos de azúcar",
+            "Zumo de 1 limón",
+            "500 ml de agua"
+        ],
+        [
+            "400 gramos de naranajas",
+            "150 gramos de azúcar",
+            "Zumo de 1 limón",
+            "500 ml de agua"
+        ],
+        [
+            "400 gramos de melocotones",
+            "150 gramos de azúcar",
+            "Zumo de 1 limón",
+            "500 ml de agua"
+        ],
+        [
+            "375 gramos de Azúcar",
+            "250 ml de agua",
+            "2 plátano",
+            "2 peras",
+            "2 naranajas",
+            "2 kiwis",
+            "1 rodaja grande de melón",
+            "2 Melocotónes",
+            "1/2 Zumo de limón" 
+        ],
+        [
+            "60 g patatas",
+            "25 g zanahorias",
+            "1/2 cebolla",
+            "1/2 diente ajo",
+            "130 g pasta"
         ]
     ],
     "Directions": [
@@ -109,6 +177,70 @@
             "Pon el brazo de la batidora dentro de la olla y a velocidad mínima, da dos o tres golpes de triturado para homogenizar un poco la mezcla. No es necesario que la tritures totalmente si como a mi te gusta encontrarte algún tropezón.",
             "Comprueba el punto de la mermelada poniendo una cucharada en un plato frío, si pasados unos segundos mantiene la textura sin desparramarse, estará lista, si la notas muy líquida, déjala unos minutos más a fuego medio.",
             "Deja enfriar y envasa"
+        ],
+        [
+            "Cortar 3 o 4 rajas normales del melón y quitarles las pipas.",
+            "Desde la parte interior (donde estaban las pipas), ir sacando láminas en sentido longitudinal con la ayuda de un pelador.",
+            "Cortar las lonchas de jamón por el medio a lo largo o de modo que sean de tamaño similar a las láminas de melón.",
+            "Colocar en cada plato el doble de melón que de jamón.",
+            "Añadir un hilito de aceite de oliva por encima."
+        ],
+        [
+            "Lavar, pelar y quitar el corazón a las manzanas. Trocearlas.",
+            "Colocar una cacerola al fuego con el agua y las manzanas cortadas.",
+            "Cuando comience a hervir se añade el azúcar y el zumo de limón. Dejar cocer removiendo de vez en cuando hasta que las manzanas estén muy tiernas. Triturar todo en la batidora y colar.",
+            "Introducir el helado/sorbete en la sorbetera y meter en el congelador.",
+            "Servir el helado formando bolas en copas anchas para helado o copas de martini decorando con un par de hojitas de menta fresca."
+        ],
+        [
+            "Lavar, pelar y quitar el corazón a las peras. Trocearlas.",
+            "Colocar una cacerola al fuego con el agua y las peras cortadas.",
+            "Cuando comience a hervir se añade el azúcar y el zumo de limón. Dejar cocer removiendo de vez en cuando hasta que las peras estén muy tiernas. Triturar todo en la batidora y colar.",
+            "Introducir el helado/sorbete en la sorbetera y meter en el congelador.",
+            "Servir el helado formando bolas en copas anchas para helado o copas de martini decorando con un par de hojitas de menta fresca."
+        ],
+        [
+            "Lavar, pelar y quitar las pipas del melón. Trocearlo.",
+            "Colocar una cacerola al fuego con el agua y el melon cortado.",
+            "Cuando comience a hervir se añade el azúcar y el zumo de limón. Dejar cocer removiendo de vez en cuando hasta que el melón esté muy tiernas. Triturar todo en la batidora y colar.",
+            "Introducir el helado/sorbete en la sorbetera y meter en el congelador.",
+            "Servir el helado formando bolas en copas anchas para helado o copas de martini decorando con un par de hojitas de menta fresca."
+        ],
+        [
+            "Lavar, pelar los kiwis. Trocearlos.",
+            "Colocar una cacerola al fuego con el agua y los kiwis cortados.",
+            "Cuando comience a hervir se añade el azúcar y el zumo de limón. Dejar cocer removiendo de vez en cuando hasta que los kiwis estén muy tiernas. Triturar todo en la batidora y colar.",
+            "Introducir el helado/sorbete en la sorbetera y meter en el congelador.",
+            "Servir el helado formando bolas en copas anchas para helado o copas de martini decorando con un par de hojitas de menta fresca."
+        ],
+        [
+            "Lavar, pelar las naranjas. Trocearlas.",
+            "Colocar una cacerola al fuego con el agua y las naranajas cortadas.",
+            "Cuando comience a hervir se añade el azúcar y el zumo de limón. Dejar cocer removiendo de vez en cuando hasta que las naranajas estén muy tiernas. Triturar todo en la batidora y colar.",
+            "Introducir el helado/sorbete en la sorbetera y meter en el congelador.",
+            "Servir el helado formando bolas en copas anchas para helado o copas de martini decorando con un par de hojitas de menta fresca."
+        ],
+        [
+            "Lavar, pelar y quitar el corazón de los melocotones. Trocearlos.",
+            "Colocar una cacerola al fuego con el agua y los melocotones cortados.",
+            "Cuando comience a hervir se añade el azúcar y el zumo de limón. Dejar cocer removiendo de vez en cuando hasta que los melocotones estén muy tiernas. Triturar todo en la batidora y colar.",
+            "Introducir el helado/sorbete en la sorbetera y meter en el congelador.",
+            "Servir el helado formando bolas en copas anchas para helado o copas de martini decorando con un par de hojitas de menta fresca."
+        ],
+        [
+            "Para hacer el almíbar ponemos en un cazo el azúcar y el agua, y sin remover llevamos a ebullición. Dejamos que hierva durante dos minutos y retiramos del fuego. Reservamos hasta que se temple.",
+            "Por otro lado, en un cuenco amplio, troceamos las frutas, una vez lavadas y peladas.",
+            "Añadimos el zumo de limón para que no se oxiden. Mezclamos con cuidado, para que las cerezas no manchen mucho la fruta y el zumo se reparta bien.",
+            "Mezclado todo con tacto",
+            "Tapamos la macedonia y refrigeramos durante unas horas antes de consumirla."
+        ],
+        [
+            "Pica las patatas, las zanahorias, la cebolla y el ajo.",
+            "Vierte todo en una cazuela a fuego medio y cocina hasta que las patatas estén tiernas.",
+            "Con ayuda de una batidora, bate las patatas, las zanahorias, la cebolla y el ajo con el resto de los ingredientes, hasta lograr una masa homogénea.",
+            "Cuece la pasta en agua con sal hasta que se cocinen.",
+            "Una vez que estén hechos, quitar el agua y echar la pasta sobre la salsa y remover.",
+            "Echa sal y listo para comer"
         ]
     ]
 }
