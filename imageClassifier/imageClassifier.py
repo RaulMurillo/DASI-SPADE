@@ -80,31 +80,19 @@ class ImageAgent(Agent):
 
             self.cnn_model = tf.keras.models.load_model(os.path.join(CNN_DIR, 'saved_model/my_model.h5'))
 
-            # self.presence.approve_all=True
-            # self.presence.set_presence(
-            #                  state=PresenceState(True, PresenceShow.CHAT),  # available and interested in chatting
-            #                  status="Waiting for messages...",
-            #                  priority=2
-            #                 )
-
         async def run(self):
-
-            # print("Counter: {}".format(self.counter))
-            # self.counter += 1
-            # await asyncio.sleep(1)
             logging.info("ClassifyBehaviour running")
             t=10000
 
-            # wait for a message for 10 seconds
+            # wait for a message for t seconds
             msg = await self.receive(timeout=t)
-            # self.presence.set_available(show=PresenceShow.AWAY)
             if msg:
-                print("Message received with content: {}".format(msg.body))
+                logging.info("[ImageAgent] Message received with content: {}".format(msg.body))
                 img = tf.io.read_file(msg.body)
                 img = decode_img(img)
                 img = tf.expand_dims(img, axis=0)
                 pred = self.cnn_model.predict_classes(img)[0]
-                logging.info(f"Image is of class {self.agent.CLASS_NAMES[pred]}")
+                logging.info(f"[ImageAgent] Image is of class {self.agent.CLASS_NAMES[pred]}")
 
                 msg = Message(to=CHAT_JID)
                 # Send ingredient

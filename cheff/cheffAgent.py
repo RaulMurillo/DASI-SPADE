@@ -243,7 +243,7 @@ class CheffAgent(Agent):
                 logging.debug(menu_pref.get_shape())
                 logging.info(f"[Cook] Preferred menu:\n{menu_pref}")
 
-                menu = menu_avail + menu_pref
+                menu = menu_avail.multiply(menu_avail + menu_pref)
 
                 logging.info('[Cook] The recipe that best matches is: {}'.format(
                     self.recipe_book['Title'][menu.argmax()]))
