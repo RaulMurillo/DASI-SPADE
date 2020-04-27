@@ -1,4 +1,5 @@
 # SPADE libs
+from functools import wraps
 from multiprocessing import Process, Pipe
 import time
 import asyncio
@@ -261,7 +262,7 @@ def call2dialogflow(input_text):
 
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
-from functools import wraps
+
 
 def send_action(action):
     """Sends `action` while processing func command."""
@@ -269,11 +270,13 @@ def send_action(action):
     def decorator(func):
         @wraps(func)
         def command_func(update, context, *args, **kwargs):
-            context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
+            context.bot.send_chat_action(
+                chat_id=update.effective_message.chat_id, action=action)
             return func(update, context,  *args, **kwargs)
         return command_func
-    
+
     return decorator
+
 
 def start_bot(conn):
     # State definitions for Telegram Bot
@@ -403,23 +406,17 @@ def start_bot(conn):
 
         conn.send({'Image': photo_path})
 
-        # # TODO: Change by Image agent's response
-        # update.message.reply_text(f'Uploaded image as {photo_name}!')
         # Receive answer from Chat Agent
-        response = f'Uploaded image as {photo_name}!'
+        response = 'Foto recibida!'  # f'Uploaded image as {photo_name}!'
         if conn.poll(timeout=5):
-            i = conn.recv()
-            print(i, type(i))
-            response = 'Veo que tienes ' + ilower()
+            ingred = conn.recv()
+            response = 'Veo que tienes ' + ingred.lower()
         update.message.reply_text(response)
 
         return ADD_PHOTO
 
     @send_action(ChatAction.TYPING)
-    def stop_images(update, context):
-        update.message.reply_text(
-            'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
-
+    def get_cheff_response(update, context):
         # Send message to Chat Agent
         if not context.user_data.get(RECIPE):
             # CU-001
@@ -431,7 +428,7 @@ def start_bot(conn):
 
         # Receive answer from Chat Agent
         response = 'Lo siento, el servidor está teniendo problemas, Vuelve a probar más tarde'
-        if conn.poll(timeout=10):
+        if conn.poll(timeout=5):
             r = conn.recv()
             if not context.user_data.get(RECIPE):
                 # CU-001
@@ -444,6 +441,8 @@ def start_bot(conn):
                     response += '\n\n<b><u>Instrucciones</u></b>'
                     for n, i in enumerate(r['Directions']):
                         response += '\n' + str(n+1) + '. ' + i
+                elif (r == None):
+                    response = 'Lo siento, no hay recetas disponibles con lo que me has indicado'
             else:
                 # CU-002
                 if (type(r) == list):
@@ -456,6 +455,12 @@ def start_bot(conn):
                     else:
                         response = f'¡Tienes todos los ingredientes clave para cocinar {context.user_data.get(RECIPE).to_lower()}!'
         update.message.reply_text(response, parse_mode=ParseMode.HTML)
+
+    def stop_images(update, context):
+        update.message.reply_text(
+            'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+
+        get_cheff_response(update, context)
 
         buttons = [['Sí', 'No']]
         keyboard = ReplyKeyboardMarkup(

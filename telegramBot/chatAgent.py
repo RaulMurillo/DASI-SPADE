@@ -55,7 +55,6 @@ class ChatAgent(Agent):
                     if response:
                         ingred = self.agent.INGREDIENTS[int(response.body)]
                         self.agent.pipe.send(ingred)
-                        print('ingred sent to bot!')
                     # else:
                     #     self.agent.pipe.send('Lo siento, el servidor tiene problemas. Prueba más tarde')
                 elif 'CU-001' in bot_msg:
@@ -70,12 +69,15 @@ class ChatAgent(Agent):
                     # Pass response to bot - notify to user
                     if response:
                         all_menus = np.array(json.loads(response.body))
-                        # JSON with best recipe
-                        menu = {
-                            'Title': self.recipe_book['Title'][all_menus.argmax()],
-                            'Ingredients': self.recipe_book['Ingredients'][all_menus.argmax()],
-                            'Directions': self.recipe_book['Directions'][all_menus.argmax()],
-                        }
+                        if all_menus.max() > 0:
+                            # JSON with best recipe
+                            menu = {
+                                'Title': self.recipe_book['Title'][all_menus.argmax()],
+                                'Ingredients': self.recipe_book['Ingredients'][all_menus.argmax()],
+                                'Directions': self.recipe_book['Directions'][all_menus.argmax()],
+                            }
+                        else:
+                            menu = None
                         self.agent.pipe.send(menu)
                     else:
                         self.agent.pipe.send('Lo siento, el servidor tiene problemas. Prueba más tarde')
