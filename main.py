@@ -1,5 +1,5 @@
 from telegramBot.chatAgent import ChatAgent
-from telegramBot.telegramBot_2 import start_bot
+from telegramBot.telegramBot import start_bot
 from cheff.cheffAgent import CheffAgent
 from imageClassifier.imageClassifier import ImageAgent
 from spade import quit_spade
