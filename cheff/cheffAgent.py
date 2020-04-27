@@ -101,12 +101,11 @@ class CheffAgent(Agent):
                     f"[AddIngred] Did not received any message after {t} seconds")
 
     class PreferencesBehaviour(CyclicBehaviour):
-        # TODO: messages as JSON
         async def on_start(self):
             logging.debug("PreferencesBehaviour starting . . .")
 
             prefs_file = os.path.join(CHEFF_DIR, 'prefs.npz')
-            if os.path.isfile('filename.txt'):
+            if os.path.isfile(prefs_file):
                 logging.debug("Preferences file exist")
 
                 self.agent.preferences = sp.sparse.load_npz(
@@ -123,6 +122,10 @@ class CheffAgent(Agent):
             pass
 
         async def on_end(self):
+            save_prefs()
+            pass
+
+        def save_prefs(self):
             logging.info("[Preferences] Vector:\n{}".format(
                 self.agent.preferences))
             sp.sparse.save_npz(os.path.join(
@@ -137,16 +140,19 @@ class CheffAgent(Agent):
             if msg:
                 logging.info(
                     "[Preferences] Message received with content: {}".format(msg.body))
-                ingred, pref = msg.body.split(',')
-                ingred = int(ingred)
-                pref = int(pref)
-                self.agent.preferences[0, ingred] = pref
-                logging.info(f"[Preferences]\n{self.agent.preferences}")
+                # ingred, pref = msg.body.split(',')
+                list_prefs=json.loads(msg.body)
+                for d in list_prefs:
+                    ingred = d['Ingredient']
+                    pref = d['Value']
+                    self.agent.preferences[0, ingred] = pref
+                # logging.info(f"[Preferences]\n{self.agent.preferences}")
+                self.save_prefs()
             else:
                 logging.info(
                     f"[Preferences] Did not received any message after {t} seconds")
                 # self.kill()
-                return
+                # return
 
     class MissingBehaviour(CyclicBehaviour):
         """Behaviour for dealing with use case 2

@@ -295,7 +295,7 @@ def start_bot(conn):
         """Select an action: query by recipes/ingredients or add preferences."""
         text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
             'Tambien puedes indicar tus preferencias y alergias.\n' + \
-            'Selecciona la opción de que desees y pulsa finalizar cuando hayas terminado\n\n'
+            'Selecciona la opción de que desees y pulsa <code>/exit</code> cuando hayas terminado\n\n'
 
         buttons = [['Quiero cocinar algo, pero no se me ocurre nada', 'Quiero preparar una receta concreta'],
                    ['Añadir preferencia', 'Añadir alergia'],
@@ -307,7 +307,7 @@ def start_bot(conn):
             update.message.reply_text(
                 'Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot.')
         update.message.reply_text(
-            text=text, resize_keyboard=True, reply_markup=keyboard)
+            text=text, resize_keyboard=True, reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
         # Clear Dialogflow context
         call2dialogflow('Hola DASI-Chef Bot')

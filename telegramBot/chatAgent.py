@@ -106,22 +106,19 @@ class ChatAgent(Agent):
 
                     msg = Message(to="dasi2020cheff@616.pub")
                     msg.set_metadata("performative", "inform_ref")
-                    v = '-10' if f == 'GuardarAlergia' else '5'
+                    v = -10 if f == 'GuardarAlergia' else 5
+                    msgs = []
                     for i in prefs:
                         logging.info(i)
-                        msg.body = str(self.agent.INGREDIENTS.index(i)) + ',' + v
-                        await self.send(msg)
-                        await asyncio.sleep(0.01)
-                        logging.info(f"[ChatAgent * CU-003] Message sent: {msg.body}")
+                        msgs.append({'Ingredient': self.agent.INGREDIENTS.index(i), 'Value': v})
+                    msg.body = json.dumps(msgs)
+                    # msg.body = str(self.agent.INGREDIENTS.index(i)) + ',' + v
+                    await self.send(msg)
+                    logging.info(f"[ChatAgent * CU-003] Message sent: {msg.body}")
 
                 else:   # bad message
-                    self.kill()
-            # else:
-            #     await asyncio.sleep(1)
-            # self.counter += 1
-            # await asyncio.sleep(1)
-            # if msg == '5':
-            #     self.kill()
+                    logging.warning(f'[CHAT] Message recived: {bot_msg}')
+                    # self.kill()
 
     async def setup(self):
         logging.info("ChatAgent starting . . .")
