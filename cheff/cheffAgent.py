@@ -78,6 +78,11 @@ class SenderAgent(Agent):
 
 class CheffAgent(Agent):
 
+    def reset_list_ingred(self):
+        """Restores the user list of ingredients."""
+
+        self.list_ingred = lil_matrix((1, len(self.INGREDIENTS)), dtype=bool)
+
     class AddIngredBehaviour(CyclicBehaviour):
         async def on_start(self):
             logging.debug("AddIngredBehaviour starting . . .")
@@ -112,12 +117,12 @@ class CheffAgent(Agent):
                     prefs_file)  # Expected np.int8 type
                 assert self.agent.preferences.dtype == np.int8
                 assert self.agent.preferences.shape == (
-                    1, len(self.agent.CLASS_NAMES))
+                    1, len(self.agent.INGREDIENTS))
             else:
                 logging.debug("Preferences file does not exist")
 
                 self.agent.preferences = csc_matrix(
-                    np.zeros((1, len(self.agent.CLASS_NAMES)), dtype=np.int8)
+                    np.zeros((1, len(self.agent.INGREDIENTS)), dtype=np.int8)
                 )
             pass
 
@@ -179,7 +184,7 @@ class CheffAgent(Agent):
                 recipe = self.agent.ingreds_recipes[:, int(
                     msg.body)].transpose()
                 logging.debug(recipe.get_shape())
-                # assert recipe.get_shape() == (1, len(self.agent.CLASS_NAMES))
+                # assert recipe.get_shape() == (1, len(self.agent.INGREDIENTS))
 
                 missing = csc_matrix(recipe.multiply(csc_matrix(
                     np.logical_not(self.agent.list_ingred.toarray()))),
@@ -188,7 +193,7 @@ class CheffAgent(Agent):
                 b_list = missing.toarray()[0, :]
                 logging.debug(b_list)
 
-                m_list = [i for (i, v) in zip(self.agent.CLASS_NAMES, b_list) if v]
+                m_list = [i for (i, v) in zip(self.agent.INGREDIENTS, b_list) if v]
                 logging.info(m_list)
 
                 # Notify chat/user
@@ -250,6 +255,7 @@ class CheffAgent(Agent):
                 msg.set_metadata("performative", "confirm")
                 msg.body = json.dumps(menu.toarray()[0, :].tolist())
                 await self.send(msg)
+                self.agent.reset_list_ingred()
 
 
             else:
@@ -261,10 +267,11 @@ class CheffAgent(Agent):
         logging.info("Cheff Agent starting . . .")
         # Ingredients names
         with open(os.path.join(CNN_DIR, 'ingredients_es.csv'), 'r') as f: #classes
-            self.CLASS_NAMES = list(csv.reader(f))[0]
+            self.INGREDIENTS = list(csv.reader(f))[0]
+        logging.debug(self.INGREDIENTS)
         # User list of ingredients
-        self.list_ingred = lil_matrix((1, len(self.CLASS_NAMES)), dtype=bool)
-        logging.debug(self.CLASS_NAMES)
+        # self.list_ingred = lil_matrix((1, len(self.INGREDIENTS)), dtype=bool)
+        self.reset_list_ingred()
         # Matrix of ingreds_recipes
         self.ingreds_recipes = csc_matrix(np.genfromtxt(os.path.join(
             CHEFF_DIR, 'ingreds_recipes.csv'), dtype=np.int8, delimiter=','))
