@@ -25,6 +25,8 @@ dirname = os.path.dirname(__file__)
 CNN_DIR = os.path.join('imageClassifier', 'dnn')
 CHEFF_DIR = os.path.join(dirname, '')
 
+CHAT_JID = 'akjncakj@616.pub'
+
 
 class SenderAgent(Agent):
     """Agent for testing `CheffAgent`
@@ -103,7 +105,7 @@ class CheffAgent(Agent):
             logging.debug("PreferencesBehaviour starting . . .")
 
             prefs_file = os.path.join(CHEFF_DIR, 'prefs.npz')
-            if os.path.isfile('filename.txt'):
+            if os.path.isfile(prefs_file):
                 logging.debug("Preferences file exist")
 
                 self.agent.preferences = sp.sparse.load_npz(
@@ -120,6 +122,10 @@ class CheffAgent(Agent):
             pass
 
         async def on_end(self):
+            save_prefs()
+            pass
+
+        def save_prefs(self):
             logging.info("[Preferences] Vector:\n{}".format(
                 self.agent.preferences))
             sp.sparse.save_npz(os.path.join(
@@ -127,7 +133,6 @@ class CheffAgent(Agent):
             pass
 
         async def run(self):
-            pass
             logging.debug("PreferencesBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
@@ -135,16 +140,19 @@ class CheffAgent(Agent):
             if msg:
                 logging.info(
                     "[Preferences] Message received with content: {}".format(msg.body))
-                ingred, pref = msg.body.split(',')
-                ingred = int(ingred)
-                pref = int(pref)
-                self.agent.preferences[0, ingred] = pref
-                logging.info(f"[Preferences]\n{self.agent.preferences}")
+                # ingred, pref = msg.body.split(',')
+                list_prefs=json.loads(msg.body)
+                for d in list_prefs:
+                    ingred = d['Ingredient']
+                    pref = d['Value']
+                    self.agent.preferences[0, ingred] = pref
+                # logging.info(f"[Preferences]\n{self.agent.preferences}")
+                self.save_prefs()
             else:
                 logging.info(
                     f"[Preferences] Did not received any message after {t} seconds")
-                self.kill()
-                return
+                # self.kill()
+                # return
 
     class MissingBehaviour(CyclicBehaviour):
         """Behaviour for dealing with use case 2
@@ -177,8 +185,17 @@ class CheffAgent(Agent):
                     np.logical_not(self.agent.list_ingred.toarray()))),
                     dtype=bool)
 
-                logging.debug(missing.toarray()[0, :])
-                logging.info(self.agent.CLASS_NAMES[missing.toarray()[0, :]])
+                b_list = missing.toarray()[0, :]
+                logging.debug(b_list)
+
+                m_list = [i for (i, v) in zip(self.agent.CLASS_NAMES, b_list) if v]
+                logging.info(m_list)
+
+                # Notify chat/user
+                msg = Message(to=CHAT_JID)
+                msg.set_metadata("performative", "confirm")
+                msg.body = json.dumps(m_list)
+                await self.send(msg)
 
             else:
                 logging.info(
@@ -207,7 +224,6 @@ class CheffAgent(Agent):
                 logging.info(
                     "[Cook] Message received with content: {}".format(msg.body))
                 logging.info("[Cook] Gonna start cooking...")
-                # TODO: Change presence notification
 
                 logging.info(
                     f"[Cook] Ingredients list:\n{self.agent.list_ingred}")
@@ -224,19 +240,27 @@ class CheffAgent(Agent):
 
                 menu = menu_avail + menu_pref
 
-                logging.info('The recipe that best matches is: {}'.format(
+                logging.info('[Cook] The recipe that best matches is: {}'.format(
                     self.recipe_book['Title'][menu.argmax()]))
-                logging.info(self.recipe_book['Ingredients'][menu.argmax()])
-                logging.info(self.recipe_book['Directions'][menu.argmax()])
+                logging.debug(self.recipe_book['Ingredients'][menu.argmax()])
+                logging.debug(self.recipe_book['Directions'][menu.argmax()])
+
+                # Notify chat/user
+                msg = Message(to=CHAT_JID)
+                msg.set_metadata("performative", "confirm")
+                msg.body = json.dumps(menu.toarray()[0, :].tolist())
+                await self.send(msg)
+
 
             else:
                 logging.info(
                     f"[Cook] Did not received any message after {t} seconds")
 
     async def setup(self):
+        print('CHEFF')
         logging.info("Cheff Agent starting . . .")
         # Ingredients names
-        with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:
+        with open(os.path.join(CNN_DIR, 'ingredients_es.csv'), 'r') as f: #classes
             self.CLASS_NAMES = list(csv.reader(f))[0]
         # User list of ingredients
         self.list_ingred = lil_matrix((1, len(self.CLASS_NAMES)), dtype=bool)
