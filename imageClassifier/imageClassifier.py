@@ -69,6 +69,10 @@ def decode_img(img):
     # Use `convert_image_dtype` to convert to floats in the [0,1] range.
     img = tf.image.convert_image_dtype(img, tf.float32)
     # resize the image to the desired size.
+    h, w, _ = tf.shape(img).numpy()
+    if h!=w:  # Central cropping
+        target_size = min(h,w)
+        img = tf.image.resize_with_crop_or_pad(img, target_size, target_size)
     return tf.image.resize(img, [224, 224])
 
 
