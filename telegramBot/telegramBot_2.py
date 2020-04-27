@@ -18,7 +18,7 @@ import json
 import datetime
 
 from google.api_core.exceptions import InvalidArgument
-from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, ParseMode, ChatAction
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           ConversationHandler, CallbackQueryHandler)
 
@@ -261,6 +261,20 @@ def call2dialogflow(input_text):
 
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
+from functools import wraps
+
+def send_action(action):
+    """Sends `action` while processing func command."""
+
+    def decorator(func):
+        @wraps(func)
+        def command_func(update, context, *args, **kwargs):
+            context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=action)
+            return func(update, context,  *args, **kwargs)
+        return command_func
+    
+    return decorator
+
 def start_bot(conn):
     # State definitions for Telegram Bot
     (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
@@ -272,7 +286,7 @@ def start_bot(conn):
     (START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
 
     with open(os.path.join(CNN_DIR, 'ingredients_es.csv'), 'r') as f:
-            INGREDIENTS = list(csv.reader(f))[0]
+        INGREDIENTS = list(csv.reader(f))[0]
 
     def start(update, context):
         """Select an action: query by recipes/ingredients or add preferences."""
@@ -367,6 +381,7 @@ def start_bot(conn):
 
         return ADD_PHOTO
 
+    @send_action(ChatAction.TYPING)
     def save_image(update, context):
         """Save the input images."""
         user = update.message.from_user
@@ -392,12 +407,15 @@ def start_bot(conn):
         # update.message.reply_text(f'Uploaded image as {photo_name}!')
         # Receive answer from Chat Agent
         response = f'Uploaded image as {photo_name}!'
-        if conn.poll(timeout=1):
-            response = conn.recv()
+        if conn.poll(timeout=5):
+            i = conn.recv()
+            print(i, type(i))
+            response = 'Veo que tienes ' + ilower()
         update.message.reply_text(response)
 
         return ADD_PHOTO
 
+    @send_action(ChatAction.TYPING)
     def stop_images(update, context):
         update.message.reply_text(
             'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
@@ -412,18 +430,32 @@ def start_bot(conn):
             # update.message.reply_text()
 
         # Receive answer from Chat Agent
-        response = 'Lo siento, el servidor está teniendo problemas. Vuelve a probar más tarde'
+        response = 'Lo siento, el servidor está teniendo problemas, Vuelve a probar más tarde'
         if conn.poll(timeout=10):
             r = conn.recv()
             if not context.user_data.get(RECIPE):
                 # CU-001
-                response = str(r)
+                if (type(r) == dict):
+                    update.message.reply_text(
+                        'Te sugiero preparar {}'.format(r['Title']))
+                    response = '<b><u>Ingredientes</u></b>'
+                    for i in r['Ingredients']:
+                        response += '\n\u2022 ' + i
+                    response += '\n\n<b><u>Instrucciones</u></b>'
+                    for n, i in enumerate(r['Directions']):
+                        response += '\n' + str(n+1) + '. ' + i
             else:
                 # CU-002
-                my_string = ', '.join(r)
-                response = 'Te faltan los siguientes ingredientes clave: ' + my_string.to_lower()
+                if (type(r) == list):
+                    if len(r):
+                        ingred_list = ''
+                        for i in r:
+                            ingred_list += '\n\u2022 ' + i.capitalize()
 
-        update.message.reply_text(response)
+                        response = 'Te faltan los siguientes ingredientes clave: ' + ingred_list
+                    else:
+                        response = f'¡Tienes todos los ingredientes clave para cocinar {context.user_data.get(RECIPE).to_lower()}!'
+        update.message.reply_text(response, parse_mode=ParseMode.HTML)
 
         buttons = [['Sí', 'No']]
         keyboard = ReplyKeyboardMarkup(
@@ -530,7 +562,8 @@ def start_bot(conn):
             # Pass ingredients to chat agent
             if len(knowns) > 0:
                 # f = -10 if context.user_data[INTENT] == 'GuardarAlergia' else 5
-                conn.send({'CU-003': knowns, 'factor': context.user_data.get(INTENT)})
+                conn.send(
+                    {'CU-003': knowns, 'factor': context.user_data.get(INTENT)})
 
             if len(unknowns) > 0:
                 my_string = ', '.join(unknowns)

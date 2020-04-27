@@ -48,6 +48,16 @@ class ChatAgent(Agent):
                     msg.set_metadata("performative", "request")
                     msg.body = bot_msg['Image']
                     await self.send(msg)
+
+                    # Recive ImageAgent's response
+                    response = await self.receive(timeout=3)
+                    # Pass response to bot - notify to user
+                    if response:
+                        ingred = self.agent.INGREDIENTS[int(response.body)]
+                        self.agent.pipe.send(ingred)
+                        print('ingred sent to bot!')
+                    # else:
+                    #     self.agent.pipe.send('Lo siento, el servidor tiene problemas. Prueba más tarde')
                 elif 'CU-001' in bot_msg:
                     # Notify CheffAgent
                     msg = Message(to="dasi2020cheff@616.pub")
@@ -60,7 +70,7 @@ class ChatAgent(Agent):
                     # Pass response to bot - notify to user
                     if response:
                         all_menus = np.array(json.loads(response.body))
-                        # TODO: JSON with best recipe
+                        # JSON with best recipe
                         menu = {
                             'Title': self.recipe_book['Title'][all_menus.argmax()],
                             'Ingredients': self.recipe_book['Ingredients'][all_menus.argmax()],

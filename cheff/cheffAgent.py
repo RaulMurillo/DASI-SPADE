@@ -254,7 +254,7 @@ class CheffAgent(Agent):
         print('CHEFF')
         logging.info("Cheff Agent starting . . .")
         # Ingredients names
-        with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:
+        with open(os.path.join(CNN_DIR, 'ingredients_es.csv'), 'r') as f: #classes
             self.CLASS_NAMES = list(csv.reader(f))[0]
         # User list of ingredients
         self.list_ingred = lil_matrix((1, len(self.CLASS_NAMES)), dtype=bool)
