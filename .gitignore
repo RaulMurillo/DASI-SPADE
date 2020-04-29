@@ -45,3 +45,6 @@ hs_err_pid*
 
 # Credentials
 private_key.*
+
+# Configurations
+*config.*

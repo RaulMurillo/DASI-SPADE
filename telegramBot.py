@@ -1,7 +1,7 @@
 from google.api_core.exceptions import InvalidArgument
 from telegram import ReplyKeyboardMarkup, ParseMode, ChatAction
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          ConversationHandler, CallbackQueryHandler)
+from telegram.ext import (Updater, CommandHandler,
+                          MessageHandler, Filters, ConversationHandler)
 from functools import wraps
 from multiprocessing import Process, Pipe
 
@@ -12,15 +12,23 @@ import json
 import datetime
 import csv
 
-CNN_DIR = os.path.join('imageClassifier', 'dnn')
+try:
+    from config import APP_CONFIG as CONFIG
 
+    COMMON_DIR = CONFIG['COMMON_DIR']
+    PHOTO_DIR = CONFIG['UPLOADS_DIR']
+except:
+    COMMON_DIR = os.path.join('common', '')
+    PHOTO_DIR = os.path.join(os.getcwd(), 'uploads')
 
-## ---------------------------------- START DIALOGFLOW -----------------------------------------##
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+## ---------------------------------- START DIALOGFLOW -----------------------------------------##
+
 
 # DialogFlow Credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'private_key.json'
@@ -28,8 +36,6 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'private_key.json'
 DIALOGFLOW_PROJECT_ID = 'dasibot-pfrrfb'
 DIALOGFLOW_LANGUAGE_CODE = 'es'
 SESSION_ID = 'me'
-
-photo_dir = os.path.join(os.getcwd(), 'uploads')
 
 
 def call2dialogflow(input_text):
@@ -64,13 +70,12 @@ def call2dialogflow(input_text):
 
         r['fields'] = response.query_result.parameters.fields[valorFields]
     else:
-        logging.debug('[Dialogflow] - Missing required params')
+        logger.debug('[Dialogflow] - Missing required params')
     return r
 
 
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
-
 
 def send_action(action):
     """Sends `action` while processing func command."""
@@ -86,7 +91,7 @@ def send_action(action):
     return decorator
 
 
-def start_bot(conn):
+def start_bot(token, conn):
     """Starts a Telegram Bot that pass messages to other process via `conn`."""
 
     # State definitions for Telegram Bot
@@ -97,10 +102,14 @@ def start_bot(conn):
 
     # Different constants for this example
     (START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
-    
+
     # List of ingredients available in the system
-    with open(os.path.join(CNN_DIR, 'ingredients_es.csv'), 'r') as f:
+    with open(os.path.join(COMMON_DIR, 'ingredients_es.csv'), 'r') as f:
         INGREDIENTS = list(csv.reader(f))[0]
+
+    # Pictures folder
+    if not os.path.exists(PHOTO_DIR):
+        os.makedirs(PHOTO_DIR)
 
     def start(update, context):
         """Select an action: query by recipes/ingredients or add preferences."""
@@ -131,7 +140,7 @@ def start_bot(conn):
     # TODO
     def display_info(update, context):
         """Show software user manual in GUI"""
-        
+
         text = 'Información actualmente no disponible :('
         update.message.reply_text(text=text)
         return SELECTING_ACTION
@@ -159,16 +168,16 @@ def start_bot(conn):
         try:
             context.user_data[FULFILLMENT] = response['fulfillment']
             context.user_data[INTENT] = response['intent']
-            logging.info(f'INTENT: {context.user_data[INTENT]}')
+            logger.info(f'INTENT: {context.user_data[INTENT]}')
         except KeyError:
             update.message.reply_text('Error with Dialogflow server')
             return error(update, context)
 
         try:
             context.user_data[FIELDS] = response['fields']
-            logging.info(f'FIELDS: {context.user_data[FIELDS]}')
+            logger.info(f'FIELDS: {context.user_data[FIELDS]}')
         except KeyError:
-            logging.debug('No fields in Dialogflow response')
+            logger.debug('No fields in Dialogflow response')
         # Check intention
         if context.user_data[INTENT] == 'ConsultarPlatoAElaborar':  # CU01
             return adding_images(update, context)
@@ -203,18 +212,13 @@ def start_bot(conn):
         photo_file = update.message.photo[-1].get_file()
         currentDT = datetime.datetime.now()
 
-        # try:
-        #     os.mkdir(photo_dir, )
-        #     print("Directory ", photo_dir, " created")
-        # except FileExistsError:
-        #     print("Directory ", photo_dir, " already exists")
         photo_name = 'user_photo' + \
             currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
-        photo_path = os.path.join(photo_dir, photo_name)
+        photo_path = os.path.join(PHOTO_DIR, photo_name)
         photo_file.download(photo_path)
-        logger.info("Image of %s: %s", user.first_name, photo_name)
+        logger.debug("Image of %s: %s", user.first_name, photo_name)
 
-        logger.info("Image updated at %s", photo_path)
+        logger.debug("Image updated at %s", photo_path)
 
         conn.send({'Image': photo_path})
 
@@ -234,7 +238,7 @@ def start_bot(conn):
         """
 
         # Send message to Chat Agent
-        if not context.user_data.get(RECIPE): # CU-001
+        if not context.user_data.get(RECIPE):  # CU-001
             conn.send({'CU-001': None})
         else:   # CU-002
             conn.send({'CU-002': context.user_data.get(RECIPE)})
@@ -243,7 +247,7 @@ def start_bot(conn):
         response = 'Lo siento, el servidor está teniendo problemas. Vuelve a probar más tarde'
         if conn.poll(timeout=5):
             r = conn.recv()
-            if not context.user_data.get(RECIPE): # CU-001
+            if not context.user_data.get(RECIPE):  # CU-001
                 if (type(r) == dict):
                     update.message.reply_text(
                         'Te sugiero preparar {}'.format(r['Title']))
@@ -257,7 +261,7 @@ def start_bot(conn):
                         response += '\n' + str(n+1) + '. ' + i
                 elif (r == None):
                     response = 'Lo siento, no hay recetas disponibles con lo que me has indicado'
-            else: # CU-002
+            else:  # CU-002
                 if (type(r) == list):
                     if len(r):
                         ingred_list = ''
@@ -311,7 +315,7 @@ def start_bot(conn):
                 context.user_data[FULFILLMENT] = response['fulfillment']
                 # context.user_data[INTENT] = response['intent'] # Should be already set
 
-                # logging.info(context.user_data[INTENT])
+                # logger.info(context.user_data[INTENT])
             except KeyError:
                 update.message.reply_text('Error with Dialogflow server')
                 exit(1)
@@ -332,7 +336,7 @@ def start_bot(conn):
         # Save recipe to cook
         context.user_data[RECIPE] = context.user_data[FIELDS].list_value.values[0].string_value
         context.user_data[FIELDS] = None
-        logging.info(context.user_data[RECIPE])
+        logger.info(context.user_data[RECIPE])
         return adding_images(update, context)
 
     def adding_prefs(update, context):
@@ -408,14 +412,14 @@ def start_bot(conn):
         context.user_data.pop(FIELDS, None)  # Delete fields
         return ADD_PREFS
 
-    def telegramBot_main():
+    def telegramBot_main(token):
         """Creates and launches the Telegram Bot."""
 
         # Create the Updater and pass it your bot's token.
         # Make sure to set use_context=True to use the new context based callbacks
         # Post version 12 this will no longer be necessary
         updater = Updater(
-            "1109746327:AAEfk6ivUvhR23M6z1BBOHvKKb5pHHwSGlQ", use_context=True)
+            token, use_context=True)
         # Get the dispatcher to register handlers
         dp = updater.dispatcher
 
@@ -464,10 +468,6 @@ def start_bot(conn):
         # log all errors
         dp.add_error_handler(error)
 
-        # Pictures folder
-        if not os.path.exists(photo_dir):
-            os.makedirs(photo_dir)
-
         # Start the Bot
         updater.start_polling()
 
@@ -476,8 +476,8 @@ def start_bot(conn):
         # start_polling() is non-blocking and will stop the bot gracefully.
         updater.idle()
 
-    logging.debug(f'My connection is {conn}')
-    telegramBot_main()
+    logger.debug(f'My connection is {conn}')
+    telegramBot_main(token)
 ## ---------------------------------- END TELEGRAM -----------------------------------------------##
 
 
@@ -491,5 +491,3 @@ if __name__ == "__main__":
     parent_conn, child_conn = Pipe()
     p = Process(target=start_bot, args=(child_conn,))
     p.start()
-
-    

@@ -1,26 +1,29 @@
-import time
-import asyncio
+# SPADE modules
 from spade.agent import Agent
 from spade import quit_spade
-import spade.behaviour
-from spade.behaviour import CyclicBehaviour
-from spade.behaviour import PeriodicBehaviour
-from spade.behaviour import OneShotBehaviour
+from spade.behaviour import CyclicBehaviour, PeriodicBehaviour
 from spade.message import Message
 from spade.template import Template
-# from aioxmpp import PresenceState, PresenceShow
-import csv
+import asyncio
 
 import numpy as np
 import tensorflow as tf
+import csv
+import os
 import logging
 
-import os
-dirname = os.path.dirname(__file__)
-CNN_DIR = os.path.join(dirname, 'dnn')
+try:
+    from config import APP_CONFIG as CONFIG
 
-CHEFF_JID = 'dasi2020cheff@616.pub'
-CHAT_JID = 'akjncakj@616.pub'
+    CHEFF_JID = CONFIG['CHEFF_JID']
+    CHAT_JID = CONFIG['CHAT_JID']
+    CNN_DIR = CONFIG['CNN_DIR']
+except:
+    CHEFF_JID = 'cheff@localhost'
+    CHAT_JID = 'chat@localhost'
+    CNN_DIR = os.path.join('cnn_model', '')
+
+logger = logging.getLogger(__name__)
 
 
 class SenderAgent(Agent):
@@ -30,6 +33,7 @@ class SenderAgent(Agent):
     """
     class SendBehav(PeriodicBehaviour):
         async def on_start(self):
+            logger.info("Starting SendBehav . . .")
             self.counter = 0
             self.imgs = ['IMG_20200321_181344.jpg', 'IMG_20200321_181528.jpg',
                          'IMG_20200322_193347.jpg', 'IMG_20200321_181521.jpg',
@@ -37,16 +41,18 @@ class SenderAgent(Agent):
                          'IMG_20200321_181524.jpg', 'IMG_20200322_193316.jpg']
 
         async def run(self):
-            print("SendBehav running")
+            logger.debug("SendBehav running")
 
             msg = Message(to="image01@localhost")     # Instantiate the message
             # Set the "request" FIPA performative
             msg.set_metadata("performative", "request")
-            msg.body = os.path.join(CNN_DIR, 'test_imgs', self.imgs[self.counter]) # Set the message content
+            # Set the message content
+            msg.body = os.path.join(
+                CNN_DIR, 'test_imgs', self.imgs[self.counter])
             # msg.body = f"Message {self.counter}"
 
             await self.send(msg)
-            print("Message sent!")
+            logger.info("[SenderAgent - SendBehav] Message sent!")
 
             self.counter += 1
             if self.counter >= len(self.imgs):
@@ -54,7 +60,7 @@ class SenderAgent(Agent):
                 await self.agent.stop()
 
     async def setup(self):
-        print("SenderAgent started")
+        logger.info("SenderAgent starting . . .")
         b = self.SendBehav(period=2)
         self.add_behaviour(b)
 
@@ -64,14 +70,14 @@ def decode_img(img):
 
     Returns a TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
     """
-    # convert the compressed string to a 3D uint8 tensor
+    # Convert the compressed string to a 3D uint8 tensor
     img = tf.image.decode_jpeg(img, channels=3)
-    # Use `convert_image_dtype` to convert to floats in the [0,1] range.
+    # Use `convert_image_dtype` to convert to floats in the [0,1] range
     img = tf.image.convert_image_dtype(img, tf.float32)
-    # resize the image to the desired size.
+    # Resize the image to the desired size
     h, w, _ = tf.shape(img).numpy()
-    if h!=w:  # Central cropping
-        target_size = min(h,w)
+    if h != w:  # Central cropping
+        target_size = min(h, w)
         img = tf.image.resize_with_crop_or_pad(img, target_size, target_size)
     return tf.image.resize(img, [224, 224])
 
@@ -80,23 +86,26 @@ class ImageAgent(Agent):
 
     class ClassifyBehaviour(CyclicBehaviour):
         async def on_start(self):
-            print("Starting behaviour . . .")
+            logger.info("Starting ClassifyBehaviour . . .")
 
-            self.cnn_model = tf.keras.models.load_model(os.path.join(CNN_DIR, 'saved_model/my_model.h5'))
+            self.cnn_model = tf.keras.models.load_model(
+                os.path.join(CNN_DIR, 'saved_model', 'my_model.h5'))
 
         async def run(self):
-            logging.info("ClassifyBehaviour running")
-            t=10000
+            logger.debug("ClassifyBehaviour running")
+            t = 10000
 
             # wait for a message for t seconds
             msg = await self.receive(timeout=t)
             if msg:
-                logging.info("[ImageAgent] Message received with content: {}".format(msg.body))
+                logger.info(
+                    "[ClassifyBehaviour] Message received with content: {}".format(msg.body))
                 img = tf.io.read_file(msg.body)
                 img = decode_img(img)
                 img = tf.expand_dims(img, axis=0)
                 pred = self.cnn_model.predict_classes(img)[0]
-                logging.info(f"[ImageAgent] Image is of class {self.agent.CLASS_NAMES[pred]}")
+                logger.info(
+                    f"[ClassifyBehaviour] Image is of class {self.agent.CLASS_NAMES[pred]}")
 
                 msg = Message(to=CHAT_JID)
                 # Send ingredient
@@ -109,18 +118,14 @@ class ImageAgent(Agent):
                 msg.body = str(pred)
                 await self.send(msg)
             else:
-                print("Did not received any message after 10 seconds")
+                logger.info(
+                    "[ClassifyBehaviour] Did not received any message after 10 seconds")
 
-            # stop agent from behaviour
-            # await self.agent.stop()
-
-            # self.presence.set_available(show=PresenceShow.CHAT)
-
-        async def on_end(self):
-            print("Behaviour finished")
+        # async def on_end(self):
+        #     logger.info("ClassifyBehaviour finished")
 
     async def setup(self):
-        print("Image Agent starting . . .")
+        logger.info("ImageAgent starting . . .")
         # Ingredients names
         with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:
             self.CLASS_NAMES = list(csv.reader(f))[0]
@@ -146,14 +151,19 @@ class ImageAgent(Agent):
 
 
 if __name__ == "__main__":
-    # imageagent = ImageAgent("image01@localhost", "user01")
-    imageagent = ImageAgent("dasi2020image@616.pub", "123456")
+    import time
+
+    logging.basicConfig()
+    logging.root.setLevel(logging.INFO)
+    logging.basicConfig(level=logging.INFO)
+
+    imageagent = ImageAgent("image01@localhost", "user01")
 
     future = imageagent.start()
     future.result()  # Wait until the start method is finished
 
-    # senderagent = SenderAgent("sender@localhost", "user01")
-    # senderagent.start()
+    senderagent = SenderAgent("sender@localhost", "user01")
+    senderagent.start()
 
     while True:
         try:
@@ -161,7 +171,7 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
 
-    # senderagent.stop()
+    senderagent.stop()
     imageagent.stop()
 
     print("Agents finished")
