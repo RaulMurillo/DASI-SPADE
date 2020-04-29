@@ -17,6 +17,22 @@ Other considerations:
 * You will need Dialogflow credentials.
 * The neural network model can be found at https://drive.google.com/open?id=19PA-QcdE7IBYzLSc-QPdXHSShHL3_G9y.
 
+## App execution
+1. Add your `config.py` file with the corresponding credentials to `src` folder.
+2. Execute the script `src/main.py`.
+
+## User's guide
+
+### Connect with Telegram Bot
+Once the application is running, the user can interact with it via Telegram.
+There are 2 available options:
+1. Accessing link https://t.me/DASIChef_bot
+2. Search in the Telegram app for `DASIChef_bot`.
+
+### Bot interaction
+Type `/start` for starting a conversation with the bot.  
+To finish the conversation, type `/exit` on the main menu.
+
 
 ## Authors and credits
 
