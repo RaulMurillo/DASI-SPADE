@@ -17,33 +17,31 @@ try:
 
     COMMON_DIR = CONFIG['COMMON_DIR']
     PHOTO_DIR = CONFIG['UPLOADS_DIR']
+    # DialogFlow Credentials
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = CONFIG['DIALOGFLOW']['CREDENTIALS']
+    PROJECT_ID = CONFIG['DIALOGFLOW']['PROJECT_ID']
+    LANGUAGE_CODE = CONFIG['DIALOGFLOW']['LANGUAGE_CODE']
+    SESSION_ID = CONFIG['DIALOGFLOW']['SESSION_ID']
 except:
     COMMON_DIR = os.path.join('common', '')
     PHOTO_DIR = os.path.join(os.getcwd(), 'uploads')
-
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+    # DialogFlow Credentials
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = ''
+    PROJECT_ID = ''
+    LANGUAGE_CODE = ''
+    SESSION_ID = ''
 
 logger = logging.getLogger(__name__)
 
 ## ---------------------------------- START DIALOGFLOW -----------------------------------------##
 
 
-# DialogFlow Credentials
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'private_key.json'
-
-DIALOGFLOW_PROJECT_ID = 'dasibot-pfrrfb'
-DIALOGFLOW_LANGUAGE_CODE = 'es'
-SESSION_ID = 'me'
-
-
 def call2dialogflow(input_text):
     # Init API
     session_client = dialogflow.SessionsClient()
-    session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+    session = session_client.session_path(PROJECT_ID, SESSION_ID)
     text_input = dialogflow.types.TextInput(
-        text=input_text, language_code=DIALOGFLOW_LANGUAGE_CODE)
+        text=input_text, language_code=LANGUAGE_CODE)
     query_input = dialogflow.types.QueryInput(text=text_input)
 
     try:
@@ -73,9 +71,9 @@ def call2dialogflow(input_text):
         logger.debug('[Dialogflow] - Missing required params')
     return r
 
-
 ## ---------------------------------- END DIALOGFLOW -------------------------------------------##
 ## ---------------------------------- START TELEGRAM -------------------------------------------##
+
 
 def send_action(action):
     """Sends `action` while processing func command."""
