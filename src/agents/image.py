@@ -9,7 +9,7 @@ import asyncio
 import numpy as np
 import tensorflow as tf
 import csv
-import os
+from pathlib import Path
 import logging
 
 try:
@@ -19,9 +19,12 @@ try:
     CHAT_JID = CONFIG['CHAT_JID']
     CNN_DIR = CONFIG['CNN_DIR']
 except:
+    logger.warning('Exception raised when importing config.')
+
+    project_folder = Path(__file__).parent.absolute()
+    CNN_DIR = project_folder / 'cnn_model'
     CHEFF_JID = 'cheff@localhost'
     CHAT_JID = 'chat@localhost'
-    CNN_DIR = os.path.join('cnn_model', '')
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +50,7 @@ class SenderAgent(Agent):
             # Set the "request" FIPA performative
             msg.set_metadata("performative", "request")
             # Set the message content
-            msg.body = os.path.join(
-                CNN_DIR, 'test_imgs', self.imgs[self.counter])
-            # msg.body = f"Message {self.counter}"
+            msg.body = str(CNN_DIR / 'test_imgs' / self.imgs[self.counter])
 
             await self.send(msg)
             logger.info("[SenderAgent - SendBehav] Message sent!")
@@ -89,7 +90,7 @@ class ImageAgent(Agent):
             logger.info("Starting ClassifyBehaviour . . .")
 
             self.cnn_model = tf.keras.models.load_model(
-                os.path.join(CNN_DIR, 'saved_model', 'my_model.h5'))
+                CNN_DIR / 'saved_model' / 'my_model.h5')
 
         async def run(self):
             logger.debug("ClassifyBehaviour running")
@@ -127,7 +128,7 @@ class ImageAgent(Agent):
     async def setup(self):
         logger.info("ImageAgent starting . . .")
         # Ingredients names
-        with open(os.path.join(CNN_DIR, 'classes.csv'), 'r') as f:
+        with open((CNN_DIR / 'classes.csv'), 'r') as f:
             self.CLASS_NAMES = list(csv.reader(f))[0]
 
         # gpus = tf.config.experimental.list_physical_devices('GPU')

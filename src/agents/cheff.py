@@ -11,8 +11,7 @@ import scipy as sp
 from scipy.sparse import csc_matrix, csr_matrix, lil_matrix
 import json
 import csv
-
-import os
+from pathlib import Path
 import logging
 
 try:
@@ -21,8 +20,11 @@ try:
     CHAT_JID = CONFIG['CHAT_JID']
     COMMON_DIR = CONFIG['COMMON_DIR']
 except:
+    logger.warning('Exception raised when importing config.')
+
+    project_folder = Path(__file__).parent.absolute()
+    COMMON_DIR = project_folder / 'common'
     CHAT_JID = 'chat@localhost'
-    COMMON_DIR = os.path.join('common', '')
 
 logger = logging.getLogger(__name__)
 
@@ -109,8 +111,8 @@ class CheffAgent(Agent):
         async def on_start(self):
             logger.info("PreferencesBehaviour starting . . .")
 
-            prefs_file = os.path.join(COMMON_DIR, 'prefs.npz')
-            if os.path.isfile(prefs_file):
+            prefs_file = COMMON_DIR / 'prefs.npz'
+            if prefs_file.exists():
                 logger.debug("Preferences file exist")
 
                 self.agent.preferences = sp.sparse.load_npz(
@@ -126,15 +128,15 @@ class CheffAgent(Agent):
                 )
             pass
 
-        async def on_end(self):
-            save_prefs()
-            pass
-
         def save_prefs(self):
             logger.info("[PreferencesBehaviour] Vector:\n{}".format(
                 self.agent.preferences))
-            sp.sparse.save_npz(os.path.join(
-                COMMON_DIR, 'prefs.npz'), self.agent.preferences)
+            sp.sparse.save_npz(COMMON_DIR / 'prefs.npz',
+                               self.agent.preferences)
+            pass
+
+        async def on_end(self):
+            save_prefs()
             pass
 
         async def run(self):
@@ -211,7 +213,7 @@ class CheffAgent(Agent):
 
         async def on_start(self):
             logger.info("CookBehaviour starting . . .")
-            with open(os.path.join(COMMON_DIR, 'recipes.json'), 'r') as json_file:
+            with open((COMMON_DIR / 'recipes.json'), 'r') as json_file:
                 self.recipe_book = json.load(json_file)
 
             pass
@@ -263,15 +265,15 @@ class CheffAgent(Agent):
     async def setup(self):
         logger.info("CheffAgent starting . . .")
         # Ingredients names
-        with open(os.path.join(COMMON_DIR, 'ingredients_es.csv'), 'r') as f:  # classes
+        with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:  # classes
             self.INGREDIENTS = list(csv.reader(f))[0]
         logger.debug(self.INGREDIENTS)
         # User list of ingredients
         # self.list_ingred = lil_matrix((1, len(self.INGREDIENTS)), dtype=bool)
         self.reset_list_ingred()
         # Matrix of ingreds_recipes
-        self.ingreds_recipes = csc_matrix(np.genfromtxt(os.path.join(
-            COMMON_DIR, 'ingreds_recipes.csv'), dtype=np.int8, delimiter=','))
+        self.ingreds_recipes = csc_matrix(np.genfromtxt(
+            (COMMON_DIR / 'ingreds_recipes.csv'), dtype=np.int8, delimiter=','))
         # User preferences on ingredients
         self.preferences = None
 

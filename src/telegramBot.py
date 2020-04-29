@@ -1,16 +1,19 @@
-from google.api_core.exceptions import InvalidArgument
 from telegram import ReplyKeyboardMarkup, ParseMode, ChatAction
 from telegram.ext import (Updater, CommandHandler,
                           MessageHandler, Filters, ConversationHandler)
 from functools import wraps
+from google.api_core.exceptions import InvalidArgument
 from multiprocessing import Process, Pipe
 
-import logging
 import os
 import dialogflow
 import json
 import datetime
 import csv
+from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     from config import APP_CONFIG as CONFIG
@@ -23,15 +26,17 @@ try:
     LANGUAGE_CODE = CONFIG['DIALOGFLOW']['LANGUAGE_CODE']
     SESSION_ID = CONFIG['DIALOGFLOW']['SESSION_ID']
 except:
-    COMMON_DIR = os.path.join('common', '')
-    PHOTO_DIR = os.path.join(os.getcwd(), 'uploads')
+    logger.warning('Exception raised when importing config.')
+
+    project_folder = Path(__file__).parent.absolute()
+    COMMON_DIR = project_folder / 'common'
+    PHOTO_DIR = project_folder / 'uploads'
     # DialogFlow Credentials
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = ''
     PROJECT_ID = ''
     LANGUAGE_CODE = ''
     SESSION_ID = ''
 
-logger = logging.getLogger(__name__)
 
 ## ---------------------------------- START DIALOGFLOW -----------------------------------------##
 
@@ -102,12 +107,11 @@ def start_bot(token, conn):
     (START_OVER, RECIPE, INTENT, FULFILLMENT, FIELDS) = map(chr, range(10, 15))
 
     # List of ingredients available in the system
-    with open(os.path.join(COMMON_DIR, 'ingredients_es.csv'), 'r') as f:
+    with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:
         INGREDIENTS = list(csv.reader(f))[0]
 
     # Pictures folder
-    if not os.path.exists(PHOTO_DIR):
-        os.makedirs(PHOTO_DIR)
+    PHOTO_DIR.mkdir(parents=True, exist_ok=True)
 
     def start(update, context):
         """Select an action: query by recipes/ingredients or add preferences."""
@@ -212,13 +216,14 @@ def start_bot(token, conn):
 
         photo_name = 'user_photo' + \
             currentDT.strftime("%Y-%m-%d-%H-%M-%S") + '.jpg'
-        photo_path = os.path.join(PHOTO_DIR, photo_name)
+
+        photo_path = PHOTO_DIR / photo_name
         photo_file.download(photo_path)
         logger.debug("Image of %s: %s", user.first_name, photo_name)
 
         logger.debug("Image updated at %s", photo_path)
 
-        conn.send({'Image': photo_path})
+        conn.send({'Image': str(photo_path)})
 
         # Receive answer from Chat Agent
         response = 'Foto recibida!'  # f'Uploaded image as {photo_name}!'

@@ -10,7 +10,7 @@ import numpy as np
 import json
 import csv
 from multiprocessing import Pipe
-import os
+from pathlib import Path
 import logging
 
 try:
@@ -20,9 +20,12 @@ try:
     IMAGE_JID = CONFIG['IMAGE_JID']
     COMMON_DIR = CONFIG['COMMON_DIR']
 except:
+    logger.warning('Exception raised when importing config.')
+
+    project_folder = Path(__file__).parent.absolute()
+    COMMON_DIR = project_folder / 'common'
     CHEFF_JID = 'cheff@localhost'
     IMAGE_JID = 'image@localhost'
-    COMMON_DIR = os.path.join('common', '')
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +39,7 @@ class ChatAgent(Agent):
     class DispatcherBehav(PeriodicBehaviour):
         async def on_start(self):
             logger.info("Starting DispatcherBehav . . .")
-            with open(os.path.join(COMMON_DIR, 'recipes.json'), 'r') as json_file:
+            with open((COMMON_DIR / 'recipes.json'), 'r') as json_file:
                 self.recipe_book = json.load(json_file)
             # self.counter = 0
 
@@ -139,7 +142,7 @@ class ChatAgent(Agent):
     async def setup(self):
         logger.info("ChatAgent starting . . .")
         logger.info(f"[ChatAgent] Connection mechanism: {self.pipe}")
-        with open(os.path.join(COMMON_DIR, 'ingredients_es.csv'), 'r') as f:
+        with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:
             self.INGREDIENTS = list(csv.reader(f))[0]
 
         dispatch = self.DispatcherBehav(period=1.5)

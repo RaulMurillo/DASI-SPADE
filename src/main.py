@@ -5,8 +5,8 @@ from spade import quit_spade
 import telegramBot
 from config import APP_CONFIG as CONFIG
 from multiprocessing import Process, Pipe
-import logging
 import time
+import logging
 
 
 def main():
@@ -46,5 +46,5 @@ if __name__ == "__main__":
     logging.root.setLevel(logging.INFO)
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    
+
     main()
