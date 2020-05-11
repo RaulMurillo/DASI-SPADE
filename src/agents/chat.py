@@ -99,13 +99,8 @@ class ChatAgent(Agent):
                     # Notify cheff
                     msg = Message(to=CHEFF_JID)
                     msg.set_metadata("performative", "query_ref")
-                    # print(self.recipe_book[:])
-                    # print(self.recipe_book[:]['Title'])
-                    # TO-FIX: Error here
-                    # i = bot_msg['CU-002']
                     msg.body = str(
                         self.agent.RECIPES.index(bot_msg['CU-002'])
-                        # self.recipe_book[:]['Title'].index(bot_msg['CU-002'])
                         )
                     logger.info(f"[DispatcherBehav] {bot_msg['CU-002']} - {msg.body}")
                     await self.send(msg)
