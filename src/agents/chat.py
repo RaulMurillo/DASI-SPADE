@@ -85,9 +85,9 @@ class ChatAgent(Agent):
                         if all_menus.max() > 0:
                             # JSON with best recipe
                             menu = {
-                                'Title': self.recipe_book['Title'][all_menus.argmax()],
-                                'Ingredients': self.recipe_book['Ingredients'][all_menus.argmax()],
-                                'Directions': self.recipe_book['Directions'][all_menus.argmax()],
+                                'Title': self.recipe_book[all_menus.argmax()]['Title'],
+                                'Ingredients': self.recipe_book[all_menus.argmax()]['Ingredients'],
+                                'Directions': self.recipe_book[all_menus.argmax()]['Steps'],
                             }
                         else:
                             menu = None
@@ -99,10 +99,15 @@ class ChatAgent(Agent):
                     # Notify cheff
                     msg = Message(to=CHEFF_JID)
                     msg.set_metadata("performative", "query_ref")
+                    # print(self.recipe_book[:])
+                    # print(self.recipe_book[:]['Title'])
+                    # TO-FIX: Error here
+                    # i = bot_msg['CU-002']
                     msg.body = str(
-                        self.recipe_book['Title'].index(bot_msg['CU-002']))
-                    i = bot_msg['CU-002']
-                    logger.info(f'[DispatcherBehav] {i} - {msg.body}')
+                        self.agent.RECIPES.index(bot_msg['CU-002'])
+                        # self.recipe_book[:]['Title'].index(bot_msg['CU-002'])
+                        )
+                    logger.info(f"[DispatcherBehav] {bot_msg['CU-002']} - {msg.body}")
                     await self.send(msg)
 
                     # Recive cheff's response
@@ -144,6 +149,9 @@ class ChatAgent(Agent):
         logger.info(f"[ChatAgent] Connection mechanism: {self.pipe}")
         with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:
             self.INGREDIENTS = list(csv.reader(f))[0]
+        
+        with open((COMMON_DIR / 'recipes.csv'), 'r') as f:
+            self.RECIPES = list(csv.reader(f))[0]
 
         dispatch = self.DispatcherBehav(period=1.5)
         self.add_behaviour(dispatch)
