@@ -239,7 +239,7 @@
             "2 kiwis",
             "1 rodaja grande de melón",
             "2 Melocotónes",
-            "1/2 Zumo de limón" 
+            "1/2 Zumo de limón"
         ],
         "Steps": [
             "Para hacer el almíbar ponemos en un cazo el azúcar y el agua, y sin remover llevamos a ebullición. Dejamos que hierva durante dos minutos y retiramos del fuego. Reservamos hasta que se temple.",
@@ -275,9 +275,9 @@
             "400 g. de champiñones",
             "1 cebolla",
             "2 dientes de ajo",
-            "40 g. de mantequilla", 
+            "40 g. de mantequilla",
             "100 g. de queso parmesano rallado",
-            "1/2 vaso de vino blanco", 
+            "1/2 vaso de vino blanco",
             "50 ml. de aceite de oliva virgen extra",
             "Sal y pimienta negra (al gusto)"
         ],
@@ -286,7 +286,7 @@
             "Ahora vamos a preparar las setas. Quitales la tierra y córtalas en rodajas finas.",
             "Ahora coge dos dientes de ajo, pélalos y pícalos bien finos. Ponlos en una sartén con 5 cucharadas de aceite de oliva a fuego medio-bajo. Cuando el ajo se empiece a dorar añade los champiñones, media cuchara pequeña con sal y unas vueltas de molinillo de pimienta negra. Deja a fuego medio hasta que las setas pierdan todo el agua y estén bien hechas. Cuando estén en su punto aparta del fuego la sartén y reserva las setas.",
             "Si el caldo no está bien caliente ponlo a calentar en un cazo grande mientras preparamos el arroz. Pruébalo de sal y si en necesario añade una pizca, prueba y rectifica las veces que haga falta hasta que esté sabroso.",
-            "Pela la cebolla y córtala en trozos pequeños. Coge una cacerola (de unos 25 cm de diámetro será suficiente) y añade la mitad de la mantequilla y 2 cucharadas de aceite de oliva. Cuando esté caliente añade la cebolla, una pizca de sal y deja que se poche (se ponga tierna y traslucida) durante 15-20 minutos.", 
+            "Pela la cebolla y córtala en trozos pequeños. Coge una cacerola (de unos 25 cm de diámetro será suficiente) y añade la mitad de la mantequilla y 2 cucharadas de aceite de oliva. Cuando esté caliente añade la cebolla, una pizca de sal y deja que se poche (se ponga tierna y traslucida) durante 15-20 minutos.",
             "Añade el arroz a la cacerola y con una cuchara remuévelo durante 2 minutos. Después añade 100 ml de vino blanco y deja que se evapore casi en su totalidad. Incorpora las setas que teníamos reservadas.",
             "Ahora añade tres cazos de caldo muy caliente. Deja a fuego medio hasta que se evapore casi todo el caldo y remueve constantemente para que el arroz suelte almidón (y el arroz se ponga cremoso). Ve añadiendo un cazo de caldo caliente cada vez que el arroz se quede sin líquido (tendrás que añadir por lo menos 6-7 cazos en total) y sigue removiendo siempre. Pasados 18 minutos desde que añadiste el primer cazo de caldo prueba el arroz (si es arborio tardará un buen rato más en hacerse: 20 - 25 minutos) para ver como está. Si es necesario añade otro cazo de caldo y así hasta que el arroz esté en su punto. Debe quedar muy cremoso.",
             "Cuando el arroz esté en su punto añade el queso parmesano rallado y la mantequilla restante. Remueve bien y listo."
@@ -316,8 +316,448 @@
             "Para formar las fajitas de verduras y tofu, unta generosamente cada tortilla con hummus y coloca dos rectángulos de tofu en el centro.",
             "Coloca varias cucharadas de relleno en el centro, cierra las tortillas levantando los bordes y llevándolos hacia el centro y marca cada fajita a la plancha para fijar la tortilla.",
             "Sirve las fajitas orientales con un poco de salsa se soja. Ahora que sabes cómo hacer fajitas de verduras y tofu veganas, anímate a probarlas y añade más vegetales si lo deseas. Esta receta de fajitas veganas es perfecta para la cena o para el almuerzo acompañada de tacos veganos de coliflor para disfrutar de variedad de sabores. Más recetas en mi blog Vegspiration.",
-            "Si te ha gustado la receta de Fajitas de verduras y tofu, te sugerimos que entres en nuestra categoría de Recetas de Fajitas."
+        ]
+    },
+    {
+        "Title": "Hojaldre de espárragos trigueros",
+        "Ingredients": [
+            "1 lámina de hojaldre",
+            "8 espárragos verdes",
+            "⅓ taza de hummus",
+            "1 trozo de queso vegano u otro",
+            "4 hojas de kale",
+            "1 puñado de nueces"
+        ],
+        "Steps": [
+            "Estira un poco la masa de hojaldre con un rodillo y córtala en cuadrados.",
+            "En el centro de cada cuadrado de masa coloca en diagonal una cucharada de crema de hummus. Encima coloca trocitos o láminas de queso. Yo he utilizado un queso vegano, pero puedes usar el queso que más te guste. Si deseas preparar un queso vegano casero para esta receta, visita mi perfil de RecetasGratis para ver las recetas.",
+            "Truco: Utiliza un queso que se derrita al horno para potenciar el sabor del relleno del hojaldre de espárragos verdes.",
+            "Corta cada espárrago por la mitad y trocea las hojas de kale en trozos medianos.",
+            "Envuelve cada trozo de espárrago en kale y coloca los espárragos envueltos encima del queso. Coloca algunas nueces troceadas por encima.",
+            "Cierra los saquitos de hojaldre de espárragos y queso llevando los bordes sin relleno hacia arriba y apretando la masa con los dedos para que se pegue.",
+            "Precalienta el horno a 180 grados y colócalos en una bandeja de horno cubierta con papel vegetal o sulfurizado. Hornea el hojaldre relleno de espárragos trigueros a 180 ºC durante 20 minutos hasta que la masa se dore.",
+            "¿Buscas otras ideas para obtener recetas fáciles pero originales? Pues échale un visatzo a mi blog Vegspiration.",
+        ]
+    },
+    {
+        "Title": "Gyozas de verduras",
+        "Ingredients": [
+            "1 paquete de papel de gyoza",
+            "1 berenjena",
+            "1 cebolla",
+            "2 tomates",
+            "½ taza de soja texturizada fina",
+            "1 zanahoria",
+            "½ cucharadita de sal",
+            "1 chorro de aceite",
+            "¼ taza de salsa de soja",
+            "1 chorro de vinagre de arroz",
+            "1 chorro de aceite de sésamo",
+            "2 dientes de ajo machacados",
+            "½ cucharadita de jengibre fresco rallado"
+        ],
+        "Steps": [
+            "Para preparar las gyozas veganas vas a necesitar las obleas de masa fina que se llaman piel de gyoza (gyoza skin) y que puedes encontrar en cualquier supermercado asiático. Vienen en formato congelado, por tanto debes sacarlas del congelador un poco antes.",
+            "Pon la soja texturizada en remojo, en agua tibia durante media hora. A continuación, escurre muy bien la soja eliminando todo el líquido posible.",
+            "Corta la berenjena, la zanahoria, el tomate y la cebolla en dados pequeños para preparar el relleno de las gyozas veganas.",
+            "Calienta una sartén con aceite y sofríe la cebolla, el ajo y el jengibre. Cuando la cebolla esté transparente, agrega el tomate y sofríelo.",
+            "Incorpora la zanahoria y la berenjena, saltea la verdura 2-3 minutos y añade la soja texturizada, la sal y un chorro de salsa de soja. Cocina el relleno delas gyozas de verduras durante 8-10 minutos, removiendo de vez en cuando hasta que la verdura quede blanda.",
+            "Para rellenar las gozas veganas coge una oblea de masa y coloca una cucharada de relleno en el centro. Con los dedos moja los extremos de la masa y dóblala por la mitad. Cierra los bordes con los dedos haciendo 5-6 pliegues.",
+            "Para cocinar las gyozas al vapor puedes utilizar la máquina de vapor o la Thermomix, cocínalas hasta que se pongan transparentes. Si no dispones de ninguno de estos electrodomésticos, calienta una sartén con aceite de sésamo y fríe las gyozas hasta que se doren y se tuesten por un lado. A continuación, añade 1 taza de agua cubriendo el fondo de la sartén, pon la tapa y cocina las gyozas de verduras durante 8-10 minutos hasta que se evapore el agua.",
+            "Mientras, prepara la vinagreta mezclando en un bol la salsa de soja, el vinagre de arroz y el aceite de sésamo.",
+            "Sirve las gyozas con la vinagreta. Ahora que sabes cómo hacer gyozas de verduras, prepara un menú al más puro estilo asiático, con pan chino y dorayakis veganos de postre. Más recetas veganas en mi blog Vegspiration.",
+        ]
+    },
+    {
+        "Title": "Pastel de champiñones al microondas",
+        "Ingredients": [
+            "½ cebolla",
+            "12 champiñón",
+            "5 cucharadas soperas de harina de garbanzos",
+            "5 cucharadas soperas de agua",
+            "½ cucharadita de sal kala namak",
+            "1 cucharada sopera de aceite de oliva",
+            "½ puerro",
+            "1 cucharada sopera de fécula de maíz",
+            "1 puñado de piñones",
+            "1 pizca de sal"
+        ],
+        "Steps": [
+            "Pica la cebolla, corta los champiñones en láminas y el puerro en rodajas. Calienta una sartén con aceite y sofríe la cebolla y el puerro hasta que empiecen a ablandarse.",
+            "Añade los champiñones y salpimienta. Cocínalos hasta que queden blandos, agrega la fécula de maíz y remueve para seguir con la receta de pastel de champiñones al microondas.",
+            "Por otro lado, mezcla en un bol la harina de garbanzos con el agua y bate con un tenedor hasta que la mezcla tenga la consistencia de un huevo batido.",
+            "Coloca la verdura salteada en la batidora. Añade la mezcla de harina de garbanzos, los piñones y tritura bien hasta que la masa quede homogénea.",
+            "Vierte la masa en un una bandeja o tupper apto para el microondas y cocina el pastel de champiñones durante 12 minutos a máxima potencia.",
+            "Corta el pastel en trozos y sírvelo como un entrante, parte de un plato principal o como relleno de bocadillos o sándwiches. Esta receta de pastel de champiñones al microondas es muy fácil y rápida, y se puede servir acompañada de otros aperitivos como los hojaldres de espárragos trigueros o la tortilla vegana rellena. Más recetas en mi blog Vegspiration.",
+        ]
+    },
+    {
+        "Title": "Fajitas veganas",
+        "Ingredients": [
+            "4 tortillas de trigo",
+            "½ taza de quinoa",
+            "1 taza de garbanzos cocidos",
+            "¼ taza de maíz",
+            "1 cebolla",
+            "2 dientes de ajo",
+            "¼ pimiento rojo",
+            "4 rodajas de calabaza",
+            "4 hojas de lechuga",
+            "1 manojo de rúcula",
+            "1 cucharada sopera de aceite",
+            "½ cucharadita de sal",
+            "1 pizca de pimienta negra",
+            "½ cucharadita de romero",
+            "½ cucharadita de tomillo",
+            "2 cucharadas soperas de cilantro fresco",
+            "2 cucharadas soperas de tahini"
+        ],
+        "Steps": [
+            "Pon la quinoa en un colador y lávala bajo el chorro de agua. Introduce la quinoa en un cazo y cúbrela con una taza de agua. Lleva el agua a ebullición, baja el fuego y cocina la quinoa durante 12-15 minutos hasta que quede blanda. Escurre y reserva.",
+            "Truco: Siempre hay que agregar el doble de agua que de quinoa, ese es el truco para que quede bien cocida.",
+            "Calienta una sartén con aceite y sofríe la cebolla y el ajo picados en dados pequeños. Cuando la cebolla empiece a ponerse transparente agrega el pimiento cortado en dados, el maíz, sal y pimienta. Sigue sofriendo la verdura hasta que el pimiento quede blando. Incorpora la quinoa y mézclala con el sofrito.",
+            "Mientras preparas el sofrito para las fajitas vegetales, coloca las rodajas de calabaza en una bandeja de horno, salpimienta y espolvorea el romero y el tomillo por encima. Echa un chorro de aceite encima de las rodajas y hornéalas 15-20 minutos hasta que queden blandas.",
+            "Calienta un poco las tortillas de trigo en el horno. Coloca una hoja de lechuga y rúcula sobre cada tortilla.",
+            "En el centro a lo largo coloca un trozo de calabaza, varias cucharadas de quinoa con el sofrito, varias cucharadas de garbanzos y un poco de cilantro fresco. Encima vierte una cucharadita de tahini y cierra las tortillas de trigo primero doblando el borde inferior y luego los laterales. Puedes marcar las fajitas veganas con quinoa a la plancha para que la tortilla quede crujiente si quieres.",
+            "No dejes de probar estas fajitas vegetarianas con queso tan ricas o si no, visita mi blog Vegspiration e inspírate para preparar muchas otras recetas veganas.",
+        ]
+    },
+    {
+        "Title": "Paella vegana de quinoa",
+        "Ingredients": [
+            "1 trozo de pimiento rojo",
+            "1 zanahoria",
+            "½ cebolla",
+            "180 gramos de quinoa",
+            "1 tomate",
+            "50 gramos de judías verdes",
+            "80 gramos de espárragos verdes",
+            "2 tazas de caldo de verduras",
+            "1 pizca de sal",
+            "1 pizca de pimienta negra molida"
+        ],
+        "Steps": [
+            "Reunimos todos los ingredientes para preparar la paella de quinoa con verduras.",
+            "Para comenzar, hacemos un sofrito con la cebolleta y el pimiento rojo cortados en cuadraditos pequeños. Dejamos cocinar 4 minutos a fuego medio. Mientras tanto, cortamos las judías verdes en trozos de unos 3 centímetros y las hervimos en agua durante 5 minutos. Pasado este tiempo, escurrimos y reservamos.",
+            "Agregamos la zanahoria pelada y cortada del mismo tamaño que el pimiento, y los espárragos también en trocitos. Salpimentamos y dejamos cocinar otros 5 minutos.",
+            "Incorporamos las judías verdes y la quinoa lavada, y mezclamos bien para que se integren en el sofrito.",
+            "Es el momento de incorporar el caldo de verduras a nuestra paella vegetariana. Ponemos el doble de caldo que de quinoa y dejamos cocer a fuego suave durante 20 minutos.",
+            "Truco: Si ves que la paella se queda sin líquido puedes añadir más caldo de verduras o agua.",
+            "Puedes servir la paella vegana de quinoa directamente en la paellera o en platos individuales, como más te guste. Si eres fan de la quinoa, te recomendamos otras recetas como la ensalada de quinoa vegana o los tacos veganos de quinoa. ¡Buen provecho!",
+        ]
+    },
+    {
+        "Title": "Setas con jamón",
+        "Ingredients": [
+            "500 gramos de setas variadas",
+            "2 dientes de ajos",
+            "100 gramos de taquitos de jamón",
+            "50 mililitros de vino blanco",
+            "1 puñado de perejil picado",
+            "3 cucharadas soperas de aceite de oliva",
+            "1 pizca de sal"
+        ],
+        "Steps": [
+            "Preparamos los ingredientes. Limpiamos y cortamos las setas.",
+            "Ponemos una sartén al fuego con 2-3 cucharadas de aceite, picamos los ajos y los añadimos a la sartén.",
+            "Truco: Cuanto menos aceite les eches, menos calorías y por tanto, menos engordarán las setas con jamón.",
+            "Cuando empiecen a estar dorados los ajos añadimos las setas cortadas y limpias. Removemos y dejamos cocinar hasta que las setas al ajillo queden doradas.",
+            "Cuando estén doradas añadimos el vaso de vino y dejamos reducir unos 5 minutos.",
+            "Añadimos el jamón, removemos todo junto y apagamos.",
+            "Espolvoreamos con el perejil las setas al ajillo con jamón . ¡Y ya estarán listas para comer!",
+            "Puedes acompañar las setas con jamón junto con otros entrantes como esta riquísima tortilla de berenjena o esta deliciosas empanadillas de pisto. Encontrarás muchísimas más recetas sabrosas en mi blog Cocinando con Montse.",
+        ]
+    },
+    {
+        "Title": "Paella de verduras vegana",
+        "Ingredients": [
+            "200 gramos de arroz",
+            "½ taza de judiones o judías blancas cocidas",
+            "200 gramos de tempeh",
+            "1 cebolla",
+            "1 pimiento rojo",
+            "½ taza de guisantes",
+            "½ taza de maíz dulce",
+            "¼ taza de aceitunas verdes",
+            "¼ taza de habas cocidas",
+            "2 dientes de ajo",
+            "1 lata de tomate triturado",
+            "1 zanahoria",
+            "2 cucharadas soperas de aceite",
+            "1 cucharadita de cúrcuma o colorante amarillo",
+            "1 cucharadita de pimentón dulce",
+            "agua o caldo vegetal",
+            "1 pizca de sal",
+            "1 hoja de laurel"
+        ],
+        "Steps": [
+            "Pica la cebolla, el ajo, el pimiento y la zanahoria en dados pequeños.",
+            "Calienta una sartén-paellera con aceite y rehoga el ajo y la cebolla. Añade el pimiento rojo y la zanahoria y sofríe bien. Añade los guisantes, el maíz, los judiones, las aceitunas, cocina varios minutos removiendo de vez en cuando e incorpora el tomate triturado, la sal, el laurel, el pimentón y la cúrcuma. Mezcla muy bien y cocina la paella vegana de verduras varios minutos más.",
+            "Vierte dentro de la sartén la misma cantidad de caldo vegetal o agua que tienes preparada de arroz. Lleva el caldo a ebullición y mantén el hervor durante 5 minutos. Incorpora el arroz, tapa la sartén con papel de aluminio y cocina la paella vegetariana de verduras durante unos 10 minutos a fuego alto hasta que se evapore todo el agua.",
+            "Por otro lado corta el tempeh en láminas y dóralo a la plancha por ambos lados. Cólocalo encima del arroz y sirve la paella de verduras vegana con varias rodajas de limón.",
+            "En mi blog de inspiración vegana Vegspiration encontrarás muchas más ideas para cocinar arroces tan deliciosos como este.",
+        ]
+    },
+    {
+        "Title": "Arroz con bacalao y verduras",
+        "Ingredients": [
+            "450 g de bacalao",
+            "500 g de arroz",
+            "1 pimiento verde",
+            "1 cebolla",
+            "2 setas de buen tamaño",
+            "50 g de aceite",
+            "3 dientes de ajo",
+            "albahaca",
+            "Pimentón rojo dulce",
+            "40 ml de vino blanco",
+            "Colorante alimentario o azafrán",
+            "1 litro de agua"
+        ],
+        "Steps": [
+            "Echa los 50 g de aceite en la cazuela y sofríe la cebolla, el pimiento y el ajo.",
+            "Añade ahora las setas y dóralas un poco.",
+            "Truco: Puedes agregarles muchos otros tipos de verduras u hongos a tu arroz con bacalao si quieres.",
+            "Agrega ahora un poco de pimentón rojo dulce.",
+            "Añade a la cazuela el bacalao y pásalo un poco, luego espolvorea un poco de albahaca y echa 40 ml de vino.",
+            "Añade el arroz, el colorante alimentario o azafrán (yo le pongo marca Aromat), sazona a tu gusto y pon un litro de agua.",
+            "Cocina el arroz con bacalao fácil unos 5 minutos a fuego vivo y 15 minutos a fuego lento.",
+            "Sirve el arroz con bacalao y verduras recién hecho. Combínalo con unas berenjenas a la plancha de entrante y una mousse de sandía de postre por ejemplo.",
+        ]
+    },
+    {
+        "Title": "Guiso de frijoles negros con carne",
+        "Ingredients": [
+            "300 gramos de frijoles negros cocinados con su respectivo caldo",
+            "1 unidad de cebolla blanca",
+            "1 unidad de tomates rojos",
+            "1 litro de Caldo de res",
+            "1 pizca de Perejil",
+            "1 cucharadita de Aceite de oliva",
+            "1 pizca de pasta de ajo",
+            "250 gramos de carne molida",
+            "1 pizca de Sal",
+            "1 pizca de Pimienta negra"
+        ],
+        "Steps": [
+            "El primer paso para realizar la receta de frijoles negros es prealistar los ingredientes.",
+            "Lleva una sartén a fuego medio, adiciona la cebolla blanca y el tomate en cuadros como se observa en la fotografía.",
+            "Agrega la carne molida de res y mézclala con el sofrito base. Añade sal, pimienta y pasta de ajo al gusto.",
+            "Como ingredientes adicionales puedes añadir un poco de laurel seco y paprika, de esta manera nuestra receta de frijoles negros va a tener más sabor.",
+            "Añade el caldo de carne y los frijoles y mezcla con el sofrito que teníamos en la sartén. Lo ideal es que esto se realice en una olla honda para que se concentren los sabores de la preparación. Deja conservar durante 10-15 minutos a fuego lento.",
+            "Sirve el guiso de frijoles negros espolvoreando un poco de perejil fresco encima como se observa en la fotografía. Puedes acompañar con arroz blanco esta preparación. Si deseas más recetas de frijoles y tienes algún comentario o inquietud, escríbenos. ¡Disfruta!",
+        ]
+    },
+    {
+        "Title": "Potaje de garbanzos con espinacas y chorizo",
+        "Ingredients": [
+            "1 unidad de cebolla",
+            "1 diente de Ajo",
+            "2 unidades de tomates",
+            "1 chorro de Aceite de oliva",
+            "1 cucharada sopera de Pimentón (Paprika)",
+            "1 hoja de Laurel",
+            "1 kilogramo de garbanzos",
+            "1 unidad de Papa",
+            "Agua fría",
+            "1 pizca de Sal",
+            "1 pizca de Pimienta",
+            "50 gramos de Tocino ahumado",
+            "2 manojos de espinacas"
+        ],
+        "Steps": [
+            "En primer lugar, el día anterior ponemos los garbanzos en agua templada con una cucharadita de bicarbonato o un puñado de sal y los dejamos en remojo durante toda la noche (normalmente 12 horas).",
+            "Picamos 1 cebolla mediana y un diente de ajo en trozos muy pequeños para que se vayan deshaciendo durante la cocción. Pelamos y troceamos 2 tomates. En una cazuela echamos un chorrito de aceite de oliva, cebollas y los dientes de ajo. Sofreímos todo durante 10 minutos para que se integren bien los sabores.",
+            "Agregamos el tomate y una hoja de laurel para aromatizar. Sofreímos durante 2-3 minutos. Añadimos una cucharada generosa de pimentón, removemos rápidamente e incorporamos los garbanzos ya escurridos. Removemos otra vez para que se junte todo bien y dejamos cocinar durante 3 minutos más.",
+            "Echamos una papa cortada en gajos o como se apetezca. Cubrimos con agua fría, para que hierva lentamente, hasta que quede la cazuela casi llena. Recuerda que todavía quedan ingredientes por añadir al potaje de garbanzos, de ahí la importancia de añadir agua fría. Cuando empiece a hervir, bajamos el fuego para que vaya más lento y no rompa las legumbres.",
+            "Cuando el potaje lleve 1/2 hora cociendo le añadimos sal y pimienta al gusto. Incorporamos los chorizos cortados en rodajas y el tocino en dados. Dejamos cocinar lentamente a temperatura media durante 20 minutos aproximadamente, removiendo la preparación de vez en cuando.",
+            "Pasado el tiempo, retiramos los chorizos y el tocino para que el potaje no tenga tanta grasa. Los reservamos para la hora de servir.",
+            "En otra cazuela aparte, blanqueamos las espinacas para quitarles el amargor. Para blanquearlas tendremos que verter en la cazuela agua hirviendo con sal, introducir y sacar las espinacas. Luego, en una tabla troceamos con un cuchillo grande las espinacas blanqueadas y, cuando falten 10-15 minutos para finalizar la cocción del potaje, las añadimos. Debemos cocinar la preparación a fuego lento y probando de vez en cuando por si se cocina antes de tiempo.",
+            "Sirve el potaje de garbanzos y espinacas en platos hondos y coloca el chorizo y el tocino encima. Puedes acompañarlo con arroz blanco y pan rústico. ¡Buen provecho!",
+        ]
+    },
+    {
+        "Title": "Patatas a la riojana",
+        "Ingredients": [
+            "400 gramos de patatas",
+            "200 gramos de chorizo rojo (extremeño)",
+            "1 unidad de cebolla (no muy grande)",
+            "4 dientes de Ajo",
+            "3 hojas de Laurel",
+            "2 unidades de pimientos rojos (choriceros)",
+            "1 cucharada sopera de Pimentón",
+            "Agua"
+        ],
+        "Steps": [
+            "Pelamos y picamos las patatas de forma irregular. Para hacer la auténtica receta, debemos hacer un corte en la patata y romper, así obtenemos las patatas rotas de forma irregular.",
+            "Picamos la cebolla y los ajos en trocitos pequeños. Luego, cogemos una sartén honda y ponemos aceite a calentar para sofreír estos ingredientes. Cuando esté caliente, añadimos la cebolla y el ajo y cocinamos hasta que estén blandos (caramelizados).",
+            "Incorporamos el laurel, el pimentón, el chorizo y las patatas y dejamos rehogar durante 3 minutos. Acto seguido, agregamos los pimientos previamente cortados en trocitos y machacados en el mortero con una cucharadita de sal.",
+            "Seguimos rehogando unos minutos más. Finalmente, vertemos agua hasta cubrir todos los ingredientes, o un poco más si fuese necesario. Dejamos cocinar durante 5 minutos a fuego rápido, luego bajamos a lento y lo mantenemos hasta que las patatas estén cocidas (unos 10 minutos más aproximadamente).",
+            "Cuando estén, servimos las patatas a la riojana calientes. Y de segundo, podemos preparar un solomillo al horno o en salsa.",
+        ]
+    },
+    {
+        "Title": "Veganesa de aguacate",
+        "Ingredients": [
+            "1 taza de aceite oliva sabor suave o aceite de girasol",
+            "½ taza de leche de soja sin azúcares",
+            "1 diente de ajo",
+            "1 cucharadita de sal",
+            "1 aguacate mediano",
+            "1 cucharada sopera de zumo de limón"
+        ],
+        "Steps": [
+            "Ordena los ingredientes en la mesa con su respectivas cantidades. Agrega los utensilios que necesitarás para preparar esta mayonesa vegana.",
+            "Retira la cáscara del aguacate. Pica la fruta a la mitad y saca la pepa. Luego, corta en trozos medianos, así facilitas el proceso de machacado. ¡Listo todo para preparar la salsa de aguacate!",
+            "Tritura el aguacate hasta conseguir una pasta. Utiliza el utensilio de cocina de tu preferencia. En esa ocasión utilicé una licuadora manual pero puedes utilizar: la licuadora, un pisa papas, un procesador de alimentos.... !hasta el mortero!",
+            "Es importante lograr una pasta homogénea, bien triturada sin grumos para la base de nuestra veganesa con leche de soja.",
+            "Una vez lograda la pasta o crema, agrega el resto de los ingredientes a excepción del aceite. Mezcla hasta lograr una consistencia cremosa. Luego, coloca poco a poco el aceite, hasta lograr una textura homogénea, semejante a la mayonesa tradicional.",
+            "La consistencia ideal de la veganesa es parecida a la mayonesa común, sin embargo tú puedes jugar con la textura hasta lograr la ideal para ti. El secreto está en la cantidad de aceite, menos aceite más densa y más aceite más ligera. Por otro lado, si utilizas menos aceite, más light será la salsa. El mínimo de aceite que puedes utilizar es 100 mililitros, el promedio ideal es alrededor de una 1 taza o incluso algo más, con este promedio tú puedes jugar.",
+            "Truco: Cuando agregas el aceite no debes parar de mezclar, por lo cual, es recomendable hacerlo con un ayudante de cocina eléctrico o mezclar de forma vigorosa y continua utilizando una varilla manual.",
+            "¡Lista para servir! Esta deliciosa mayonesa de aguacate sin huevo, la puedes combinar con casi cualquier aperitivo. Las hamburguesas, los perros calientes, los tequeños o sándwiches saben deliciosos con esta preparación. ¡Combina con todo!",
+            "Y también, esta veganesa de aguacate es perfecta para la mesa en festejos: cumpleaños, Navidad, Año Nuevo, entre otros.",
+            "Si se te antoja una salsa rica y ligera, aquí tienes la opción perfecta. Además,resulta muy fácil de preparar, rápida y necesitas poco ingredientes. ¡Manos a la obra!",
+            "Prueba esta deliciosa mayonesa de aguacate vegana y comparte tu experiencia con nosotros. ¿Con foto? ¡Sí, muchísimo mejor!",
+        ]
+    },
+    {
+        "Title": "Alioli (con túrmix)",
+        "Ingredients": [
+            "1 huevo a temperatura ambiente",
+            "4 ajos",
+            "Aceite"
+        ],
+        "Steps": [
+            "Poner el huevo, los ajos cortados y un poco de aceite en el vaso de la batidora.",
+            "Dejar la batidora en el fondo del vaso sin mover a velocidad media hasta que todo el alioli casero emulsione",
+            "Echar un poco de aceite si hiciera falta en la salsa alioli y listo para acompañar con a las patatas por ejemplo. Este alioli con túrmix fácil no te defraudará.",
+            "Truco: Puedes añadir una pizca de sal también si quieres.",
+        ]
+    },
+    {
+        "Title": "Veganesa de zanahoria",
+        "Ingredients": [
+            "250 gramos de zanahorias",
+            "2 cucharadas soperas de tahine",
+            "½ zumo de limón",
+            "100 mililitros de aceite de oliva sabor suave o aceite de girasol",
+            "½ diente de ajo",
+            "1 pizca de sal"
+        ],
+        "Steps": [
+            "Cocina la zanahoria durante 20 minutos aproximadamente o hasta que su textura sea tierna. Otro método es cocinarlas al vapor, mucho mejor porque así evitas el exceso de humedad en la hortaliza. Demasiada humedad puede perjudicar el resultado de la salsa de zanahoria.",
+            "Escurre las zanahorias sancochadas durante unos minutos. Espera hasta que salga todo el agua, esto es importante para controlar la consistencia de la mayonesa vegana.",
+            "Corta la hortaliza en rodajas o trozos pequeños para facilitar el proceso de triturado. Si utilizas una licuadora de mano que posea una parte de plástico, como en este caso, debes esperar a que la zanahoria esté casi fría o el plástico se derretirá. En cambio, si utilizas un pisa-papas, licuadora u otro procesador de alimentos, resulta recomendable triturar la hortaliza mientras se encuentra entre caliente-tibia. Así se facilitará la preparación del puré para nuestra mayonesa de zanahoria vegana.",
+            "Deposita las zanahorias cortadas en el envase de la licuadora. Procesa hasta lograr una pasta suave y pareja. Es importante no dejar grumos para obtener la consistencia adecuada para la salsa vegana.",
+            "¡Listo! Ahora ya puedes colocar la mesa de trabajo con todo lo necesario para comenzar esta exquisita receta de mayonesa de zanahoria sin huevo.",
+            "Asa medio ajo con una cucharadita de aceite de oliva. Remueve constantemente, así evitarás que se queme. Si el ajo se quema, será amargo y no servirá.",
+            "También puedes agregar el diente de ajo crudo, sin embargo lo recomiendo asado pues suaviza su sabor y la mayonesa vegana queda... ¡divina!.",
+            "Truco: Si colocas el ajo crudo es recomendable retirar la veta que se encuentra en el centro.",
+            "Verte el tahine, el ajo, el zumo de limón y la sal en la licuadora. Mezcla hasta integrar todos los ingredientes.",
+            "Añade el aceite poco a poco, hasta lograr una consistencia homogénea. Recuerda, aquí te sugiero 100 militros como base pero puedes agregar más aceite hasta conseguir la textura de tú preferencia. Si deseas algo más semejante a una mayonesa tradicional lo ideal es una taza de aceite, o a veces incluso un poco más, depende del gusto de cada quién. Si te decides por usar el mínimo, es decir 100 mililitros, tendrás una consistencia más parecida a un dip pero la mayonesa de zanahoria sin huevo será más saludable e igualmente exquisita .",
+            "Truco: Cuando agregues el aceite no debes parar de mezclar, por lo cual es más recomendable hacerlo con un ayudante de cocina eléctrico. Si necesitas hacerlo manual, hazlo de forma vigorosa utilizando una varilla, sin parar. ¿Cuando sabes que está lista? Es",
+            "¡A degustar! Los usos de la veganesa de zanahoria son casi ilimitados, por lo cual resulta una aliada perfecta para sacarte de apuros en más de una ocasión. Ideal para realzar guarniciones y aperitivos, siempre te lucirás con ella.",
+            "¿Quién puede resistir el sabor de la mayonesa para veganos? Si ya caíste en sus encantos, por favor comparte tu experiencia y una foto de tu creación culinaria.",
+            "Un paso fundamental en las veganesas y las mayonesas tradicionales es el momento cuando mezclas el aceite con la totalidad de los ingredientes. Ese momento justo es crucial para la consistencia adecuada de la salsa. Lo recomendable es agregar el aceite poco a poco, para obtener los resultados esperados.",
+            "Si no consigues tahine o resulta un poco engorroso encontrarlo, compra semillas de sésamo y prepáralo en casa. El tahine es una pasta preparada con semillas de ajonjolí (conocida en algunos lugares como sésamo) que se le agrega a una gran cantidad de salsas y platos provenientes del Medio Oriente, incluso algunos del Mediterráneo y de la zona Balcánica. El hummus, baba ganush, halva, croquetas, faláfel, ensaladas, shawarma, pan de pitas y los pinchos morunos, representan algunos de las formas de aplicar esta sabrosa pasta. Para prepararla sólo necesitas: aceite de oliva, semillas de sésamo tostadas y una pizca de sal. Procesas todo y listo… ¡muy fácil! Recuerda que para nuestra salsa de zanahoria sólo necesitas 2 cucharadas de tahine."
+        ]
+    },
+    {
+        "Title": "Salsa de zanahoria y cebolla para acompañar",
+        "Ingredients": [
+            "5 zanahorias medianas",
+            "1 cebolla",
+            "1 cucharadita de romero",
+            "1 cucharadita de pasta de miso",
+            "2 dientes de ajo",
+            "1 taza de agua (240 mililitros)",
+            "½ taza de vino blanco",
+            "1 cucharada sopera de harina de trigo",
+            "1 pizca de sal",
+            "1 pizca de pimienta",
+            "2 cucharadas soperas de aceite"
+        ],
+        "Steps": [
+            "Corta la zanahoria y la cebolla en dados, y corta el ajo en láminas.",
+            "Calienta el aceite en un cazo y pocha un poco la cebolla y el ajo. Añade la zanahoria y cocina 2 minutos a fuego medio removiendo de vez en cuando.",
+            "Añade el vino, una pizca de sal y pimienta y el romero y cocina hasta que la zanahoria quede blanda.",
+            "A continuación, añade la harina y remueve rápido para disolver los grumos. Poco a poco añade el agua removiendo continuamente hasta obtener la textura deseada.",
+            "Tritura la salsa salsa de zanahoria y cebolla en la batidora o con una miniprimer hasta que quede cremosa. Añade la pasta de miso y remueve con una espátula. La pasta de miso no se debe hervir, por tanto, la añadimos al final cuando la salsa de haya enfriado un poco.",
+            "Usa la salsa de zanahoria y cebolla para carnes o verduras o para acompañar tu plato favorito. Yo te recomiendo que la utilices en algunos de mis recetas veganas como los filetes empanados o los filetes de soja.",
+        ]
+    },
+    {
+        "Title": "Bizcocho de yogur griego",
+        "Ingredients": [
+            "2 yogures griegos naturales",
+            "3 huevos",
+            "2 medidas de yogur de harina",
+            "1 medida de yogur de maicena",
+            "1 sobre de levadura química tipo Royal o polvos de hornear",
+            "1 medida de yogur de azúcar (blanco o moreno)",
+            "1 medida de yogur de aceite de girasol",
+            "Ralladura de limón (opcional)",
+            "Esencia de vainilla (opcional)"
+        ],
+        "Steps": [
+            "Precalienta el horno a 180 ºC mientras preparas la masa del bizcocho de yogur griego esponjoso. Asimismo, vacía los yogures en un bol y utiliza los recipientes vacíos para medir el resto de ingredientes.",
+            "En otro bol, mezcla el azúcar blanco o moreno junto con los huevos hasta obtener una crema blanquecina y homogénea con ayuda de unas varillas o un batidor de mano eléctrico.",
+            "Truco: Puedes utilizar también algún edulcorante artificial o natural pero ten en cuenta que las cantidades a añadir variarán ligeramente.",
+            "Agrega esta mezcla a los yogures griegos junto con el aceite de girasol y, de manera opcional, puedes añadir si quieres la ralladura de un limón o unas gotitas de esencia de vainilla, según el sabor que le quieras dar a este bizcocho de yogur griego casero.",
+            "Añade las harinas y la levadura tamizándolas previamente y bate de nuevo hasta conseguir una masa homogénea.",
+            "Truco: Si quieres conseguir un bizcocho de yogur griego sin gluten utiliza solo 3 medidas de maicena y nada de harina común.",
+            "Vierte la masa del bizcocho de yogur griego fácil en un molde redondo, cuadrado o rectangular previamente engrasado y enharinado o forrado con papel vegetal/sulfurizado. Mételo al horno y cocínalo durante unos 40 minutos hasta que esté bien cocido.",
+            "Truco: Pincha en el centro del queque con un palillo y si este sale limpio y seco es que está bien horneado.",
+            "Una vez horneado, déjalo enfriar a temperatura ambiente sobre una rejilla y después ya podrás degustar el bizcocho de yogur griego natural cuando quieras.",
+            "Truco: Guárdalo en una recipiente hermético forrado con papel vegetal para que tarde más en secarse.",
+        ]
+    },
+    {
+        "Title": "Bechamel de calabacín light",
+        "Ingredients": [
+            "2 calabacínes medianos",
+            "1 cebolla",
+            "250 mililitros de Leche desnatada o vegetal",
+            "1 cucharada sopera de Aceite de oliva virgen extra",
+            "½ cucharada sopera de arroz (opcional)",
+            "1 pizca de Nuez moscada",
+            "1 pizca de Sal",
+            "1 pizca de Pimienta negra",
+            "1 diente de Ajo (opcional)"
+        ],
+        "Steps": [
+            "Para preparar esta bechamel de calabacín light, empezaremos pelando y picando la cebolla y el diente de ajo (si es que hemos elegido ponerlo) mientras se calienta la cucharada de aceite en un sartén. Una vez caliente, pochamos las verduras a fuego medio-alto.",
+            "Mientras tanto, pelamos los calabacines y los cortamos en dados pequeños, así la bechamel de dieta tardará muchos menos en hacerse (cuanto más grandes sean los trozos más tardarán en cocerse).",
+            "Si quieres que la bechamel de calabacín tenga un color más parecido a la salsa original es mejor que les quites la piel.",
+            "Truco: Si lo prefieres puedes dejar los calabacines con piel como he hecho yo pero ten en cuenta que te quedará una bechamel light con un color más verdoso y trocitos verdes de la piel visibles.",
+            "Cuando la cebolla empiece a estar dorada, agregamos lo dados de calabacín a la sartén, removemos y dejamos pochar durante unos 5 minutos.",
+            "A continuación, añadimos la leche desnatada, una pizca de sal, nuez moscada y pimienta negra molida y el arroz. Entonces removemos todo bien, tapamos la sartén y dejamos que se cocine todo durante unos 20 minutos aproximadamente a fuego bajo.",
+            "Este último ingrediente es opcional pero he comprobado que la textura de la bechamel de calabacín paso a paso es mucho más parecida a la salsa tradicional si lo agregamos.",
+            "Truco: Si prefieres una bechamel de calabacín vegana utiliza leche vegetal en su preparación.",
+            "Una vez pasado ese tiempo, comprobamos que las verduras están bien cocidas, lo pasamos todo a un vaso de batidora o a un recipiente hondo y trituramos la bechamel de calabacín para croquetas en este caso, ya que el toque del arroz hace que nos quede mucho más espesa.",
+            "Si veis que no la queréis tan espesa podéis aclarar la bechamel de calabacín light añadiendo un poco más de leche o incluso agua. Una vez tiene la consistencia deseada, rectificamos de sabor ¡y listo!",
+        ]
+    },
+    {
+        "Title": "Tarta de manzana",
+        "Ingredients": [
+            "4 manzanas",
+            "180 gr. de harina",
+            "½ sobre de levadura química (8 gramos de polvos para hornear)",
+            "2 huevos",
+            "100 gr. de azúcar moreno",
+            "175 ml. de leche",
+            "frutos rojos (para adornar)",
+            "mermelada de albaricoque",
+            "mantequilla y harina para el molde"
+        ],
+        "Steps": [
+            "Coloca la harina, la levadura, los huevos, el azúcar, 2 manzanas (peladas y cortadas en dados) y la leche en el vaso batidor. Tritura hasta que quede una masa homogénea.",
+            "Vierte la mezcla sobre el molde untado de mantequilla y espolvoreado de harina. Pela las otras 2 manzanas, córtalas en láminas y cubre la superficie de la tarta.",
+            "Hornéala a 180ºC durante 45 minutos (con el horno precalentado).",
+            "Deja que se temple un poco, desmolda y con ayuda de un pincel unta la superficie con un poco de mermelada de albaricoque.",
+            "Adorna la tarta de manzana con los frutos rojos y unas hojas de menta. Sirve la tarta de manzana.",
+            "Consejo: Si quieres dar un toque diferente a tu tarta de manzana, puedes añadir a la masa una cucharadita de canela en polvo."
         ]
     }
-    
 ]
