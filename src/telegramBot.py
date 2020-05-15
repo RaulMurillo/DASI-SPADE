@@ -143,8 +143,18 @@ def start_bot(token, conn):
     def display_info(update, context):
         """Show software user manual in GUI"""
 
-        text = 'Información actualmente no disponible :('
-        update.message.reply_text(text=text)
+        text = 'Este es el mensaje de ayuda del bot. A continuación te detallo lo que puedes hacer.\n' + \
+            '1. Te puedo proponer un plato a elaborar en función de las imágenes que me envies. Para seleccionar esta opción pulsa <b><i>Quiero cocinar algo, pero no se me ocurre nada</i></b>.\n' + \
+            '2. Me puedes decir una receta en concreto que te gustaría cocinar y te daré las pautas que necesitas para ayudarte en su elaboración. Para seleccionar esta opción puedes marcar <b><i>Quiero preparar una receta concreta</i></b>.\n' + \
+            '3. Puedes actualizar tus preferencias, ya sea por gusto seleccionando <b><i>Añadir preferencia</i></b> o por intolerancia a algún alimento con la opción <b><i>Añadir alergia</i></b>.\n' + \
+            'Una vez seleccionada una de las opciones previas sigue las indicaciones que se muestran en pantalla.\n' + \
+            'Acuerdate de seleccionar la opción <code>/exit</code> cuando hayas terminado.\n' + \
+            'Puedes volver a ver la sección de ayuda escribiendo <code>/help</code>\n\n' + \
+            '<b>FAQs</b>\n\n' + \
+            '1. ¿Que ocurre con las imagenes una vez que las mando al sistema? \n-Las imágenes enviadas al sistema son procesadas por una red neuronal entrenada con una gran variedad de alimentos.\n\n' + \
+            '2. ¿Puedo cocinar cualquier receta? \n-El sistema solo ofrece las recetas que se han guardado en él, por lo que existe la posibilidad de que una receta en específico falte.\n'
+        update.message.reply_text(
+            text=text, parse_mode=ParseMode.HTML)
         return SELECTING_ACTION
 
     def done(update, context):
@@ -432,7 +442,7 @@ def start_bot(token, conn):
 
             states={
                 SELECTING_ACTION: [
-                    CommandHandler('info', display_info),
+                    CommandHandler('help', display_info),
                     CommandHandler('exit', done),
                     # MessageHandler(Filters.regex('^CU01$'), adding_images),
                     # MessageHandler(Filters.regex('^CU02$'), adding_recipe),
