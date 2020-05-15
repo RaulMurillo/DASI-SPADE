@@ -139,7 +139,6 @@ def start_bot(token, conn):
         context.user_data[START_OVER] = True
         return SELECTING_ACTION
 
-    # TODO
     def display_info(update, context):
         """Show software user manual in GUI"""
 
