@@ -118,9 +118,12 @@ def start_bot(token, conn):
 
         text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
             'Tambien puedes indicar tus preferencias y alergias.\n' + \
-            'Selecciona la opción de que desees y pulsa <code>/exit</code> cuando hayas terminado\n\n'
+            'Selecciona la opción de que desees y escribe <code>/exit</code> cuando hayas terminado\n' + \
+            'Si tienes alguna duda, introduce <code>/help</code> para más información. \n'
 
-        buttons = [['Quiero cocinar algo, pero no se me ocurre nada', 'Quiero preparar una receta concreta'],
+        buttons = [['/help'],
+                   ['Quiero cocinar algo, pero no se me ocurre nada',
+                       'Quiero preparar una receta concreta'],
                    ['Añadir preferencia', 'Añadir alergia'],
                    ['/exit']]
         keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
@@ -128,7 +131,9 @@ def start_bot(token, conn):
         # If we're starting over we don't need do send a new message
         if not context.user_data.get(START_OVER):
             update.message.reply_text(
-                'Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot.')
+                '¡Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot ' +
+                '\U0001F9D1\U0000200D\U0001F373'
+            )
         update.message.reply_text(
             text=text, parse_mode=ParseMode.HTML, resize_keyboard=True, reply_markup=keyboard)
 
@@ -140,21 +145,43 @@ def start_bot(token, conn):
         return SELECTING_ACTION
 
     def display_info(update, context):
-        """Show software user manual in GUI"""
+        """Shows software user manual in GUI"""
 
-        text = 'Este es el mensaje de ayuda del bot. A continuación te detallo lo que puedes hacer.\n' + \
-            '1. Te puedo proponer un plato a elaborar en función de las imágenes que me envies. Para seleccionar esta opción pulsa <b><i>Quiero cocinar algo, pero no se me ocurre nada</i></b>.\n' + \
-            '2. Me puedes decir una receta en concreto que te gustaría cocinar y te daré las pautas que necesitas para ayudarte en su elaboración. Para seleccionar esta opción puedes marcar <b><i>Quiero preparar una receta concreta</i></b>.\n' + \
+        text = '<b><u>Información</u></b> \U00002139\n' + \
+            'Este es el mensaje de ayuda del bot. A continuación te detallo lo que puedes hacer.\n' + \
+            '1. Te puedo proponer un plato a elaborar en función de las imágenes que me envíes. Para seleccionar esta opción escribe <b><i>Quiero cocinar, pero no se me ocurre nada</i></b>.\n' + \
+            '2. Me puedes decir una receta en concreto que te gustaría cocinar y te daré las pautas que necesitas para ayudarte en su elaboración. Para seleccionar esta opción puedes introducir <b><i>Quiero preparar una receta concreta</i></b>.\n' + \
             '3. Puedes actualizar tus preferencias, ya sea por gusto seleccionando <b><i>Añadir preferencia</i></b> o por intolerancia a algún alimento con la opción <b><i>Añadir alergia</i></b>.\n' + \
             'Una vez seleccionada una de las opciones previas sigue las indicaciones que se muestran en pantalla.\n' + \
             'Acuerdate de seleccionar la opción <code>/exit</code> cuando hayas terminado.\n' + \
             'Puedes volver a ver la sección de ayuda escribiendo <code>/help</code>\n\n' + \
-            '<b>FAQs</b>\n\n' + \
-            '1. ¿Que ocurre con las imagenes una vez que las mando al sistema? \n-Las imágenes enviadas al sistema son procesadas por una red neuronal entrenada con una gran variedad de alimentos.\n\n' + \
-            '2. ¿Puedo cocinar cualquier receta? \n-El sistema solo ofrece las recetas que se han guardado en él, por lo que existe la posibilidad de que una receta en específico falte.\n'
+            '<b>FAQs</b> \U0001F64B\U00002753\n' + \
+            '1. ¿Que ocurre con las imagenes una vez que las mando al sistema? \n' + \
+            '- Las imágenes enviadas al sistema son procesadas por una red neuronal entrenada con una gran variedad de alimentos.\n' + \
+            '2. ¿Puedo cocinar cualquier receta? \n' + \
+            '- El sistema solo ofrece las recetas que se han guardado en él, por lo que existe la posibilidad de que una receta en específico falte. Si quieres consultar las recetas disponibles, introduce <code>/recetas</code>.\n' + \
+            '3. ¿Tengo que escribir el texto exactamente como se indica? \n' + \
+            '- No, el bot es capaz de entenderte siguiendo una conversación natural. Por ejemplo, puedes probar a introducir tus gustos directamente escribiendo \"Me gusta mucho ...\" o \"Hoy quiero preparar ...\" para buscar una receta.\n'
+
         update.message.reply_text(
             text=text, parse_mode=ParseMode.HTML)
         return SELECTING_ACTION
+
+    @send_action(ChatAction.TYPING)
+    def display_recipes(update, context):
+        """Shows list of recipes available in the system."""
+
+        # List of recipes available in the system
+        with open((COMMON_DIR / 'recipes.csv'), 'r') as f:
+            RECIPES = list(csv.reader(f))[0]
+
+        text = "<b><u>Recetas disponibles</u></b>"
+
+        for r in RECIPES:
+            text += '\n\u2022 ' + r
+
+        update.message.reply_text(
+            text=text, parse_mode=ParseMode.HTML)
 
     def done(update, context):
         """Closes user conversation."""
@@ -338,11 +365,17 @@ def start_bot(token, conn):
                 context.user_data[FIELDS] = response['fields']
                 if len(context.user_data[FIELDS].list_value.values) > 1:
                     update.message.reply_text(
-                        'Por favor, introduce una sola receta, o escribe \'salir\' para volver', reply_markup=keyboard)
+                        'Por favor, introduce una sola receta, o escribe \'salir\' para volver',
+                        reply_markup=keyboard
+                    )
                     return ADD_RECIPE
             except KeyError:
                 update.message.reply_text(
-                    'Lo siento, no conozco esa receta.\nPrueba con otra, o escribe \'salir\' para volver', reply_markup=keyboard)
+                    'Lo siento, no conozco esa receta.\n' +
+                    'Prueba con otra, o escribe \'salir\' para volver\n' +
+                    'Puedes cosultar las recetas con <code>/recetas</code>',
+                    reply_markup=keyboard, parse_mode=ParseMode.HTML
+                )
                 return ADD_RECIPE
 
         # Save recipe to cook
@@ -443,6 +476,7 @@ def start_bot(token, conn):
                 SELECTING_ACTION: [
                     CommandHandler('help', display_info),
                     CommandHandler('exit', done),
+                    CommandHandler('recetas', display_recipes),
                     # MessageHandler(Filters.regex('^CU01$'), adding_images),
                     # MessageHandler(Filters.regex('^CU02$'), adding_recipe),
                     # MessageHandler(Filters.regex('^CU03A$'), adding_prefs),
@@ -450,6 +484,7 @@ def start_bot(token, conn):
                     MessageHandler(Filters.text, detect_intention),
                 ],
                 ADD_RECIPE: [
+                    CommandHandler('recetas', display_recipes),
                     MessageHandler(Filters.regex('^salir$'), start),
                     MessageHandler(Filters.text, save_recipe),
                 ],
