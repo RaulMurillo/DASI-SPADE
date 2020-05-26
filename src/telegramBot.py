@@ -236,6 +236,8 @@ def start_bot(token, conn):
             return adding_recipe(update, context)
         elif (context.user_data[INTENT] == 'GuardarGusto') or (context.user_data[INTENT] == 'GuardarAlergia'):  # CU03
             return adding_prefs(update, context)
+        elif context.user_data[INTENT] == 'MostrarReceta':  # CU04
+            return show_recipe(update, context)
         else:
             update.message.reply_text(context.user_data[FULFILLMENT])
             context.user_data[INTENT] = None
