@@ -778,7 +778,7 @@
     },
     {
         "Title": "Potaje de judías blancas",
-        "ingredients": [
+        "Ingredients": [
             "500 gramos de judías blancas",
             "2 patatas",
             "2 zanahorias",
@@ -788,7 +788,7 @@
             "1 pizca de pimienta negra molida",
             "1 cucharada sopera de aceite de oliva virgen extra"
         ],
-          "steps": [
+          "Steps": [
             "Para preparar nuestro potaje, la noche previa pondremos las judías en un bol amplio y añadiremos abundante agua. Las dejaremos en remojo como mínimo toda la noche.",
             "Al día siguiente las escurrimos, las lavamos y las ponemos en la olla con una cucharada de aceite de oliva. Ponemos la cantidad de agua justa para cubrirlas porque en esta cocción rápida no hay casi evaporación, y cerramos la olla según las instrucciones del fabricante.",
             "La ponemos al fuego y cuando suba el pitorro que indica que la presión se ha hecho bajamos la intensidad del fuego al mínimo y cocinamos de diez a doce minutos.",
@@ -802,7 +802,7 @@
     },
     {
         "Title": "Huevos rellenos",
-        "ingredients": [
+        "Ingredients": [
             "6 huevos",
             "3 latas de atún en aceite",
             "2 cucharadas soperas de tomate frito o ketchup",
@@ -813,7 +813,7 @@
             "1 pizca de sal",
             "1 pizca de pimienta negra molida"
         ],
-          "steps": [
+          "Steps": [
             "Cuece los huevos en una olla con abundante agua durante unos 10 minutos aproximadamente si son medianos. También precalienta el horno a 200-250 ºC.",
             "Mientras tanto, pica los pimientos del piquillo junto con la cebolla tierna y mézclalo todo con las latas de atún bien escurridas.",
             "Añade el tomate frito o el ketchup y 2 cucharadas más de la salsa mayonesa casera o comprada (o más cantidad si lo prefieres) y mézclalo bien con todo. Así los huevos rellenos de atún gratinados tendrán un toque de salsa rosa.",
@@ -830,7 +830,7 @@
     },
     {
         "Title": "Rancho canario vegano",
-        "ingredients": [
+        "Ingredients": [
             "500 gramos de garbanzos cocidos",
             "250 gramos de seitán o carne vegetal",
             "100 gramos de macarrones tiburón o fideos gruesos",
@@ -848,7 +848,7 @@
             "1 pizca de azafrán",
             "1 litro de agua"
         ],
-          "steps": [
+          "Steps": [
             "Pica la cebolla, el ajo y el tomate. Calienta en una olla con aceite y sofrie la verdura para empezar a preparar el rancho canario paso a paso. Antes de que el sofrito quede listo, añade el pimentón, remueve y cocina varios minutos más.",
             "Trocea el seitán o la carne vegetal, la zanahoria y las papas. Incorpóralos al sofrito, remueve y cocina durante unos 3-4 minutos. Si no dispones de seitán, siempre puedes utilizar tofu de garbanzos casero, ¡muy fácil de hacer!",
             "Añade el tomillo, el azafrán, la sal, el laurel, el vino y cocina hasta que el rancho canario vegano alcance el primer hervor.",
@@ -859,7 +859,7 @@
     },
     {
         "Title": "Guiso de espinacas con crema de cacahuetes",
-        "ingredients": [
+        "Ingredients": [
             "600 gramos de espinacas",
             "2 cebollas",
             "2 tomates",
@@ -869,7 +869,7 @@
             "½ cucharadita de sal",
             "¼ taza de agua caliente"
         ],
-          "steps": [
+          "Steps": [
             "Corta la cebolla y el tomate en dados. Lava y corta las espinacas en trozos grandes para empezar a preparar el guiso de espinacas africano.",
             "Calienta una sartén o una cazuela con aceite y sofríe la cebolla hasta que empiece a ponerse transparente. Incorpora el tomate y cocina removiendo de vez en cuando hasta que se ablande.",
             "Añade las espinacas cortadas a la cazuela, remueve, tapa y cocínalas durante 5 minutos removiendo de vez en cuando.",
@@ -883,7 +883,7 @@
     },
     {
         "Title": "Guiso de garbanzos con carne de cerdo",
-        "ingredients": [
+        "Ingredients": [
             "250 gramos de garbanzos",
             "1 vaso pequeño de arroz",
             "4 huesos de espinazo",
@@ -897,7 +897,7 @@
             "1 cucharadita de sal",
             "8 hebras de azafrán de pelo"
         ],
-          "steps": [
+          "Steps": [
             "Ponemos en remojo los garbanzos la noche anterior. Al día siguiente, en una olla echamos los garbanzos, los huesos de espinazo, la pata hecha cuatro trozos, la oreja partida en trozos y el trozo de morro. Cubrimos todo con agua y lo ponemos a hervir a fuego lento durante 2 horas, y si tenemos que añadirle agua, la incorporamos caliente.",
             "Yo a la pata le doy un hervor previo para que salga más tierna. De esta forma, el guiso de garbanzos con carne de cerdo queda mucho más jugoso y sabroso.",
             "Después echamos las patatas, el arroz y el boniato pelado y partido en trozos. Dejamos hervir media hora más e incorporamos un majado con los ajos y el azafrán de pelo. En este momento también añadimos las morcillas, rectificamos de sal, dejamos hervir un par de minutos y apagamos el fuego.",
@@ -908,7 +908,7 @@
     },
     {
         "Title": "Patatas guisadas con carne y verduras",
-        "ingredients": [
+        "Ingredients": [
             "1/2 kg de carne de cerdo o ternera",
             "6 patatas",
             "1 cebolla",
@@ -921,7 +921,7 @@
             "Azafrán (colorante)",
             "1 cucharada de aceite de oliva"
         ],
-          "steps": [
+          "Steps": [
             "Picamos la cebolla, el pimiento y el tomate y lo sofreímos todo con el aceite caliente.",
             "Pasamos el sofrito por la batidora para triturarlo y lo echamos en la olla con la carne, vino blanco (si es cerdo, si se utiliza carne de ternera mejor le echamos vino tinto), nuez moscada, pimienta negra y sal. Cubrimos con agua la carne, cerramos la olla exprés y la dejamos 20 minutos a partir del momento en el que pite.",
             "Pasado el tiempo, cortamos las patatas a trozos y la añadimos a la carne con el colorante. Cerramos nuevamente la olla y dejamos otros 10 minutos desde que vuelva a pitar la olla. Si vemos que nos hace falta un poco mas de agua, se la añadimos antes de cerrar la olla.",
@@ -931,7 +931,7 @@
     },
     {
         "Title": "Estofado de verduras vegano",
-        "ingredients": [
+        "Ingredients": [
             "2 naranjas",
             "2 zanahorias",
             "1 manojo de kale o col crespa",
@@ -946,7 +946,7 @@
             "2 cucharadas soperas de aceite",
             "1 litro de caldo vegetal"
         ],
-          "steps": [
+          "Steps": [
             "Pela la verdura, corta en trozos medianos la batata y en rodajas la zanahoria y el apio. Pica la cebolla y los tomates (puedes escaldarlos si no te gusta la piel) en dados pequeños y trocea la kale.",
             "En una olla calienta el aceite y pocha la cebolla, el apio y el tomate. Cuando tengas el sofrito listo añade la zanahoria y la batata y cocina durante varios minutos hasta que empiecen a ablandarse. Añade kale y sigue cocinando 5 minutos más removiendo de vez en cuando.",
             "Vierte el caldo vegetal dentro de la olla cubriendo la verdura. También incorpora las especias: el pimentón, la sal, la pimienta, la cúrcuma y el jengibre.",
@@ -957,7 +957,7 @@
     },
     {
         "Title": "Guiso de patatas con chorizo",
-        "ingredients": [
+        "Ingredients": [
             "2 trozos de chorizo",
             "3 patatas medianas",
             "1 chorro de Vino blanco",
@@ -966,7 +966,7 @@
             "1 pizca de Pimienta negra molida",
             "1 pizca de Pimentón dulce molido"
         ],
-          "steps": [
+          "Steps": [
             "El primer paso para elaborar este guiso de patatas con chorizo fácil es partir el embutido en trozos, lo ponemos en una cazuela y añadimos el vino, el pimentón y la pimienta. Removemos bien para mezclar los ingredientes y ponemos a calentar.",
             "Mientras pelamos, lavamos y chascamos las patatas. Chascar las patatas consiste en partirlas en trozos cortando sólo una parte con el cuchillo y desprendiendo el trozo tirando de él. De esta manera conseguimos un corte irregular y que las patatas se deshagan un poquito al cocinarlas y se espese el caldo de las patatas con chorizo.",
             "Añadimos las patatas a la cazuela y movemos bien para que se impregnen del caldito del vino y las especias. Cubrimos con agua y añadimos la salsa de tomate casera.",
@@ -976,7 +976,7 @@
     },
     {
         "Title": "Potaje de garbanzos con bacalao y espinacas",
-        "ingredients": [
+        "Ingredients": [
             "garbanzos",
             "4 filetes o lomos de bacalao desalado y sin espinas",
             "espinacas frescas o congeladas",
@@ -988,7 +988,7 @@
             "1 cucharadita de ñora molida",
             "1 cucharadita de pimentón dulce"
         ],
-          "steps": [
+          "Steps": [
             "En primer lugar juntaremos todos los ingredientes para poder desenvolvernos más fácil en la cocina en teniendo, así, todos los productos reunidos.",
             "Truco: La cantidad de espinacas, garbanzos y pescado puede variar en función del número de comensales.",
             "Ponemos los garbanzos a hervir. Para ello, se cuecen durante 45 minutos en la olla express.",
@@ -1002,7 +1002,7 @@
     },
     {
         "Title": "Potaje de verduras con judías",
-        "ingredients": [
+        "Ingredients": [
             "½ taza de garbanzos cocidos",
             "½ taza de judías rojas cocidas",
             "2 lonchas de seitán",
@@ -1018,7 +1018,7 @@
             "1 cucharadita de comino molido",
             "2 litros de agua"
         ],
-          "steps": [
+          "Steps": [
             "Corta las verduras, es decir, la cebolla, el apio, la zanahoria, el calabacín y la calabaza en trozos pequeños. Pela y corta las patatas en trozos medianos y también las hojas de remolacha. Corta el seitán en dados pequeños.",
             "Calienta el aceite en una olla grande y pocha la cebolla. Añade la zanahoria y el apio y cocina un minuto removiendo de vez en cuando.",
             "Agrega el calabacín, la calabaza y las hojas de remolacha y cocina la verdura durante otros 2-3 minutos para seguir con la preparación del potaje de verduras.",
@@ -1029,7 +1029,7 @@
     },
     {
         "Title": "Estofado de seitán con patatas",
-        "ingredients": [
+        "Ingredients": [
             "300 gramos de Seitán",
             "1 cebolla",
             "2 zanahorias",
@@ -1046,7 +1046,7 @@
             "1 litro de Caldo vegetal o agua",
             "2 cucharadas soperas de Aceite"
         ],
-          "steps": [
+          "Steps": [
             "Para empezar a elaborar este estofado de seitán con patatas, empieza cortando el seitán en dados no muy grandes, salpimiéntalo y sofríe en la sartén con un poco de aceite hasta que se doren un poco. Coloca el seitán en un recipiente y reserva.",
             "Corta el tomate, el pimiento y la cebolla en dados pequeños y la zanahoria en rodajas. Prepara una fritura de cebolla, ajo, tomate y pimiento en la misma sartén que has usado para el seitán.",
             "Cuando esté casi hecho el sofrito del guiso vegano con seitán añade el laurel,el tomillo y el pimentón. Cocina medio minuto y añade un choro del vino y del agua o caldo vegetal. Traspasa este sofrito del seitán con verduras a una olla junto con la carne vegetal y la zanahoria en rodajas.",
