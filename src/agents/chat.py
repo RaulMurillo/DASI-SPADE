@@ -83,12 +83,22 @@ class ChatAgent(Agent):
                     if response:
                         all_menus = np.array(json.loads(response.body))
                         if all_menus.max() > 0:
-                            # JSON with best recipe
-                            menu = {
-                                'Title': self.recipe_book[all_menus.argmax()]['Title'],
-                                'Ingredients': self.recipe_book[all_menus.argmax()]['Ingredients'],
-                                'Directions': self.recipe_book[all_menus.argmax()]['Steps'],
-                            }
+                            # # JSON with best recipe
+                            # menu = {
+                            #     'Title': self.recipe_book[all_menus.argmax()]['Title'],
+                            #     'Ingredients': self.recipe_book[all_menus.argmax()]['Ingredients'],
+                            #     'Directions': self.recipe_book[all_menus.argmax()]['Steps'],
+                            # }
+                            # List with 5 best recipes
+                            menu = []
+                            N = 5
+                            best_menu = all_menus.argsort()[-N:][::-1]
+                            for m in best_menu:
+                                if all_menus[m] > 0:
+                                    menu.append(self.recipe_book[m]['Title'])
+                                else:
+                                    break
+
                         else:
                             menu = None
                         self.agent.pipe.send(menu)
@@ -134,6 +144,16 @@ class ChatAgent(Agent):
                     logger.info(
                         f"[DispatcherBehav] Message sent: {msg.body}")
 
+                elif 'CU-004' in bot_msg:
+                    choice = self.agent.RECIPES.index(bot_msg['CU-004'])
+
+                    menu = {
+                                'Title': self.recipe_book[choice]['Title'],
+                                'Ingredients': self.recipe_book[choice]['Ingredients'],
+                                'Directions': self.recipe_book[choice]['Steps'],
+                            }
+                    self.agent.pipe.send(menu)
+                    
                 else:   # bad message
                     logger.warning(
                         f'[DispatcherBehav] Message recived: {bot_msg}')
