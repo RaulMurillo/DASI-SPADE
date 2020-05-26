@@ -198,7 +198,7 @@ def start_bot(token, conn):
         logger.error('Update "%s" caused error "%s"', update, context.error)
 
     def ask_continue(update, context):
-        """XX"""
+        """Ask the user if wishes to do more queries."""
 
         # Ask for more interactions
         buttons = [['Sí', 'No']]
@@ -285,14 +285,21 @@ def start_bot(token, conn):
 
         return ADD_PHOTO
 
+
     @send_action(ChatAction.TYPING)
     def get_cheff_response(update, context):
-        """Stops image reception and calls `get_cheff_response`.
-           Sends data and receives according response.
-           Uses the accesible pipe `conn` for sending/receiving messages.
+        """Stops image reception and calls `print_cheff_response`.
         """
         update.message.reply_text(
             'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+
+        return print_cheff_response(update, context)
+
+    @send_action(ChatAction.TYPING)
+    def print_cheff_response(update, context):
+        """Sends data and receives according response.
+           Uses the accesible pipe `conn` for sending/receiving messages.
+        """
 
         fail = True
 
@@ -314,10 +321,6 @@ def start_bot(token, conn):
                     response = ''
                     for i in r:
                         response += '\n\u2022 ' + i
-                    # # Recipe instructions, step by step
-                    # response += '\n\n<b><u>Instrucciones</u></b>'
-                    # for n, i in enumerate(r['Directions']):
-                    #     response += '\n' + str(n+1) + '. ' + i
                     fail = False
                 elif (r == None):
                     response = 'Lo siento, no hay recetas disponibles con lo que me has indicado'
@@ -389,7 +392,6 @@ def start_bot(token, conn):
         """Asks agent about full recipe and shows it to user.
            Uses the accesible pipe `conn` for sending/receiving messages.
         """
-        print('show_recipe')
         # Send message to Chat Agent
         if not context.user_data.get(RECIPE):  # CU-001
             # TODO: Get recipe to ask cheff
@@ -398,7 +400,6 @@ def start_bot(token, conn):
             try:
                 get_recipe(update, context)
             except:
-                print('show_recipe - get_recipe failed')
                 return SHOW_RECIPE
 
             if FIELDS in context.user_data:
@@ -433,7 +434,6 @@ def start_bot(token, conn):
 
     def adding_recipe(update, context):
         """Adds the recipe you would like to cook."""
-        print("adding_recipe")
 
         if FIELDS in context.user_data:
             # Recipe already introduced by the user
@@ -445,12 +445,9 @@ def start_bot(token, conn):
         return END
 
     def get_recipe(update, context):
-        """X"""
-        print("get_recipe")
-        print(update.message.text)
+        """Saves recipe selected by user."""
         # Validate with Dialogflow
         response = call2dialogflow(update.message.text)
-        print(response)
         try:
             context.user_data[FULFILLMENT] = response['fulfillment']
             # context.user_data[INTENT] = response['intent'] # Should be already set
@@ -483,12 +480,10 @@ def start_bot(token, conn):
 
     def save_recipe(update, context):
         """Saves input for recipe and return to next state."""
-        print("save_recipe")
 
         # Get recipe, if not introduced previously
         if FIELDS not in context.user_data:
 
-            print("FIELDS not in context.user_data")
             # # Validate with Dialogflow
             # response = call2dialogflow(update.message.text)
 
