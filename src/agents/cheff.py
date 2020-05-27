@@ -204,6 +204,7 @@ class CheffAgent(Agent):
                 msg.set_metadata("performative", "confirm")
                 msg.body = json.dumps(m_list)
                 await self.send(msg)
+                self.agent.reset_list_ingred()
 
             else:
                 logger.info(
@@ -247,9 +248,9 @@ class CheffAgent(Agent):
                 menu = menu_avail.multiply(menu_avail + menu_pref)
 
                 logger.info('[CookBehaviour] The recipe that best matches is: {}'.format(
-                    self.recipe_book['Title'][menu.argmax()]))
-                logger.debug(self.recipe_book['Ingredients'][menu.argmax()])
-                logger.debug(self.recipe_book['Directions'][menu.argmax()])
+                    self.recipe_book[menu.argmax()]['Title']))
+                logger.debug(self.recipe_book[menu.argmax()]['Ingredients'])
+                logger.debug(self.recipe_book[menu.argmax()]['Steps'])
 
                 # Notify chat/user
                 msg = Message(to=CHAT_JID)

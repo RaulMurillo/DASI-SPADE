@@ -83,12 +83,22 @@ class ChatAgent(Agent):
                     if response:
                         all_menus = np.array(json.loads(response.body))
                         if all_menus.max() > 0:
-                            # JSON with best recipe
-                            menu = {
-                                'Title': self.recipe_book['Title'][all_menus.argmax()],
-                                'Ingredients': self.recipe_book['Ingredients'][all_menus.argmax()],
-                                'Directions': self.recipe_book['Directions'][all_menus.argmax()],
-                            }
+                            # # JSON with best recipe
+                            # menu = {
+                            #     'Title': self.recipe_book[all_menus.argmax()]['Title'],
+                            #     'Ingredients': self.recipe_book[all_menus.argmax()]['Ingredients'],
+                            #     'Directions': self.recipe_book[all_menus.argmax()]['Steps'],
+                            # }
+                            # List with 5 best recipes
+                            menu = []
+                            N = 5
+                            best_menu = all_menus.argsort()[-N:][::-1]
+                            for m in best_menu:
+                                if all_menus[m] > 0:
+                                    menu.append(self.recipe_book[m]['Title'])
+                                else:
+                                    break
+
                         else:
                             menu = None
                         self.agent.pipe.send(menu)
@@ -100,9 +110,9 @@ class ChatAgent(Agent):
                     msg = Message(to=CHEFF_JID)
                     msg.set_metadata("performative", "query_ref")
                     msg.body = str(
-                        self.recipe_book['Title'].index(bot_msg['CU-002']))
-                    i = bot_msg['CU-002']
-                    logger.info(f'[DispatcherBehav] {i} - {msg.body}')
+                        self.agent.RECIPES.index(bot_msg['CU-002'])
+                        )
+                    logger.info(f"[DispatcherBehav] {bot_msg['CU-002']} - {msg.body}")
                     await self.send(msg)
 
                     # Recive cheff's response
@@ -134,6 +144,16 @@ class ChatAgent(Agent):
                     logger.info(
                         f"[DispatcherBehav] Message sent: {msg.body}")
 
+                elif 'CU-004' in bot_msg:
+                    choice = self.agent.RECIPES.index(bot_msg['CU-004'])
+
+                    menu = {
+                                'Title': self.recipe_book[choice]['Title'],
+                                'Ingredients': self.recipe_book[choice]['Ingredients'],
+                                'Directions': self.recipe_book[choice]['Steps'],
+                            }
+                    self.agent.pipe.send(menu)
+                    
                 else:   # bad message
                     logger.warning(
                         f'[DispatcherBehav] Message recived: {bot_msg}')
@@ -144,6 +164,9 @@ class ChatAgent(Agent):
         logger.info(f"[ChatAgent] Connection mechanism: {self.pipe}")
         with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:
             self.INGREDIENTS = list(csv.reader(f))[0]
+        
+        with open((COMMON_DIR / 'recipes.csv'), 'r') as f:
+            self.RECIPES = list(csv.reader(f))[0]
 
         dispatch = self.DispatcherBehav(period=1.5)
         self.add_behaviour(dispatch)

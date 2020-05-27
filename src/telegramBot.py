@@ -65,7 +65,7 @@ def call2dialogflow(input_text):
         valorFields = None
         if(r['intent'] == "GuardarGusto") or (r['intent'] == "GuardarAlergia"):
             valorFields = "Ingredientes"
-        elif(r['intent'] == "GuardarReceta"):
+        elif(r['intent'] == "GuardarReceta") or (r['intent'] == "MostrarReceta"):
             valorFields = "Receta"
         else:
             # raise ValueError
@@ -99,7 +99,7 @@ def start_bot(token, conn):
 
     # State definitions for Telegram Bot
     (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
-     ASK_CHEFF, ADD_PREFS) = map(chr, range(5))
+     ASK_CHEFF, ADD_PREFS, SHOW_RECIPE, CONTINUE) = map(chr, range(7))
     # Shortcut for ConversationHandler.END
     END = ConversationHandler.END
 
@@ -118,17 +118,22 @@ def start_bot(token, conn):
 
         text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
             'Tambien puedes indicar tus preferencias y alergias.\n' + \
-            'Selecciona la opción de que desees y pulsa <code>/exit</code> cuando hayas terminado\n\n'
+            'Selecciona la opción de que desees y escribe <code>/exit</code> cuando hayas terminado\n' + \
+            'Si tienes alguna duda, introduce <code>/help</code> para más información. \n'
 
-        buttons = [['Quiero cocinar algo, pero no se me ocurre nada', 'Quiero preparar una receta concreta'],
-                   ['Añadir preferencia', 'Añadir alergia'],
-                   ['/exit']]
+        buttons = [['/help'],
+                   ['Recomíendame una receta',
+                       'Quiero preparar una receta concreta'],
+                   ['Añadir preferencia', 'Alimentos que prefiero no tomar'],
+                   ['/start', '/exit']]
         keyboard = ReplyKeyboardMarkup(buttons, one_time_keyboard=True)
 
         # If we're starting over we don't need do send a new message
         if not context.user_data.get(START_OVER):
             update.message.reply_text(
-                'Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot.')
+                '¡Hola! Me llamo DASI-Chef Bot pero puedes llamarme Chef Bot ' +
+                '\U0001F9D1\U0000200D\U0001F373'
+            )
         update.message.reply_text(
             text=text, parse_mode=ParseMode.HTML, resize_keyboard=True, reply_markup=keyboard)
 
@@ -139,13 +144,44 @@ def start_bot(token, conn):
         context.user_data[START_OVER] = True
         return SELECTING_ACTION
 
-    # TODO
     def display_info(update, context):
-        """Show software user manual in GUI"""
+        """Shows software user manual in GUI"""
 
-        text = 'Información actualmente no disponible :('
-        update.message.reply_text(text=text)
+        text = '<b><u>Información</u></b> \U00002139\n' + \
+            'Este es el mensaje de ayuda del bot. A continuación te detallo lo que puedes hacer.\n' + \
+            '1. Te puedo proponer un plato a elaborar en función de las imágenes que me envíes. Para seleccionar esta opción escribe <b><i>Quiero cocinar, pero no se me ocurre nada</i></b>.\n' + \
+            '2. Me puedes decir una receta en concreto que te gustaría cocinar y te daré las pautas que necesitas para ayudarte en su elaboración. Para seleccionar esta opción puedes introducir <b><i>Quiero preparar una receta concreta</i></b>.\n' + \
+            '3. Puedes actualizar tus preferencias, ya sea por gusto seleccionando <b><i>Añadir preferencia</i></b> o por intolerancia a algún alimento con la opción <b><i>Añadir alergia</i></b>.\n' + \
+            'Una vez seleccionada una de las opciones previas sigue las indicaciones que se muestran en pantalla.\n' + \
+            'Acuerdate de seleccionar la opción <code>/exit</code> cuando hayas terminado.\n' + \
+            'Puedes volver a ver la sección de ayuda escribiendo <code>/help</code>\n\n' + \
+            '<b>FAQs</b> \U0001F64B\U00002753\n' + \
+            '1. ¿Que ocurre con las imagenes una vez que las mando al sistema? \n' + \
+            '- Las imágenes enviadas al sistema son procesadas por una red neuronal entrenada con una gran variedad de alimentos.\n' + \
+            '2. ¿Puedo cocinar cualquier receta? \n' + \
+            '- El sistema solo ofrece las recetas que se han guardado en él, por lo que existe la posibilidad de que una receta en específico falte. Si quieres consultar las recetas disponibles, introduce <code>/recetas</code>.\n' + \
+            '3. ¿Tengo que escribir el texto exactamente como se indica? \n' + \
+            '- No, el bot es capaz de entenderte siguiendo una conversación natural. Por ejemplo, puedes probar a introducir tus gustos directamente escribiendo \"Me gusta mucho ...\" o \"Hoy quiero preparar ...\" para buscar una receta.\n'
+
+        update.message.reply_text(
+            text=text, parse_mode=ParseMode.HTML)
         return SELECTING_ACTION
+
+    @send_action(ChatAction.TYPING)
+    def display_recipes(update, context):
+        """Shows list of recipes available in the system."""
+
+        # List of recipes available in the system
+        with open((COMMON_DIR / 'recipes.csv'), 'r') as f:
+            RECIPES = list(csv.reader(f))[0]
+
+        text = "<b><u>Recetas disponibles</u></b>"
+
+        for r in RECIPES:
+            text += '\n\u2022 ' + r
+
+        update.message.reply_text(
+            text=text, parse_mode=ParseMode.HTML)
 
     def done(update, context):
         """Closes user conversation."""
@@ -160,6 +196,19 @@ def start_bot(token, conn):
         """Log Errors caused by Updates."""
 
         logger.error('Update "%s" caused error "%s"', update, context.error)
+
+    def ask_continue(update, context):
+        """Ask the user if wishes to do more queries."""
+
+        # Ask for more interactions
+        buttons = [['Sí', 'No']]
+        keyboard = ReplyKeyboardMarkup(
+            buttons, resize_keyboard=True, one_time_keyboard=True)
+
+        update.message.reply_text(
+            text='¿Quieres realizar alguna otra consulta?', reply_markup=keyboard)
+
+        return CONTINUE
 
     def detect_intention(update, context):
         """Detects user's intention from input text."""
@@ -187,6 +236,8 @@ def start_bot(token, conn):
             return adding_recipe(update, context)
         elif (context.user_data[INTENT] == 'GuardarGusto') or (context.user_data[INTENT] == 'GuardarAlergia'):  # CU03
             return adding_prefs(update, context)
+        elif context.user_data[INTENT] == 'MostrarReceta':  # CU04
+            return show_recipe(update, context)
         else:
             update.message.reply_text(context.user_data[FULFILLMENT])
             context.user_data[INTENT] = None
@@ -234,11 +285,23 @@ def start_bot(token, conn):
 
         return ADD_PHOTO
 
+
     @send_action(ChatAction.TYPING)
     def get_cheff_response(update, context):
+        """Stops image reception and calls `print_cheff_response`.
+        """
+        update.message.reply_text(
+            'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+
+        return print_cheff_response(update, context)
+
+    @send_action(ChatAction.TYPING)
+    def print_cheff_response(update, context):
         """Sends data and receives according response.
            Uses the accesible pipe `conn` for sending/receiving messages.
         """
+
+        fail = True
 
         # Send message to Chat Agent
         if not context.user_data.get(RECIPE):  # CU-001
@@ -251,17 +314,14 @@ def start_bot(token, conn):
         if conn.poll(timeout=5):
             r = conn.recv()
             if not context.user_data.get(RECIPE):  # CU-001
-                if (type(r) == dict):
+                if (type(r) == list):
                     update.message.reply_text(
-                        'Te sugiero preparar {}'.format(r['Title']))
-                    # Full list of ingredients
-                    response = '<b><u>Ingredientes</u></b>'
-                    for i in r['Ingredients']:
+                        'Te sugiero preparar alguna de las siguientes recetas:')
+                    # Full list of recommended recipes
+                    response = ''
+                    for i in r:
                         response += '\n\u2022 ' + i
-                    # Recipe instructions, step by step
-                    response += '\n\n<b><u>Instrucciones</u></b>'
-                    for n, i in enumerate(r['Directions']):
-                        response += '\n' + str(n+1) + '. ' + i
+                    fail = False
                 elif (r == None):
                     response = 'Lo siento, no hay recetas disponibles con lo que me has indicado'
             else:  # CU-002
@@ -274,25 +334,103 @@ def start_bot(token, conn):
                         response = 'Te faltan los siguientes ingredientes clave: ' + ingred_list
                     else:
                         response = f'¡Tienes todos los ingredientes clave para cocinar {context.user_data.get(RECIPE).to_lower()}!'
+                    fail = False
+
         update.message.reply_text(response, parse_mode=ParseMode.HTML)
 
-    def stop_images(update, context):
-        """Stops image reception and calls `get_cheff_response`."""
+        if fail:
+            return ask_continue(update, context)
+        else:
+            if not context.user_data.get(RECIPE):  # CU-001
+                # update.message.reply_text(
+                #     text='¿Quieres ver las intrucciones de esta receta?')
+                msg = 'Mostrar receta'
+                response = call2dialogflow(msg)
+                # Store values
+                try:
+                    context.user_data[FULFILLMENT] = response['fulfillment']
+                    context.user_data[INTENT] = response['intent']
+                    assert context.user_data[INTENT] == 'MostrarReceta'
+                    logger.info(f'INTENT: {context.user_data[INTENT]}')
+                except KeyError:
+                    update.message.reply_text('Error with Dialogflow server')
+                    return error(update, context)
 
-        update.message.reply_text(
-            'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+                update.message.reply_text(context.user_data[FULFILLMENT])
 
-        get_cheff_response(update, context)
-        # Ask for more interactions
-        buttons = [['Sí', 'No']]
-        keyboard = ReplyKeyboardMarkup(
-            buttons, resize_keyboard=True, one_time_keyboard=True)
+            else: # CU-002
+                # Ask for more interactions
+                buttons = [['Sí', 'No']]
+                keyboard = ReplyKeyboardMarkup(
+                    buttons, resize_keyboard=True, one_time_keyboard=True)
 
-        update.message.reply_text(
-            text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
-        context.user_data[START_OVER] = True
+                update.message.reply_text(
+                    text='¿Quieres ver las intrucciones de esta receta?', reply_markup=keyboard)
 
-        return ASK_CHEFF
+            return ASK_CHEFF
+
+    # def stop_images(update, context):
+    #     """Stops image reception and calls `get_cheff_response`."""
+
+    #     update.message.reply_text(
+    #         'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+
+    #     get_cheff_response(update, context)
+    #     # Ask for more interactions
+    #     buttons = [['Sí', 'No']]
+    #     keyboard = ReplyKeyboardMarkup(
+    #         buttons, resize_keyboard=True, one_time_keyboard=True)
+
+    #     update.message.reply_text(
+    #         text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
+    #     context.user_data[START_OVER] = True
+
+    #     return ASK_CHEFF
+
+    @send_action(ChatAction.TYPING)
+    def show_recipe(update, context):
+        """Asks agent about full recipe and shows it to user.
+           Uses the accesible pipe `conn` for sending/receiving messages.
+        """
+        # Send message to Chat Agent
+        if not context.user_data.get(RECIPE):  # CU-001
+            # TODO: Get recipe to ask cheff
+            # Get recipe, if not introduced previously
+
+            try:
+                get_recipe(update, context)
+            except:
+                return SHOW_RECIPE
+
+            if FIELDS in context.user_data:
+                # Save recipe to cook
+                context.user_data[RECIPE] = context.user_data[FIELDS].list_value.values[0].string_value
+                context.user_data[FIELDS] = None
+                logger.info(context.user_data[RECIPE])
+            # return SHOW_RECIPE
+
+        conn.send({'CU-004': context.user_data.get(RECIPE)})
+
+        # Receive answer from Chat Agent
+        response = 'Lo siento, el servidor está teniendo problemas. Vuelve a probar más tarde'
+        if conn.poll(timeout=5):
+            r = conn.recv()
+            if (type(r) == dict):
+                response = f'<b><u>{context.user_data.get(RECIPE)}</u></b>\n\n'
+                # Full list of ingredients
+                response += '<b><u>Ingredientes</u></b>'
+                for i in r['Ingredients']:
+                    response += '\n\u2022 ' + i
+                # Recipe instructions, step by step
+                response += '\n\n<b><u>Instrucciones</u></b>'
+                for n, i in enumerate(r['Directions']):
+                    response += '\n' + str(n+1) + '. ' + i
+            elif (r == None):
+                # Unreachable
+                response = 'Lo siento, no hay recetas disponibles con lo que me has indicado'
+        update.message.reply_text(response, parse_mode=ParseMode.HTML)
+
+        return ask_continue(update, context)
 
     def adding_recipe(update, context):
         """Adds the recipe you would like to cook."""
@@ -306,34 +444,79 @@ def start_bot(token, conn):
         # Unreachable
         return END
 
+    def get_recipe(update, context):
+        """Saves recipe selected by user."""
+        # Validate with Dialogflow
+        response = call2dialogflow(update.message.text)
+        try:
+            context.user_data[FULFILLMENT] = response['fulfillment']
+            # context.user_data[INTENT] = response['intent'] # Should be already set
+
+            logger.info(context.user_data[INTENT])
+        except KeyError:
+            update.message.reply_text('Error with Dialogflow server')
+            exit(1)
+
+        keyboard = ReplyKeyboardMarkup(
+            [['salir']], resize_keyboard=True, one_time_keyboard=True)
+        try:
+            context.user_data[FIELDS] = response['fields']
+            if len(context.user_data[FIELDS].list_value.values) > 1:
+                update.message.reply_text(
+                    'Por favor, introduce una sola receta, o escribe \'salir\' para volver',
+                    reply_markup=keyboard
+                )
+                # return ADD_RECIPE
+                raise ValueError
+        except KeyError:
+            update.message.reply_text(
+                'Lo siento, no conozco esa receta.\n' +
+                'Prueba con otra, o escribe \'salir\' para volver\n' +
+                'Puedes cosultar las recetas con <code>/recetas</code>',
+                reply_markup=keyboard, parse_mode=ParseMode.HTML
+            )
+            # return ADD_RECIPE
+            raise ValueError
+
     def save_recipe(update, context):
         """Saves input for recipe and return to next state."""
 
         # Get recipe, if not introduced previously
         if FIELDS not in context.user_data:
-            # Validate with Dialogflow
-            response = call2dialogflow(update.message.text)
 
+            # # Validate with Dialogflow
+            # response = call2dialogflow(update.message.text)
+
+            # try:
+            #     context.user_data[FULFILLMENT] = response['fulfillment']
+            #     # context.user_data[INTENT] = response['intent'] # Should be already set
+
+            #     # logger.info(context.user_data[INTENT])
+            # except KeyError:
+            #     update.message.reply_text('Error with Dialogflow server')
+            #     exit(1)
+
+            # keyboard = ReplyKeyboardMarkup(
+            #     [['salir']], resize_keyboard=True, one_time_keyboard=True)
+            # try:
+            #     context.user_data[FIELDS] = response['fields']
+            #     if len(context.user_data[FIELDS].list_value.values) > 1:
+            #         update.message.reply_text(
+            #             'Por favor, introduce una sola receta, o escribe \'salir\' para volver',
+            #             reply_markup=keyboard
+            #         )
+            #         return ADD_RECIPE
+            # except KeyError:
+            #     update.message.reply_text(
+            #         'Lo siento, no conozco esa receta.\n' +
+            #         'Prueba con otra, o escribe \'salir\' para volver\n' +
+            #         'Puedes cosultar las recetas con <code>/recetas</code>',
+            #         reply_markup=keyboard, parse_mode=ParseMode.HTML
+            #     )
+            #     return ADD_RECIPE
             try:
-                context.user_data[FULFILLMENT] = response['fulfillment']
-                # context.user_data[INTENT] = response['intent'] # Should be already set
-
-                # logger.info(context.user_data[INTENT])
-            except KeyError:
-                update.message.reply_text('Error with Dialogflow server')
-                exit(1)
-
-            keyboard = ReplyKeyboardMarkup(
-                [['salir']], resize_keyboard=True, one_time_keyboard=True)
-            try:
-                context.user_data[FIELDS] = response['fields']
-                if len(context.user_data[FIELDS].list_value.values) > 1:
-                    update.message.reply_text(
-                        'Por favor, introduce una sola receta, o escribe \'salir\' para volver', reply_markup=keyboard)
-                    return ADD_RECIPE
-            except KeyError:
-                update.message.reply_text(
-                    'Lo siento, no conozco esa receta.\nPrueba con otra, o escribe \'salir\' para volver', reply_markup=keyboard)
+                get_recipe(update, context)
+            except:
                 return ADD_RECIPE
 
         # Save recipe to cook
@@ -432,8 +615,9 @@ def start_bot(token, conn):
 
             states={
                 SELECTING_ACTION: [
-                    CommandHandler('info', display_info),
+                    CommandHandler('help', display_info),
                     CommandHandler('exit', done),
+                    CommandHandler('recetas', display_recipes),
                     # MessageHandler(Filters.regex('^CU01$'), adding_images),
                     # MessageHandler(Filters.regex('^CU02$'), adding_recipe),
                     # MessageHandler(Filters.regex('^CU03A$'), adding_prefs),
@@ -441,23 +625,38 @@ def start_bot(token, conn):
                     MessageHandler(Filters.text, detect_intention),
                 ],
                 ADD_RECIPE: [
+                    CommandHandler('recetas', display_recipes),
                     MessageHandler(Filters.regex('^salir$'), start),
                     MessageHandler(Filters.text, save_recipe),
                 ],
                 ADD_PHOTO: [
                     MessageHandler(Filters.photo, save_image),
-                    MessageHandler(Filters.text, stop_images),
+                    MessageHandler(Filters.text, get_cheff_response),
                 ],
                 ASK_CHEFF: [
-                    MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
-                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), done),
+                    MessageHandler(Filters.regex(
+                        r'^(.*?(\b[Ss][IiÍí]\b)[^$]*)$'), show_recipe),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), start),
+                    MessageHandler(Filters.regex('^salir$'), start),
+                    MessageHandler(Filters.text, show_recipe),
+                ],
+                SHOW_RECIPE: [
+                    CommandHandler('recetas', display_recipes),
+                    MessageHandler(Filters.regex('^salir$'), start),
+                    # MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
+                    # MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), done),
+                    MessageHandler(Filters.text, show_recipe),
                 ],
                 ADD_PREFS: [
                     MessageHandler(Filters.regex(
-                        r'^[Ss][IiÍí]$'), adding_prefs),
-                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
+                        r'^(.*?(\b[Ss][IiÍí]\b)[^$]*)$'), adding_prefs),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), start),
                     MessageHandler(Filters.text, save_prefs),
                 ],
+                CONTINUE: [
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Ss][IiÍí]\b)[^$]*)$'), start),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), done),
+                ]
             },
 
             fallbacks=[
