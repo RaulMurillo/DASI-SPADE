@@ -204,6 +204,7 @@ class CheffAgent(Agent):
                 msg.set_metadata("performative", "confirm")
                 msg.body = json.dumps(m_list)
                 await self.send(msg)
+                self.agent.reset_list_ingred()
 
             else:
                 logger.info(
