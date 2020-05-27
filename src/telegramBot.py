@@ -369,23 +369,23 @@ def start_bot(token, conn):
 
             return ASK_CHEFF
 
-    def stop_images(update, context):
-        """Stops image reception and calls `get_cheff_response`."""
+    # def stop_images(update, context):
+    #     """Stops image reception and calls `get_cheff_response`."""
 
-        update.message.reply_text(
-            'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
+    #     update.message.reply_text(
+    #         'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
 
-        get_cheff_response(update, context)
-        # Ask for more interactions
-        buttons = [['Sí', 'No']]
-        keyboard = ReplyKeyboardMarkup(
-            buttons, resize_keyboard=True, one_time_keyboard=True)
+    #     get_cheff_response(update, context)
+    #     # Ask for more interactions
+    #     buttons = [['Sí', 'No']]
+    #     keyboard = ReplyKeyboardMarkup(
+    #         buttons, resize_keyboard=True, one_time_keyboard=True)
 
-        update.message.reply_text(
-            text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
-        context.user_data[START_OVER] = True
+    #     update.message.reply_text(
+    #         text='¿Quieres realizar alguna consulta más?', reply_markup=keyboard)
+    #     context.user_data[START_OVER] = True
 
-        return ASK_CHEFF
+    #     return ASK_CHEFF
 
     @send_action(ChatAction.TYPING)
     def show_recipe(update, context):
@@ -635,27 +635,27 @@ def start_bot(token, conn):
                 ],
                 ASK_CHEFF: [
                     MessageHandler(Filters.regex(
-                        r'^[Ss][IiÍí]$'), show_recipe),
-                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
+                        r'^(.*?(\b[Ss][IiÍí]\b)[^$]*)$'), show_recipe),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), start),
                     MessageHandler(Filters.regex('^salir$'), start),
                     MessageHandler(Filters.text, show_recipe),
                 ],
                 SHOW_RECIPE: [
                     CommandHandler('recetas', display_recipes),
                     MessageHandler(Filters.regex('^salir$'), start),
-                    MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
-                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), done),
+                    # MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
+                    # MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), done),
                     MessageHandler(Filters.text, show_recipe),
                 ],
                 ADD_PREFS: [
                     MessageHandler(Filters.regex(
-                        r'^[Ss][IiÍí]$'), adding_prefs),
-                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), start),
+                        r'^(.*?(\b[Ss][IiÍí]\b)[^$]*)$'), adding_prefs),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), start),
                     MessageHandler(Filters.text, save_prefs),
                 ],
                 CONTINUE: [
-                    MessageHandler(Filters.regex(r'^[Ss][IiÍí]$'), start),
-                    MessageHandler(Filters.regex(r'^[Nn][Oo]$'), done),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Ss][IiÍí]\b)[^$]*)$'), start),
+                    MessageHandler(Filters.regex(r'^(.*?(\b[Nn][Oo]\b)[^$]*)$'), done),
                 ]
             },
 
