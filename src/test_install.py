@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import spade
 import telegramBot
 import multiprocessing

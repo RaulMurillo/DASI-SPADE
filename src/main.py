@@ -19,17 +19,20 @@ def main():
     cheff = CheffAgent(CONFIG['CHEFF_JID'], CONFIG['CHEFF_PASS'])
     image = ImageAgent(CONFIG['IMAGE_JID'], CONFIG['IMAGE_PASS'])
 
-    image.start()
-    cheff.start()
-    future = chat.start()
-    future.result()
+    f_img = image.start()
+    f_chf = cheff.start()
+    f_cht = chat.start()
+    f_img.result()
+    f_cht.result()
+    f_chf.result()
 
     # Telegram Bot
     bot_process = Process(target=telegramBot.start_bot, args=(
         CONFIG['telegram_token'], child_conn,))
     bot_process.start()
 
-    print("Wait until user interrupts with ctrl+C")
+    time.sleep(0.5)	# Assert message is displayed after logs
+    print("\n---\nWait until user interrupts with ctrl+C\n")
     while True:
         try:
             time.sleep(1)
