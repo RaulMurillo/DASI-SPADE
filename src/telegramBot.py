@@ -42,6 +42,19 @@ except:
 
 
 def call2dialogflow(input_text):
+    """Call to dialogflow API. Receive the text to analyze
+    
+    Parameters
+    ----------
+    input_text : str
+        The text introduced in the chat
+
+    Returns
+    -------
+    obj
+        a object with the fulfillment and the intent
+    """
+
     # Init API
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(PROJECT_ID, SESSION_ID)
@@ -95,7 +108,12 @@ def send_action(action):
 
 
 def start_bot(token, conn):
-    """Starts a Telegram Bot that pass messages to other process via `conn`."""
+    """Starts a Telegram Bot that pass messages to other process via `conn`.
+    Parameters
+    ----------
+    token : str
+        Bot token secret identifier
+    """
 
     # State definitions for Telegram Bot
     (SELECTING_ACTION, ADD_RECIPE, ADD_PHOTO,
@@ -114,7 +132,18 @@ def start_bot(token, conn):
     PHOTO_DIR.mkdir(parents=True, exist_ok=True)
 
     def start(update, context):
-        """Select an action: query by recipes/ingredients or add preferences."""
+        """Select an action: query by recipes/ingredients or add preferences.
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to SELECTING_ACTION conversation handler
+        """
 
         text = 'Puedo ayudarte a proponerte una receta con los ingredientes que me mandes en una imagen.\n' + \
             'Tambien puedes indicar tus preferencias y alergias.\n' + \
@@ -145,7 +174,19 @@ def start_bot(token, conn):
         return SELECTING_ACTION
 
     def display_info(update, context):
-        """Shows software user manual in GUI"""
+        """Shows software user manual in GUI
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to SELECTING_ACTION conversation handler
+        """
 
         text = '<b><u>Información</u></b> \U00002139\n' + \
             'Este es el mensaje de ayuda del bot. A continuación te detallo lo que puedes hacer.\n' + \
@@ -169,7 +210,15 @@ def start_bot(token, conn):
 
     @send_action(ChatAction.TYPING)
     def display_recipes(update, context):
-        """Shows list of recipes available in the system."""
+        """Shows list of recipes available in the system.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+        """
 
         # List of recipes available in the system
         with open((COMMON_DIR / 'recipes.csv'), 'r') as f:
@@ -184,7 +233,19 @@ def start_bot(token, conn):
             text=text, parse_mode=ParseMode.HTML)
 
     def done(update, context):
-        """Closes user conversation."""
+        """Closes user conversation.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to the END of conversation handler
+        """
 
         update.message.reply_text('Hasta la próxima!')
         conn.send({'Finish': None})
@@ -193,12 +254,32 @@ def start_bot(token, conn):
         return ConversationHandler.END
 
     def error(update, context):
-        """Log Errors caused by Updates."""
+        """Log Errors caused by Updates.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+        """
 
         logger.error('Update "%s" caused error "%s"', update, context.error)
 
     def ask_continue(update, context):
-        """Ask the user if wishes to do more queries."""
+        """Ask the user if wishes to do more queries.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to CONTINUE conversation handler
+        """
 
         # Ask for more interactions
         buttons = [['Sí', 'No']]
@@ -211,7 +292,19 @@ def start_bot(token, conn):
         return CONTINUE
 
     def detect_intention(update, context):
-        """Detects user's intention from input text."""
+        """Detects user's intention from input text.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to SELECTING_ACTION conversation handler
+        """
 
         # Use Dialogflow to detect user's intention (use case)
         response = call2dialogflow(update.message.text)
@@ -245,7 +338,19 @@ def start_bot(token, conn):
         return SELECTING_ACTION
 
     def adding_images(update, context):
-        """Adds the images of ingredients."""
+        """Adds the images of ingredients.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ADD_PHOTO conversation handler
+        """
 
         update.message.reply_text(context.user_data[FULFILLMENT])
         info_text = 'Introduce todas las fotos de los ingredientes que tengas.\n' + \
@@ -259,7 +364,19 @@ def start_bot(token, conn):
 
     @send_action(ChatAction.TYPING)
     def save_image(update, context):
-        """Saves the input images."""
+        """Saves the input images.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ADD_PHOTO conversation handler
+        """
 
         user = update.message.from_user
         photo_file = update.message.photo[-1].get_file()
@@ -289,6 +406,18 @@ def start_bot(token, conn):
     @send_action(ChatAction.TYPING)
     def get_cheff_response(update, context):
         """Stops image reception and calls `print_cheff_response`.
+
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+        print_cheff_response(update, context)
+            the default cheff response
         """
         update.message.reply_text(
             'Genial! Voy a ver qué puedo hacer con todos estos ingredientes...')
@@ -299,6 +428,17 @@ def start_bot(token, conn):
     def print_cheff_response(update, context):
         """Sends data and receives according response.
            Uses the accesible pipe `conn` for sending/receiving messages.
+
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ASK_CHEFF conversation handler
         """
 
         fail = True
@@ -391,6 +531,17 @@ def start_bot(token, conn):
     def show_recipe(update, context):
         """Asks agent about full recipe and shows it to user.
            Uses the accesible pipe `conn` for sending/receiving messages.
+
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ask_continue(update, context) function
         """
         # Send message to Chat Agent
         if not context.user_data.get(RECIPE):  # CU-001
@@ -433,7 +584,19 @@ def start_bot(token, conn):
         return ask_continue(update, context)
 
     def adding_recipe(update, context):
-        """Adds the recipe you would like to cook."""
+        """Adds the recipe you would like to cook.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ADD_RECIPE conversation handler
+        """
 
         if FIELDS in context.user_data:
             # Recipe already introduced by the user
@@ -445,7 +608,15 @@ def start_bot(token, conn):
         return END
 
     def get_recipe(update, context):
-        """Saves recipe selected by user."""
+        """Saves recipe selected by user.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+        """
         # Validate with Dialogflow
         response = call2dialogflow(update.message.text)
         try:
@@ -479,7 +650,20 @@ def start_bot(token, conn):
             raise ValueError
 
     def save_recipe(update, context):
-        """Saves input for recipe and return to next state."""
+        """Saves input for recipe and return to next state.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ADD_RECIPE conversation handler
+            to adding_images(update, context) function
+        """
 
         # Get recipe, if not introduced previously
         if FIELDS not in context.user_data:
@@ -526,7 +710,19 @@ def start_bot(token, conn):
         return adding_images(update, context)
 
     def adding_prefs(update, context):
-        """Adds likes or allergies to the system."""
+        """Adds likes or allergies to the system.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ADD_PREFS conversation handler
+        """
 
         if FIELDS in context.user_data:
             # Allergies already introduced by the user - skip this step
@@ -538,7 +734,19 @@ def start_bot(token, conn):
         return END  # Unreachable
 
     def save_prefs(update, context):
-        """Saves detected likes or allergies into system."""
+        """Saves detected likes or allergies into system.
+        
+        Parameters
+        ----------
+        update : dict
+            Telegram internal state
+        context : dict
+            Conversation internal state
+
+         Returns
+        -------
+            to ADD_PREFS conversation handler
+        """
 
         # Get ingredients, if not introduced previously
         if FIELDS not in context.user_data:
@@ -599,7 +807,13 @@ def start_bot(token, conn):
         return ADD_PREFS
 
     def telegramBot_main(token):
-        """Creates and launches the Telegram Bot."""
+        """Creates and launches the Telegram Bot.
+        
+        Parameters
+        ----------
+        token : str
+            Telegram secret token
+        """
 
         # Create the Updater and pass it your bot's token.
         # Make sure to set use_context=True to use the new context based callbacks

@@ -32,22 +32,33 @@ logger = logging.getLogger(__name__)
 
 
 class ChatAgent(Agent):
+    """Agent which interacts with the Telegram bot and other system agents."""
+
     def __init__(self, jid, password, verify_security=False, pipe=None):
+        """Start the Agent.
+        """
         super().__init__(jid, password, verify_security)
         self.pipe = pipe
 
     class DispatcherBehav(PeriodicBehaviour):
         async def on_start(self):
+            """Executed when the behavior starts.
+            """
             logger.info("Starting DispatcherBehav . . .")
             with open((COMMON_DIR / 'recipes.json'), 'r') as json_file:
                 self.recipe_book = json.load(json_file)
             # self.counter = 0
 
         async def on_end(self):
+            """Executed when the behavior ends.
+            """
             logger.info("DispatcherBehav finished")
             self.agent.pipe.close()
 
         async def run(self):
+            """Behavior main function. 
+            Send messages to ChatAgent or ImageAgent.
+            """
             logger.debug("DispatcherBehav running")
             if self.agent.pipe.poll():  # Avoid blocking thread
                 bot_msg = self.agent.pipe.recv()  # Blocking
@@ -160,6 +171,9 @@ class ChatAgent(Agent):
                     # self.kill()
 
     async def setup(self):
+        """Executed when the agent starts.
+        Read the ingredientes and recipes lists.
+        """
         logger.info("ChatAgent starting . . .")
         logger.info(f"[ChatAgent] Connection mechanism: {self.pipe}")
         with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:

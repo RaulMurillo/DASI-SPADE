@@ -35,7 +35,11 @@ class SenderAgent(Agent):
     Sends messages with image paths to `ImageAgent`. 
     """
     class SendBehav(PeriodicBehaviour):
+        """SendBehav behavior is repeted periodic.        
+        """
         async def on_start(self):
+            """Executed when the behavior starts.
+            """
             logger.info("Starting SendBehav . . .")
             self.counter = 0
             self.imgs = ['IMG_20200321_181344.jpg', 'IMG_20200321_181528.jpg',
@@ -44,6 +48,9 @@ class SenderAgent(Agent):
                          'IMG_20200321_181524.jpg', 'IMG_20200322_193316.jpg']
 
         async def run(self):
+            """Behavior main function. 
+            Sends messages to `ImageAgent`.
+            """
             logger.debug("SendBehav running")
 
             msg = Message(to="image01@localhost")     # Instantiate the message
@@ -61,6 +68,8 @@ class SenderAgent(Agent):
                 await self.agent.stop()
 
     async def setup(self):
+        """Executed when the agent starts.
+        """
         logger.info("SenderAgent starting . . .")
         b = self.SendBehav(period=2)
         self.add_behaviour(b)
@@ -69,7 +78,14 @@ class SenderAgent(Agent):
 def decode_img(img):
     """Decodes an image according to the TF model specifications
 
-    Returns a TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
+    Parameters
+    ----------
+    img : 
+        image path
+
+     Returns
+    -------
+        a TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
     """
     # Convert the compressed string to a 3D uint8 tensor
     img = tf.image.decode_jpeg(img, channels=3)
@@ -84,15 +100,24 @@ def decode_img(img):
 
 
 class ImageAgent(Agent):
-
+    """Agent for cover cu-001 and cu-002.
+    Pass the image to the CNN network to classify it. 
+    """
     class ClassifyBehaviour(CyclicBehaviour):
+        """SendBehav behavior is repeted ciclycally.        
+        """
         async def on_start(self):
+            """Executed when the behavior starts.
+            """
             logger.info("Starting ClassifyBehaviour . . .")
 
             self.cnn_model = tf.keras.models.load_model(
                 CNN_DIR / 'saved_model' / 'my_model.h5')
 
         async def run(self):
+            """Behavior main function. 
+            Analyze the image on the CNN network to classify it.
+            """
             logger.debug("ClassifyBehaviour running")
             t = 10000
 
@@ -126,6 +151,8 @@ class ImageAgent(Agent):
         #     logger.info("ClassifyBehaviour finished")
 
     async def setup(self):
+        """Executed when the agent starts.
+        """
         logger.info("ImageAgent starting . . .")
         # Ingredients names
         with open((CNN_DIR / 'classes.csv'), 'r') as f:
