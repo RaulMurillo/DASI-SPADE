@@ -25,7 +25,7 @@ Other considerations:
 
 * There is no need to install any XMPP server if agents names are not modified.
 * You will need Dialogflow credentials.
-* The neural network model can be found at https://drive.google.com/open?id=19PA-QcdE7IBYzLSc-QPdXHSShHL3_G9y.
+* The neural network model can be downloaded from https://drive.google.com/open?id=19PA-QcdE7IBYzLSc-QPdXHSShHL3_G9y. You must place it in ``src/cnn_model/saved_model`` folder.
 
 App execution
 -------------
