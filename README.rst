@@ -56,4 +56,6 @@ To finish the conversation, type ``/exit`` on the main menu.
 Authors and credits
 -------------------
 
-This project is managed by Raul Murillo (ramuri01@ucm.es) and Ignacio Regueiro (iregueir@ucm.es).
+This project is managed by Raul Murillo (ramuri01@ucm.es) and Ignacio Regueiro (iregueir@ucm.es).   
+
+Source: https://github.com/RaulMurillo/DASI-SPADE
