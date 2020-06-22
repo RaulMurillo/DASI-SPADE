@@ -34,12 +34,13 @@ class SenderAgent(Agent):
 
     Sends messages with image paths to `ImageAgent`. 
     """
+
     class SendBehav(PeriodicBehaviour):
-        """SendBehav behavior is repeted periodic.        
-        """
+        """SendBehav behavior is repeted periodic."""
+
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("Starting SendBehav . . .")
             self.counter = 0
             self.imgs = ['IMG_20200321_181344.jpg', 'IMG_20200321_181528.jpg',
@@ -49,8 +50,10 @@ class SenderAgent(Agent):
 
         async def run(self):
             """Behavior main function. 
+
             Sends messages to `ImageAgent`.
             """
+
             logger.debug("SendBehav running")
 
             msg = Message(to="image01@localhost")     # Instantiate the message
@@ -68,25 +71,26 @@ class SenderAgent(Agent):
                 await self.agent.stop()
 
     async def setup(self):
-        """Executed when the agent starts.
-        """
+        """Executed when the agent starts."""
+
         logger.info("SenderAgent starting . . .")
         b = self.SendBehav(period=2)
         self.add_behaviour(b)
 
 
 def decode_img(img):
-    """Decodes an image according to the TF model specifications
+    """Decodes an image according to the TF model specifications.
 
     Parameters
     ----------
     img : 
-        image path
+        Image path.
 
      Returns
     -------
-        a TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
+        A TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
     """
+
     # Convert the compressed string to a 3D uint8 tensor
     img = tf.image.decode_jpeg(img, channels=3)
     # Use `convert_image_dtype` to convert to floats in the [0,1] range
@@ -100,15 +104,20 @@ def decode_img(img):
 
 
 class ImageAgent(Agent):
-    """Agent for cover cu-001 and cu-002.
-    Pass the image to the CNN network to classify it. 
+    """Agent for cover CU-001 and CU-002.
+
+    Passes the image to the CNN to classify it.
     """
+
     class ClassifyBehaviour(CyclicBehaviour):
-        """SendBehav behavior is repeted ciclycally.        
+        """Main behavior, which classifies food images.
+        
+        ClassifyBehaviour behavior is repeted cyclically.  
         """
+
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("Starting ClassifyBehaviour . . .")
 
             self.cnn_model = tf.keras.models.load_model(
@@ -116,8 +125,10 @@ class ImageAgent(Agent):
 
         async def run(self):
             """Behavior main function. 
+
             Analyze the image on the CNN network to classify it.
             """
+
             logger.debug("ClassifyBehaviour running")
             t = 10000
 
@@ -151,13 +162,14 @@ class ImageAgent(Agent):
         #     logger.info("ClassifyBehaviour finished")
 
     async def setup(self):
-        """Executed when the agent starts.
-        """
+        """Executed when the agent starts."""
+
         logger.info("ImageAgent starting . . .")
         # Ingredients names
         with open((CNN_DIR / 'classes.csv'), 'r') as f:
             self.CLASS_NAMES = list(csv.reader(f))[0]
 
+        # Uncomment if TensorFlow for GPU is enabled.
         # gpus = tf.config.experimental.list_physical_devices('GPU')
         # if gpus:
         #     try:

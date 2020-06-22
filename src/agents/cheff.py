@@ -31,22 +31,25 @@ logger = logging.getLogger(__name__)
 
 class SenderAgent(Agent):
     """Agent for testing `CheffAgent`
+
     Sends messages to `CheffAgent`.
     """
 
     class SendBehav(PeriodicBehaviour):
-        """SendBehav behavior is repeted periodic.        
-        """
+        """SendBehav behavior is repeted periodic."""
+
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("Starting SendBehav . . .")
             self.counter = 0
 
         async def run(self):
-            """Behavior main function. 
+            """Behavior main function.
+
             Sends messages to `CheffAgent`.
             """
+
             logger.debug("SendBehav running")
 
             msg = Message(to="cheff@localhost")     # Instantiate the message
@@ -61,7 +64,6 @@ class SenderAgent(Agent):
                 # Add preferences
                 msg.set_metadata("performative", "inform_ref")
                 msg.body = str(13) + ',-100'
-
             else:
                 # Start cooking
                 msg.set_metadata("performative", "request")
@@ -80,40 +82,45 @@ class SenderAgent(Agent):
                 await self.agent.stop()
 
     async def setup(self):
-        """Executed when the agent starts.
-        """
+        """Executed when the agent starts."""
+
         logger.info("SenderAgent started")
         b = self.SendBehav(period=0.1)
         self.add_behaviour(b)
 
 
 class CheffAgent(Agent):
-    """Agent for testing `CheffAgent`
-    Manage the comunication with other agents and analyze the recipe better option.
+    """Agent for generating recommendations.
+
+    Manages the comunication with other agents and analyzes the best choice of recipes.
     """
+
     def reset_list_ingred(self):
         """Restores the user list of ingredients."""
 
         self.list_ingred = lil_matrix((1, len(self.INGREDIENTS)), dtype=bool)
 
     class AddIngredBehaviour(CyclicBehaviour):
-        """AddIngredBehaviour behavior is repeted cyclically.        
+        """Includes an ingredient into user's list.
+
+        AddIngredBehaviour behavior is repeted cyclically.        
         """
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("AddIngredBehaviour starting . . .")
             pass
 
         async def on_end(self):
-            """Executed when the behavior ends.
-            """
+            """Executed when the behavior ends."""
             pass
 
         async def run(self):
             """Behavior main function. 
-            Update the ingredients list.
+
+            Updates the ingredients list.
             """
+
             logger.debug("AddIngredBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
@@ -128,11 +135,13 @@ class CheffAgent(Agent):
                     f"[AddIngredBehaviour] Did not received any message after {t} seconds")
 
     class PreferencesBehaviour(CyclicBehaviour):
-        """PreferencesBehaviour behavior is repeted cyclically.        
+        """Modifies user's preferences.
+
+        PreferencesBehaviour behavior is repeted cyclically.        
         """
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("PreferencesBehaviour starting . . .")
 
             prefs_file = COMMON_DIR / 'prefs.npz'
@@ -153,8 +162,8 @@ class CheffAgent(Agent):
             pass
 
         def save_prefs(self):
-            """Save user preferences.
-            """
+            """Saves user preferences un disk."""
+
             logger.info("[PreferencesBehaviour] Vector:\n{}".format(
                 self.agent.preferences))
             sp.sparse.save_npz(COMMON_DIR / 'prefs.npz',
@@ -162,15 +171,17 @@ class CheffAgent(Agent):
             pass
 
         async def on_end(self):
-            """Executed when the behavior ends.
-            """
+            """Executed when the behavior ends."""
+
             save_prefs()
             pass
 
         async def run(self):
             """Behavior main function. 
-            Update the user preferences.
+
+            Updates the user preferences.
             """
+
             logger.debug("PreferencesBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
@@ -193,26 +204,29 @@ class CheffAgent(Agent):
                 # return
 
     class MissingBehaviour(CyclicBehaviour):
-        """Behaviour for dealing with use case 2
+        """Behaviour for dealing with CU-002.
 
-        Receives a receipe identifier and checks which ingredients are missing 
-        from the user ingredients list.
+        Receives a receipe identifier and checks which ingredients are
+        missing from the user ingredients list.
         """
+
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("MissingBehaviour starting . . .")
             pass
 
         async def on_end(self):
-            """Executed when the behavior ends.
-            """
+            """Executed when the behavior ends."""
+
             pass
 
         async def run(self):
             """Behavior main function. 
+
             Checks which ingredients are missing.
             """
+
             logger.debug("MissingBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
@@ -249,13 +263,14 @@ class CheffAgent(Agent):
                     f"[MissingBehaviour] Did not received any message after {t} seconds")
 
     class CookBehaviour(CyclicBehaviour):
-        """Behaviour for dealing with use case 1
+        """Behaviour for dealing with CU-001.
+
         Receives a list of ingredientes and checks which recipe fits better.
         """
 
         async def on_start(self):
-            """Executed when the behavior starts.
-            """
+            """Executed when the behavior starts."""
+
             logger.info("CookBehaviour starting . . .")
             with open((COMMON_DIR / 'recipes.json'), 'r') as json_file:
                 self.recipe_book = json.load(json_file)
@@ -263,14 +278,16 @@ class CheffAgent(Agent):
             pass
 
         async def on_end(self):
-            """Executed when the behavior ends.
-            """
+            """Executed when the behavior ends."""
+
             pass
 
         async def run(self):
             """Behavior main function. 
+
             Gets the recipe witch fits better with the user ingredients.
             """
+
             logger.debug("CookBehaviour running . . .")
             # wait for a message for t seconds
             t = 10000
@@ -312,8 +329,8 @@ class CheffAgent(Agent):
                     f"[CookBehaviour] Did not received any message after {t} seconds")
 
     async def setup(self):
-        """Executed when the agent starts.
-        """
+        """Executed when the agent starts."""
+
         logger.info("CheffAgent starting . . .")
         # Ingredients names
         with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:  # classes

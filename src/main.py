@@ -10,6 +10,8 @@ import logging
 
 
 def main():
+    """Main program loop."""
+    
     # Creating a pipe for bot-agent communication
     parent_conn, child_conn = Pipe()
 
