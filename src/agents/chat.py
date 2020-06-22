@@ -40,6 +40,12 @@ class ChatAgent(Agent):
         self.pipe = pipe
 
     class DispatcherBehav(PeriodicBehaviour):
+        """
+        Recives a message and resends it with corresponding format and destination.
+
+        DispatcherBehav behavior is repeted periodically.
+        """
+
         async def on_start(self):
             """Executed when the behavior starts."""
 
