@@ -14,7 +14,7 @@ The main purpose is to develop a multi-agent system able to recognize food and i
 Instalation and dependencies
 ----------------------------
 
-This software uses Python :math:`\geq` 3.6. You can install packages dependencies with ``pip`` as following:
+This software uses Python >= 3.6. You can install packages dependencies with ``pip`` as following:
 
 .. code-block:: shell
 
