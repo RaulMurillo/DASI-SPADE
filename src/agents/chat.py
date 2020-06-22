@@ -13,6 +13,8 @@ from multiprocessing import Pipe
 from pathlib import Path
 import logging
 
+logger = logging.getLogger(__name__)
+
 try:
     from config import APP_CONFIG as CONFIG
 
@@ -28,26 +30,42 @@ except:
     IMAGE_JID = 'image@localhost'
 
 
-logger = logging.getLogger(__name__)
-
-
 class ChatAgent(Agent):
+    """Agent which interacts with the Telegram bot and other system agents."""
+
     def __init__(self, jid, password, verify_security=False, pipe=None):
+        """Agent constructor for including `pipe` in agent's attributes."""
+
         super().__init__(jid, password, verify_security)
         self.pipe = pipe
 
     class DispatcherBehav(PeriodicBehaviour):
+        """
+        Recives a message and resends it with corresponding format and destination.
+
+        DispatcherBehav behavior is repeted periodically.
+        """
+
         async def on_start(self):
+            """Executed when the behavior starts."""
+
             logger.info("Starting DispatcherBehav . . .")
             with open((COMMON_DIR / 'recipes.json'), 'r') as json_file:
                 self.recipe_book = json.load(json_file)
             # self.counter = 0
 
         async def on_end(self):
+            """Executed when the behavior ends."""
+
             logger.info("DispatcherBehav finished")
             self.agent.pipe.close()
 
         async def run(self):
+            """Behavior main function. 
+
+            Sends messages to ChatAgent or ImageAgent.
+            """
+
             logger.debug("DispatcherBehav running")
             if self.agent.pipe.poll():  # Avoid blocking thread
                 bot_msg = self.agent.pipe.recv()  # Blocking
@@ -111,8 +129,9 @@ class ChatAgent(Agent):
                     msg.set_metadata("performative", "query_ref")
                     msg.body = str(
                         self.agent.RECIPES.index(bot_msg['CU-002'])
-                        )
-                    logger.info(f"[DispatcherBehav] {bot_msg['CU-002']} - {msg.body}")
+                    )
+                    logger.info(
+                        f"[DispatcherBehav] {bot_msg['CU-002']} - {msg.body}")
                     await self.send(msg)
 
                     # Recive cheff's response
@@ -148,23 +167,28 @@ class ChatAgent(Agent):
                     choice = self.agent.RECIPES.index(bot_msg['CU-004'])
 
                     menu = {
-                                'Title': self.recipe_book[choice]['Title'],
-                                'Ingredients': self.recipe_book[choice]['Ingredients'],
-                                'Directions': self.recipe_book[choice]['Steps'],
-                            }
+                        'Title': self.recipe_book[choice]['Title'],
+                        'Ingredients': self.recipe_book[choice]['Ingredients'],
+                        'Directions': self.recipe_book[choice]['Steps'],
+                    }
                     self.agent.pipe.send(menu)
-                    
+
                 else:   # bad message
                     logger.warning(
                         f'[DispatcherBehav] Message recived: {bot_msg}')
                     # self.kill()
 
     async def setup(self):
+        """Executed when the agent starts.
+
+        Reads the ingredientes and recipes lists.
+        """
+
         logger.info("ChatAgent starting . . .")
         logger.info(f"[ChatAgent] Connection mechanism: {self.pipe}")
         with open((COMMON_DIR / 'ingredients_es.csv'), 'r') as f:
             self.INGREDIENTS = list(csv.reader(f))[0]
-        
+
         with open((COMMON_DIR / 'recipes.csv'), 'r') as f:
             self.RECIPES = list(csv.reader(f))[0]
 

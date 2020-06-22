@@ -4,6 +4,8 @@ from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
 
 class DummyAgent(Agent):
+    """Test example SPADE Agent."""
+
     class MyBehav(CyclicBehaviour):
         async def on_start(self):
             print("Starting behaviour . . .")
