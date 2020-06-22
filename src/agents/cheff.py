@@ -14,6 +14,8 @@ import csv
 from pathlib import Path
 import logging
 
+logger = logging.getLogger(__name__)
+
 try:
     from config import APP_CONFIG as CONFIG
 
@@ -25,8 +27,6 @@ except:
     project_folder = Path(__file__).parent.absolute()
     COMMON_DIR = project_folder / 'common'
     CHAT_JID = 'chat@localhost'
-
-logger = logging.getLogger(__name__)
 
 
 class SenderAgent(Agent):

@@ -47,12 +47,12 @@ def call2dialogflow(input_text):
     Parameters
     ----------
     input_text : str
-        The text introduced by the user in the chat.
+    	The text introduced by the user in the chat.
 
     Returns
     -------
-    dict
-        A dict with the fulfillment and the intent as keys.
+	dict
+		a dictionary with the fulfillment and the intent as keys.
     """
 
     # Init API

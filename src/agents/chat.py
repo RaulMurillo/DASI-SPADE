@@ -13,6 +13,8 @@ from multiprocessing import Pipe
 from pathlib import Path
 import logging
 
+logger = logging.getLogger(__name__)
+
 try:
     from config import APP_CONFIG as CONFIG
 
@@ -26,9 +28,6 @@ except:
     COMMON_DIR = project_folder / 'common'
     CHEFF_JID = 'cheff@localhost'
     IMAGE_JID = 'image@localhost'
-
-
-logger = logging.getLogger(__name__)
 
 
 class ChatAgent(Agent):

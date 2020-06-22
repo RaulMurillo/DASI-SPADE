@@ -12,6 +12,8 @@ import csv
 from pathlib import Path
 import logging
 
+logger = logging.getLogger(__name__)
+
 try:
     from config import APP_CONFIG as CONFIG
 
@@ -25,8 +27,6 @@ except:
     CNN_DIR = project_folder / 'cnn_model'
     CHEFF_JID = 'cheff@localhost'
     CHAT_JID = 'chat@localhost'
-
-logger = logging.getLogger(__name__)
 
 
 class SenderAgent(Agent):
@@ -83,12 +83,13 @@ def decode_img(img):
 
     Parameters
     ----------
-    img : 
+    img : str
         Image path.
 
-     Returns
+    Returns
     -------
-        A TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
+    tensor    
+        a TensorFlow tensor of size `224x224x3` corresponding with the given `img`.
     """
 
     # Convert the compressed string to a 3D uint8 tensor
