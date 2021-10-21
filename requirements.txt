@@ -9,7 +9,7 @@ arrow==0.15.5
 astor==0.8.1
 async-timeout==3.0.1
 attrs==19.3.0
-Babel==2.8.0
+Babel==2.9.1
 cachetools==4.1.0
 certifi==2020.4.5.1
 cffi==1.14.0
